@@ -1,0 +1,258 @@
+library(gplots)
+library(readr)
+options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
+
+shinyServer(function(input, output) {
+    
+    getSelectedDataset <- reactive({
+        withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
+            # this remove from memmory non-selected datasets
+            load("data/encode_preload.RData")
+            load("data/codex_currated_preload.RData")
+            setProgress(value = 1, detail = "loading new dataset")
+            if(input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+                load("data/encode.RData")
+                dataset <- encode
+            } else if(input$dataset == "CODEX ChIP-seq (mouse, mm10)") {
+                load("data/codex_currated.RData")
+                dataset <- codex
+            } else if(input$dataset == "CODEX ChIP-seq (human, hg19)") {
+                load("data/codex_currated.RData") # change this
+                dataset <- codex      # change this
+            }
+            setProgress(value = 1, detail = "done!")
+        })
+        return(dataset)    
+    })
+
+    userPeakFileAnalysis <- reactive({
+        userPeakFileName <- input$peakFile
+        if (is.null(userPeakFileName)){
+            userPeakFile <- NULL
+            userCorrelations <- NULL
+        } else {
+            withProgress(value = 1, message = "User peak file: ", detail = "reading file", {
+                userPeakFile <- read_tsv(userPeakFileName$datapath, col_names = input$header)[, 1:3]
+                colnames(userPeakFile) <- c("chr","start","end")
+                setProgress(value = 1, detail = "intersecting peaks")
+                userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
+                dataset <- getSelectedDataset()
+                # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what it is uploading...
+                # Which encode region overlaps?
+                # we ignore peaks presents only in user peak lists for some reasons.
+                suppressWarnings(userOverlap <- overlapsAny(dataset$regionMetaData, userPeakFileGR))
+                # correlation calculation
+                setProgress(value = 1, detail = "correlations calculation")
+                userCorrelations <- cor(userOverlap,
+                                        dataset$dataMatrix
+                                        ) %>% as.vector
+                setProgress(value = 1, detail = "done!")
+            })
+        }
+        return(list("peaks" = userPeakFile, "correlations" = userCorrelations))
+    })
+    
+    getCorrelationTable <- reactive({
+        if(is.null(userPeakFileAnalysis()$correlations)) {
+            NULL
+        } else {
+            data.frame(
+                "Experiment" = getSelectedDataset()$annotation$name, 
+                "Correlation" = userPeakFileAnalysis()$correlations,
+                stringsAsFactors = FALSE
+            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
+        }
+    })
+    
+    output$tabUserPeaks <- renderDataTable(userPeakFileAnalysis()$peaks)
+    
+    output$downloadUserPeaks <- downloadHandler("uploaded_peak_list.txt",
+                                                 content = function(file) {
+                                                     write.table(userPeakFileAnalysis()$peaks, file = file, row.names = FALSE, quote = FALSE, sep = "\t")
+                                                 },
+                                                 contentType = "text/tsv")
+    
+    output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
+    
+    output$downloadUserCorrelationTable <- downloadHandler("heatChIPseq_correlations.txt",
+                                                           content = function(file) {
+                                                              write.table(getCorrelationTable(), file = file, row.names = FALSE, quote = FALSE, sep = "\t")
+                                                           },
+                                                           contentType = "text/tsv")
+    
+    subsetMatrix <- reactive({
+        dataset <- getSelectedDataset()
+        workingMatrix <- dataset$correlationMatrix
+        keep<- 1:nrow(workingMatrix)
+        # filtering is dataset-depedent...
+        if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+            if (is.null(input$cells)) {
+                temp_cells <- unique(encode$annotation$cell_line)
+            } else {
+                temp_cells <- input$cells
+            }
+            if (is.null(input$TF)) {
+                temp_TF <- unique(encode$annotation$TF)
+            } else {
+                temp_TF <- input$TF
+            }
+            keep <- which(
+                dataset$annotation$cell_line %in% temp_cells &
+                dataset$annotation$TF %in% temp_TF
+            )
+        } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") { 
+            if (is.null(input$TF_m)) {
+                temp_TF_m <- unique(codex$annotation$TF)
+            } else {
+                temp_TF_m <- input$TF_m
+            }
+            if (input$filterCellsBy == "Cell type") {
+                if (is.null(input$cell_types_m)) {
+                    temp_cell_types_m <- unique(codex$annotation[,"Cell type"])
+                } else {
+                    temp_cell_types_m <- input$cell_types_m
+                }
+                keep <- which(
+                    dataset$annotation[,"Cell type"] %in% temp_cell_types_m &
+                    dataset$annotation$TF %in% temp_TF_m
+                )
+            } else if (input$filterCellsBy == "Cell subtype") {
+                if(is.null(input$cell_subtypes_m)) {
+                    temp_cell_subtypes_m <- codex$annotation[,"Cell subtype"]
+                } else {
+                    temp_cell_subtypes_m <- input$cell_subtypes_m
+                }
+                keep <- which(
+                    dataset$annotation[,"Cell subtype"] %in% temp_cell_subtypes_m &
+                    dataset$annotation$TF %in% temp_TF_m
+                )
+            }
+        } 
+        
+        myLabels <- dataset$annotation$name
+        if(length(keep) >= 2) {
+            workingMatrix <- workingMatrix[keep, keep]
+            myLabels <- myLabels[keep]
+        }
+        # merging user data in correlation matrix
+        if(!is.null(userPeakFileAnalysis()$correlations)) {
+            workingMatrix <- rbind(workingMatrix, userPeakFileAnalysis()$correlations[keep])
+            workingMatrix <- cbind(workingMatrix, c(userPeakFileAnalysis()$correlations[keep], 1))
+            myLabels <- c(myLabels, input$nameOfPeakFile)
+        }
+        return(list("mat" = workingMatrix, "myLabels" = myLabels))
+    })
+    
+    doTheClustering <- reactive({
+        withProgress(value = 1, message = "Clustering: ", detail = "distance caluculation", {
+            myClust <- hclust(dist(subsetMatrix()$mat), method = input$hclustMethod)
+            setProgress(value = 1, detail = "hierarchical clustering")
+            dendro <- as.dendrogram(myClust)
+            setProgress(value = 1, detail = "done!")
+        })
+        return(list("dend" = dendro, "order" = myClust$order))
+    })
+    
+    matAfterHighlight <- reactive({
+        matAA <- subsetMatrix()
+        if (input$highlight & !is.null(input$peakFile)) {
+            # we increase user cor value by 2 to do the color trick
+            matAA$mat[, ncol(matAA$mat)] <- matAA$mat[, ncol(matAA$mat)] + 2
+            matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] <- matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] + 2
+        }
+        return(matAA)
+    })
+    
+    myRenderPlot <- function() {
+        matData <- matAfterHighlight()
+        clusterDat <- doTheClustering()
+        heatmap(matData$mat,
+                Rowv = clusterDat$dend,
+                Colv = "Rowv",
+                scale = "none",
+                labRow = matData$myLabels,
+                labCol = matData$myLabels,
+                margins = rep(input$margin, 2),
+                cexRow = input$labCex,
+                cexCol = input$labCex,
+                breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
+                col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255),
+                useRaster = TRUE
+        )
+    }
+    
+    output$downloadHMpng <- downloadHandler("encode_heatmap.png",
+                                            content = function(file) {
+                                                png(file, width = 950, height = 950)
+                                                myRenderPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/png")
+    
+    output$downloadHMpdf <- downloadHandler("encode_heatmap.pdf",
+                                            content = function(file) {
+                                                pdf(file, width = 13.85, height = 13.85)
+                                                myRenderPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/pdf")
+    
+    output$myHeatmap <- renderPlot(myRenderPlot())
+    
+    output$myPlotlyHeatmap <- renderPlotly({
+        matData <- matAfterHighlight()
+        clusterDat <- doTheClustering()
+        p <- plot_ly(z = matData$mat[rev(clusterDat$order), clusterDat$order],
+                     x = matData$myLabels[clusterDat$order],
+                     y = matData$myLabels[rev(clusterDat$order)],
+                     colorscale = list(
+                                       c(0.0, "rgb(0,0,255)"),
+                                       c(0.1428571, "rgb(255,255,255)"),
+                                       c(0.2857143, "rgb(255,0,0)"),
+                                       c(0.4285714, "rgb(0,0,0)"),
+                                       c(0.5714286, "rgb(0,0,255)"),
+                                       c(0.7142857, "rgb(255,255,0)"),
+                                       c(0.8571429, "rgb(0,255,0)"),
+                                       c(1, "rgb(0,0,0)")
+                                       ),
+                     zmin = -0.5,
+                     zmax = 3, # color trick for the highlight
+                     type = "heatmap",
+                     showscale = FALSE
+                     )
+        # style
+        layout(p, 
+               title = "Pairwise correlations",
+               autosize = FALSE,
+               width = 980,
+               height = 980,
+               margin = list(l = 250, r = 50, b = 250, t = 50, pad = 4),
+               font = list(size = 12),
+               xaxis = list(title = ""),
+               yaxis = list(title = "")
+               )
+    })
+    
+    output$tabTF <- renderDataTable({
+        TfTable <- as.data.frame(table(getSelectedDataset()$annotation$TF))
+        colnames(TfTable) <- c("TF", "Number of experiments")
+        TfTable <- TfTable[order(TfTable[,2], decreasing = T),]
+    })
+    
+    output$tabCells <- renderDataTable({
+        myColname <- "cell_line"
+        if(input$dataset == "CODEX ChIP-seq (mouse, mm10)") myColname <- "Cell type"
+        CellsTable <- as.data.frame(table(getSelectedDataset()$annotation[,myColname]))
+        colnames(CellsTable) <-c ("Cell line", "Number of experiments")
+        CellsTable <- CellsTable[order(CellsTable[,2], decreasing = T),]
+        return(CellsTable)
+    })
+    
+    output$tabCellsSub_m <- renderDataTable({
+        CellsTable <- as.data.frame(table(codex$annotation[,"Cell subtype"]))
+        colnames(CellsTable) <-c ("Cell subtype", "Number of experiments")
+        CellsTable <- CellsTable[order(CellsTable[,2], decreasing = T),]
+        return(CellsTable)
+    })
+    
+})

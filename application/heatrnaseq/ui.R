@@ -1,0 +1,135 @@
+# UI 
+source("data/server_adresses.R")
+shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
+                   
+    tabPanel("Instructions",
+             icon("home"),
+             a("Back to main page", href = URL_HEATSTARSEQ),
+             h2("Welcome !"),
+             h3("Intsructions:"),
+             p("1 - load a exprssion file."),
+             p("2 - wait."),
+             p("3 - I will write some interesting stuff here in the future."),
+             h3("FAQ"),
+             p("..."),
+             h3("Info"),
+             p("Source code available on GitHub (soon)."),
+             p("Made by the Josh group (add link)."),
+             p("How to cite:"),
+             p("... unpublished")
+    ),
+    
+    tabPanel("Use application",
+             sidebarLayout(
+                
+                sidebarPanel(
+                    icon("home"),
+                    a("Back to main page", href = URL_HEATSTARSEQ),
+                    h3("1 - Select a dataset"),
+                    selectInput("dataset", label = NULL, choices = c(
+                        "ENCODE RNA-seq (human)",
+                        "Bgee RNA-seq (human)",
+                        "ENCODE RNA-seq (mouse)",
+                        "Bgee RNA-seq (mouse)"
+                    )),
+                    h3("2 - Load your data (optional)"),
+                    p("Upload a tab delimited text file of at least two columns. First column must contains ensemble gene id, second column must contains normalised expression value
+                      (ie FPKM or TPM)"),
+                    textInput("nameOfExpressionFile", "Name of your experiment", value="my RNA-seq"),
+                    checkboxInput("header", strong("My expression file contains a header."), FALSE),
+                    fileInput("expressionFile", "Upload your expression file:", accept = "text/tab-separated-values"),
+                    h3("3 - Plot customisation"),
+                    checkboxInput("highlight", "Highlight my experiment in the heatmap", FALSE),
+                    # we addapt filtering widgets to the various datasets
+                    div(id = "widgetForEncodeHuman",
+                        selectInput("cells", "Subset for tissue/cell line (empty to select all):",
+                                    choices = unique(encode_rnaseq$annotation[, "Biosample term name"])[order(unique(encode_rnaseq$annotation[, "Biosample term name"]))],
+                                    selected = NULL, multiple = TRUE),
+                        selectInput("sampleType", "Subset for sample type (empty to select all):",
+                                    choices = unique(encode_rnaseq$annotation[, "Biosample type"])[order(unique(encode_rnaseq$annotation[, "Biosample type"]))],
+                                    selected = NULL, multiple = TRUE),
+                        selectInput("rnaExtract", "Subset for RNA fraction (empty to select all):",
+                                    choices = unique(encode_rnaseq$annotation[, "rnaFraction"])[order(unique(encode_rnaseq$annotation[, "rnaFraction"]))],
+                                    selected = NULL, multiple = TRUE)
+                    ),
+                    div(id = "widgetForBgeeHuman",
+                         selectInput("tissus_bgee_h", "Subset for tissue (empty to select all):",
+                                     choices = unique(bgee_human$annotation[, "Biosample term name"])[order(unique(bgee_human$annotation[, "Biosample term name"]))],
+                                     selected = NULL, multiple = TRUE),
+                         selectInput("dvp_bgee_h", "Subset for devlopemntal stage (empty to select all):",
+                                     choices = unique(bgee_human$annotation[, "Stage name"])[order(unique(bgee_human$annotation[, "Stage name"]))],
+                                     selected = NULL, multiple = TRUE),
+                         selectInput("library_bgee_h", "Subset for library type (empty to select all):",
+                                     choices = unique(bgee_human$annotation[, "Library type"])[order(unique(bgee_human$annotation[, "Library type"]))],
+                                     selected = NULL, multiple = TRUE)
+                    ),
+                    div(id = "widgetForEncodeMouse",
+                                     selectInput("cells_encode_m", "Subset for tissue/cell line (empty to select all):",
+                                                 choices = unique(encode_mouse_rnaseq$annotation[, "Biosample term name"])[order(unique(encode_mouse_rnaseq$annotation[, "Biosample term name"]))],
+                                                 selected = NULL, multiple = TRUE),
+                                     selectInput("sampleType_encode_m", "Subset for sample type (empty to select all):",
+                                                 choices = unique(encode_mouse_rnaseq$annotation[, "Biosample type"])[order(unique(encode_mouse_rnaseq$annotation[, "Biosample type"]))],
+                                                 selected = NULL, multiple = TRUE)
+                    ),
+                    div(id = "widgetForBgeeMouse",
+                                     selectInput("tissus_bgee_m", "Subset for tissue (empty to select all):",
+                                                 choices = unique(bgee_mouse$annotation[, "Biosample term name"])[order(unique(bgee_mouse$annotation[, "Biosample term name"]))],
+                                                 selected = NULL, multiple = TRUE),
+                                     selectInput("dvp_bgee_m", "Subset for devlopemntal stage (empty to select all):",
+                                                 choices = unique(bgee_mouse$annotation[, "Stage name"])[order(unique(bgee_mouse$annotation[, "Stage name"]))],
+                                                 selected = NULL, multiple = TRUE),
+                                     selectInput("library_bgee_m", "Subset for library type (empty to select all):",
+                                                 choices = unique(bgee_mouse$annotation[, "Library type"])[order(unique(bgee_mouse$annotation[, "Library type"]))],
+                                                 selected = NULL, multiple = TRUE)
+                    ),
+                    selectInput("hclustMethod", 
+                                label = "Clusterisation method",
+                                choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
+                                selected = "complete"),
+                    #conditionalPanel(condition = "input.myPanels == 'Static Heatmap'",    
+                    div(id = "widgetForLabels", 
+                                     numericInput("margin", label = "Label margin [1 - 50] (static heatmap only)", value = 20, min = 1, max = 50),
+                                     numericInput("labCex", label = "Label size [0.1 - 3] (static heatmap only)", value = 1.2, min = 0.1, max = 3)
+                    ),
+                    selectInput("correlationCorrection", 
+                                label = "Uploaded experiment correlation correction:",
+                                choices = list("Quantile normalisation", "Linear scaling", "None"),
+                                selected = "None")
+                ),
+                
+                mainPanel(
+                    tabsetPanel(
+                        tabPanel("My expression file", 
+                                 dataTableOutput("tabUserExpressionFile"),
+                                 downloadButton("downloadUserExpressionFile", label = "Save as tab delimited .txt")
+                                 ),
+                        tabPanel("Correlation table",
+                                 dataTableOutput("tabUserCorrelationTable"),
+                                 downloadButton("downloadUserCorrelationTable", label = "Save as tab delimited .txt")
+                                 ),
+                        tabPanel("Static Heatmap",
+                                 plotOutput("myHeatmap", width = "950px", height = "950px"),
+                                 img(src = "legend_small.png"),
+                                 downloadButton("downloadHMpng", label = "Save as png"),
+                                 downloadButton("downloadHMpdf", label = "Save as pdf")
+                                 ), 
+                        tabPanel("Responsive Heatmap",
+                                 plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
+                                 img(src = "legend_small.png")
+                                 ),
+                        tabPanel("Tree",
+                                 plotOutput("myTree", width = "500px", height = "950px"),
+                                 downloadButton("downloadTreePng", label = "Save as png"),
+                                 downloadButton("downloadTreePdf", label = "Save as pdf")
+                                 ),
+                        tabPanel("Dataset samples table", dataTableOutput("tabSampleList"))
+                        , id = "myPanels"
+                    )
+                )
+                
+            )
+    ),
+    
+    theme = "bootstrap.css"
+    
+)))
