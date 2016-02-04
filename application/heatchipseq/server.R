@@ -4,11 +4,38 @@ options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output) {
     
+    # UI elements activations
+    observe({
+        if (is.null(input$expressionFile)) {
+            shinyjs::hide("downloadUserPeaks")
+            shinyjs::hide("downloadUserCorrelationTable")
+        } else {
+            shinyjs::show("downloadUserPeaks")
+            shinyjs::show("downloadUserCorrelationTable")
+        }
+    })
+    
+    observe({
+        shinyjs::hide("widgetForEncodeHuman")
+        shinyjs::hide("widgetForCodexHuman")
+        shinyjs::hide("widgetForCodexMouse")
+        if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+            shinyjs::show("widgetForEncodeHuman")
+        } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") {
+            shinyjs::show("widgetForCodexHuman")
+        } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") {
+            shinyjs::show("widgetForCodexMouse")
+        } else if (input$dataset == "other (soon)") {
+            # fill this
+        }
+    })
+    
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
             # this remove from memmory non-selected datasets
             load("data/encode_preload.RData")
             load("data/codex_currated_preload.RData")
+            load("data/codex_human_chip_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
             if(input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
                 load("data/encode.RData")
@@ -17,8 +44,8 @@ shinyServer(function(input, output) {
                 load("data/codex_currated.RData")
                 dataset <- codex
             } else if(input$dataset == "CODEX ChIP-seq (human, hg19)") {
-                load("data/codex_currated.RData") # change this
-                dataset <- codex      # change this
+                load("data/codex_human_chip.RData")
+                dataset <- codex_human_chip
             }
             setProgress(value = 1, detail = "done!")
         })
@@ -85,6 +112,7 @@ shinyServer(function(input, output) {
         workingMatrix <- dataset$correlationMatrix
         keep<- 1:nrow(workingMatrix)
         # filtering is dataset-depedent...
+        
         if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             if (is.null(input$cells)) {
                 temp_cells <- unique(encode$annotation$cell_line)
@@ -100,6 +128,35 @@ shinyServer(function(input, output) {
                 dataset$annotation$cell_line %in% temp_cells &
                 dataset$annotation$TF %in% temp_TF
             )
+            
+        } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") { 
+            if (is.null(input$TF_ch)) {
+                temp_TF_ch <- unique(codex_human_chip$annotation$tf)
+            } else {
+                temp_TF_ch <- input$TF_ch
+            }
+            if (input$filterCellsBy_ch == "Cell type") {
+                if (is.null(input$cell_types_ch)) {
+                    temp_cell_types_ch <- unique(codex_human_chip$annotation$cell_type)
+                } else {
+                    temp_cell_types_ch <- input$cell_types_ch
+                }
+                keep <- which(
+                    dataset$annotation$cell_type %in% temp_cell_types_ch &
+                        dataset$annotation$tf %in% temp_TF_ch
+                )
+            } else if (input$filterCellsBy == "Cell subtype") {
+                if(is.null(input$cell_subtypes_ch)) {
+                    temp_cell_subtypes_ch <- codex_human_chip$annotation$cell_subtype
+                } else {
+                    temp_cell_subtypes_ch <- input$cell_subtypes_ch
+                }
+                keep <- which(
+                    dataset$annotation$cell_subtype %in% temp_cell_subtypes_ch &
+                        dataset$annotation$tf %in% temp_TF_ch
+                )
+            }
+            
         } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") { 
             if (is.null(input$TF_m)) {
                 temp_TF_m <- unique(codex$annotation$TF)
@@ -129,7 +186,7 @@ shinyServer(function(input, output) {
             }
         } 
         
-        myLabels <- dataset$annotation$name
+        myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
         if(length(keep) >= 2) {
             workingMatrix <- workingMatrix[keep, keep]
             myLabels <- myLabels[keep]

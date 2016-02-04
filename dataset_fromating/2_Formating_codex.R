@@ -43,7 +43,7 @@ Sys.time() - a # < 2 min
 # [1] 9507832       4
 
 # write.table(bigBed, file = "data/CODEX_mm10/allCodexMM10.bed", sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
-# the bedtools :
+# then bedtools :
 # sortBed -i allCodexMM10.bed > sorted_allCodexMM10.bed
 # bedtools merge -c 4 -o distinct -i sorted_allCodexMM10.bed > merged_allCodexMM10.bed
 

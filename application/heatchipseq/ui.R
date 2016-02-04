@@ -1,6 +1,6 @@
 # UI
 source("data/server_adresses.R")
-shinyUI(navbarPage("HeatChIPseq",
+shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
 
     tabPanel("Instructions",
              icon("home"),
@@ -28,8 +28,8 @@ shinyUI(navbarPage("HeatChIPseq",
                     h3("1 - Select a dataset"),
                     selectInput("dataset", label = NULL, choices = c(
                         "ENCODE TFBS ChIP-seq (human, hg19)",
-                        "CODEX ChIP-seq (mouse, mm10)",
-                        "CODEX ChIP-seq (human, hg19)"
+                        "CODEX ChIP-seq (human, hg19)",
+                        "CODEX ChIP-seq (mouse, mm10)"
                     )),
                     h3("2 - Load your data"),
                     p("Upload a bed-like peak file. Tab delimited, first three columns must be chromsome, peak start and peak end.
@@ -40,7 +40,8 @@ shinyUI(navbarPage("HeatChIPseq",
                     img(src = "legend_small.png"),
                     h3("3 - Heatmap customisation"),
                     checkboxInput("highlight", "Highlight my experiment in the heatmap", FALSE),
-                    conditionalPanel(condition = "input.dataset == 'ENCODE TFBS ChIP-seq (human, hg19)'",
+                    #conditionalPanel(condition = "input.dataset == 'ENCODE TFBS ChIP-seq (human, hg19)'",
+                    div(id = "widgetForEncodeHuman",
                         selectInput("TF", "Subset for TF(s) (empty to select all):",
                                     choices = unique(encode$annotation$TF)[order(unique(encode$annotation$TF))],
                                     selected = NULL, multiple = TRUE),
@@ -48,7 +49,24 @@ shinyUI(navbarPage("HeatChIPseq",
                                     choices = levels(factor(encode$annotation$cell_line))[order(levels(factor(encode$annotation$cell_line)))],
                                     selected = NULL, multiple = TRUE)
                     ),
-                    conditionalPanel(condition = "input.dataset == 'CODEX ChIP-seq (mouse, mm10)'",
+                    #conditionalPanel(condition = "input.dataset == 'CODEX ChIP-seq (mouse, mm10)'",
+                    div(id = "widgetForCodexHuman",
+                        selectInput("TF_ch", "Subset for TF(s) (empty to select all):",
+                                    choices = unique(codex_human_chip$annotation$tf)[order(unique(codex_human_chip$annotation$tf))],
+                                    selected = NULL, multiple = TRUE),
+                        radioButtons("filterCellsBy_ch", label = "Filter by", choices = list("Cell type", "Cell subtype")),
+                        conditionalPanel(condition = "input.filterCellsBy_ch == 'Cell type'",
+                                         selectInput("cell_types_ch", "Subset for cell type(s) (empty to select all):",
+                                                     choices = unique(codex_human_chip$annotation$cell_type)[order(unique(codex_human_chip$annotation$cell_type))],
+                                                     selected = NULL, multiple = TRUE)
+                        ),
+                        conditionalPanel(condition = "input.filterCellsBy_ch == 'Cell subtype'",
+                                         selectInput("cell_subtypes_ch", "Subset for cell subtypes(s) (empty to select all):",
+                                                     choices = unique(codex_human_chip$annotation$cell_subtype)[order(unique(codex_human_chip$annotation$cell_subtype))],
+                                                     selected = NULL, multiple = TRUE)
+                        )             
+                    ),
+                    div(id = "widgetForCodexMouse",
                          selectInput("TF_m", "Subset for TF(s) (empty to select all):",
                                      choices = unique(codex$annotation$TF)[order(unique(codex$annotation$TF))],
                                      selected = NULL, multiple = TRUE),
@@ -101,5 +119,5 @@ shinyUI(navbarPage("HeatChIPseq",
     
     theme = "bootstrap.css"
     
-))
+)))
 

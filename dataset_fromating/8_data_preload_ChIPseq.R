@@ -5,9 +5,11 @@ library(magrittr)
 
 load("data/encode.RData")
 load("data/codex_currated.RData")
+load("data/codex_human_chip.RData")
 
 names(encode)
 names(codex)
+names(codex_human_chip)
 
 nullifyDataForFasterPreloading <- function(myList) {
     myList[["dataMatrix"]] <- NULL
@@ -22,9 +24,13 @@ object.size(encode)
 object.size(codex)
 codex <- nullifyDataForFasterPreloading(codex)
 object.size(codex)
+object.size(codex_human_chip)
+codex_human_chip <- nullifyDataForFasterPreloading(codex_human_chip)
+object.size(codex_human_chip)
 
 save(encode, file = "data/encode_preload.RData")
 save(codex, file = "data/codex_currated_preload.RData")
+save(codex_human_chip, file = "data/codex_human_chip_preload.RData")
 
 load("data/encode.RData")
 object.size(encode)
