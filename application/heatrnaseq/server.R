@@ -360,10 +360,13 @@ shinyServer(function(input, output) {
     
     myRenderTreePlot <- function() {
         clusterDat <- doTheClustering()
+        oldPar <- list(mar = par()$mar, cex = par()$cex)
+        par(mar = c(5, 4, 4, input$margin), cex = input$labCex)
         plot(
             clusterDat$dend,
             horiz = TRUE
         )
+        par(oldPar) # not all par() can be set
     }
     
     output$downloadTreePng <- downloadHandler("dendrogram.png",
