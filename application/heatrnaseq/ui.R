@@ -1,7 +1,7 @@
-# UI 
+# UI
 source("data/server_adresses.R")
 shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
-                   
+
     tabPanel("Instructions",
              icon("home"),
              a("Back to main page", href = URL_HEATSTARSEQ),
@@ -18,19 +18,20 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
              p("How to cite:"),
              p("... unpublished")
     ),
-    
+
     tabPanel("Use application",
              sidebarLayout(
-                
+
                 sidebarPanel(
                     icon("home"),
                     a("Back to main page", href = URL_HEATSTARSEQ),
                     h3("1 - Select a dataset"),
                     selectInput("dataset", label = NULL, choices = c(
-                        "ENCODE RNA-seq (human)",
                         "Bgee RNA-seq (human)",
-                        "ENCODE RNA-seq (mouse)",
-                        "Bgee RNA-seq (mouse)"
+                        "Blueprint RNA-seq (human)",
+                        "ENCODE RNA-seq (human)",
+                        "Bgee RNA-seq (mouse)",
+                        "ENCODE RNA-seq (mouse)"
                     )),
                     h3("2 - Load your data (optional)"),
                     p("Upload a tab delimited text file of at least two columns. First column must contains ensemble gene id, second column must contains normalised expression value
@@ -63,6 +64,14 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                      choices = unique(bgee_human$annotation[, "Library type"])[order(unique(bgee_human$annotation[, "Library type"]))],
                                      selected = NULL, multiple = TRUE)
                     ),
+                    div(id = "widgetForBlueprintHuman",
+                        selectInput("tissue_blueprint_h", "Extract from (empty to select all):",
+                                    choices = unique(blueprint_rnaseq$annotation$level1)[order(unique(blueprint_rnaseq$annotation$level1))],
+                                    selected = NULL, multiple = TRUE),
+                        selectInput("celltype_blueprint_h", "Cell type (empty to select all):",
+                                    choices = unique(blueprint_rnaseq$annotation$level3)[order(unique(blueprint_rnaseq$annotation$level3))],
+                                    selected = NULL, multiple = TRUE)
+                    ),
                     div(id = "widgetForEncodeMouse",
                                      selectInput("cells_encode_m", "Subset for tissue/cell line (empty to select all):",
                                                  choices = unique(encode_mouse_rnaseq$annotation[, "Biosample term name"])[order(unique(encode_mouse_rnaseq$annotation[, "Biosample term name"]))],
@@ -82,24 +91,24 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                                  choices = unique(bgee_mouse$annotation[, "Library type"])[order(unique(bgee_mouse$annotation[, "Library type"]))],
                                                  selected = NULL, multiple = TRUE)
                     ),
-                    selectInput("hclustMethod", 
+                    selectInput("hclustMethod",
                                 label = "Clusterisation method",
                                 choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                                 selected = "complete"),
-                    #conditionalPanel(condition = "input.myPanels == 'Static Heatmap'",    
-                    div(id = "widgetForLabels", 
+                    #conditionalPanel(condition = "input.myPanels == 'Static Heatmap'",
+                    div(id = "widgetForLabels",
                                      numericInput("margin", label = "Label margin [1 - 50] (static heatmap only)", value = 20, min = 1, max = 50),
                                      numericInput("labCex", label = "Label size [0.1 - 3] (static heatmap only)", value = 1.2, min = 0.1, max = 3)
                     ),
-                    selectInput("correlationCorrection", 
+                    selectInput("correlationCorrection",
                                 label = "Uploaded experiment correlation correction:",
                                 choices = list("Quantile normalisation", "Linear scaling", "None"),
                                 selected = "None")
                 ),
-                
+
                 mainPanel(
                     tabsetPanel(
-                        tabPanel("My expression file", 
+                        tabPanel("My expression file",
                                  dataTableOutput("tabUserExpressionFile"),
                                  downloadButton("downloadUserExpressionFile", label = "Save as tab delimited .txt")
                                  ),
@@ -112,7 +121,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                  img(src = "legend_small.png"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
                                  downloadButton("downloadHMpdf", label = "Save as pdf")
-                                 ), 
+                                 ),
                         tabPanel("Responsive Heatmap",
                                  plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
                                  img(src = "legend_small.png")
@@ -126,10 +135,10 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                         , id = "myPanels"
                     )
                 )
-                
+
             )
     ),
-    
+
     theme = "bootstrap.css"
-    
+
 )))

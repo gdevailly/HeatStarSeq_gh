@@ -41,15 +41,18 @@ object.size(encode)
 setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/heatrnaseq/")
 library(GenomicRanges)
 library(magrittr)
+
 load("data/encode_rnaseq.RData")
 load("data/bgee_human.RData")
 load("data/bgee_mouse.RData")
 load("data/encode_mouse_rnaseq.RData")
+load("data/blueprint_rnaseq.RData")
 
 names(encode_rnaseq)
 names(bgee_human)
 names(bgee_mouse)
 names(encode_mouse_rnaseq)
+names(blueprint_rnaseq)
 
 nullifyDataForFasterPreloading <- function(myList) {
     myList[["dataMatrix"]] <- NULL
@@ -70,9 +73,13 @@ object.size(bgee_mouse)
 object.size(encode_mouse_rnaseq)
 encode_mouse_rnaseq <- nullifyDataForFasterPreloading(encode_mouse_rnaseq)
 object.size(encode_mouse_rnaseq)
+object.size(blueprint_rnaseq)
+blueprint_rnaseq <- nullifyDataForFasterPreloading(blueprint_rnaseq)
+object.size(blueprint_rnaseq)
 
 save(encode_rnaseq, file = "data/encode_rnaseq_preload.RData")
 save(bgee_human, file = "data/bgee_human_preload.RData")
 save(bgee_mouse, file = "data/bgee_mouse_preload.RData")
 save(encode_mouse_rnaseq, file = "data/encode_mouse_rnaseq_preload.RData")
+save(blueprint_rnaseq, file = "data/blueprint_rnaseq_preload.RData")
 

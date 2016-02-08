@@ -44,7 +44,10 @@ shinyUI(
         
         tabPanel(
             "About",
-            t("Write meaningfull things here.")
+            t("Write meaningfull things here."),
+            p(),
+            img(src = "The_Roslin_Institute_logo.gif"),
+            img(src = "BBSRC_logo.gif")
             
         ),
         

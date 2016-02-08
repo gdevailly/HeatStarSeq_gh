@@ -4,7 +4,7 @@ library(preprocessCore)
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output) {
-    
+
     # UI elements activations
     observe({
         if (is.null(input$expressionFile)) {
@@ -15,16 +15,20 @@ shinyServer(function(input, output) {
             shinyjs::show("downloadUserCorrelationTable")
         }
     })
-    
+
     observe({
-        shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForBgeeHuman")
+        shinyjs::hide("widgetForBlueprintHuman")
+        shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForEncodeMouse")
         shinyjs::hide("widgetForBgeeMouse")
+
         if (input$dataset == "ENCODE RNA-seq (human)") {
             shinyjs::show("widgetForEncodeHuman")
         } else if (input$dataset == "Bgee RNA-seq (human)") {
             shinyjs::show("widgetForBgeeHuman")
+        } else if (input$dataset == "Blueprint RNA-seq (human)") {
+            shinyjs::show("widgetForBlueprintHuman")
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             shinyjs::show("widgetForEncodeMouse")
         } else if (input$dataset == "Bgee RNA-seq (mouse)") {
@@ -33,7 +37,7 @@ shinyServer(function(input, output) {
             # fill this
         }
     })
-    
+
     observe({
         if(input$myPanels == "Static Heatmap" | input$myPanels == "Tree") {
             shinyjs::show("widgetForLabels")
@@ -41,7 +45,7 @@ shinyServer(function(input, output) {
             shinyjs::hide("widgetForLabels")
         }
     })
-    
+
     # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
@@ -56,6 +60,9 @@ shinyServer(function(input, output) {
             } else if (input$dataset == "Bgee RNA-seq (human)") {
                 load("data/bgee_human.RData")
                 dataset <- bgee_human
+            } else if (input$dataset == "Blueprint RNA-seq (human)") {
+                load("data/blueprint_rnaseq.RData")
+                dataset <- blueprint_rnaseq
             } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
                 load("data/encode_mouse_rnaseq.RData")
                 dataset <- encode_mouse_rnaseq
@@ -67,7 +74,7 @@ shinyServer(function(input, output) {
             }
             setProgress(value = 1, detail = "done!")
         })
-        return(dataset)    
+        return(dataset)
     })
 
     userExpressionFileAnalysis <- reactive({
@@ -119,14 +126,14 @@ shinyServer(function(input, output) {
             "linearNormCorrelations" = normUserCorrelations_linear
         ))
     })
-    
+
     output$tabUserExpressionFile <- renderDataTable({
         validate(
             need(!is.null(input$expressionFile), "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
         userExpressionFileAnalysis()$expression
     })
-        
+
     output$downloadUserExpressionFile <- downloadHandler("uploaded_expression_file.txt",
                                                          content = function(file) {
                                                              write.table(
@@ -135,29 +142,28 @@ shinyServer(function(input, output) {
                                                              )
                                                          },
                                                          contentType = "text/tsv")
-    
+
     getCorrelationTable <- reactive({
         validate(
             need(!is.null(input$expressionFile), "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
             data.frame(
                 "Experiment" = getSelectedDataset()$annotation$name,
-                #"Experiment" = paste(getSelectedDataset()$annotation[, "File accession"], getSelectedDataset()$annotation[, "Biosample term name"]),
                 "Correlation" = userExpressionFileAnalysis()$correlations,
                 "QuantNorm Correlation" = userExpressionFileAnalysis()$quantNormCorrelations,
                 "LinearNorm Correlation" = userExpressionFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
             )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ]
     })
-    
+
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
-    
+
     output$downloadUserCorrelationTable <- downloadHandler("heatRNAseq_correlations.txt",
                                                            content = function(file) {
                                                               write.table(getCorrelationTable(), file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                            },
                                                            contentType = "text/tsv")
-    
+
     subsetMatrix <- reactive({
         dataset <- getSelectedDataset()
         workingMatrix <- dataset$correlationMatrix
@@ -182,7 +188,7 @@ shinyServer(function(input, output) {
             keep <- which(
                 dataset$annotation[, "Biosample term name"] %in% temp_cells &
                 dataset$annotation[, "Biosample type"] %in% temp_sampleType &
-                dataset$annotation[, "rnaFraction"] %in% temp_rnaExtract   
+                dataset$annotation[, "rnaFraction"] %in% temp_rnaExtract
             )
         } else if (input$dataset == "Bgee RNA-seq (human)") {
             if (is.null(input$tissus_bgee_h)) {
@@ -203,7 +209,22 @@ shinyServer(function(input, output) {
             keep <- which(
                 dataset$annotation[, "Biosample term name"] %in% temp_tissus_bgee_h &
                 dataset$annotation[, "Stage name"] %in% temp_dvp_bgee_h &
-                dataset$annotation[, "Library type"] %in% temp_library_bgee_h   
+                dataset$annotation[, "Library type"] %in% temp_library_bgee_h
+            )
+        } else if (input$dataset == "Blueprint RNA-seq (human)") {
+            if (is.null(input$tissue_blueprint_h)) {
+                temp_tissue_blueprint_h <- unique(blueprint_rnaseq$annotation$level1)
+            } else {
+                temp_tissue_blueprint_h <- input$tissue_blueprint_h
+            }
+            if (is.null(input$celltype_blueprint_h)) {
+                temp_celltype_blueprint_h <- unique(blueprint_rnaseq$annotation$level3)
+            } else {
+                temp_celltype_blueprint_h <- input$celltype_blueprint_h
+            }
+            keep <- which(
+                dataset$annotation$level1 %in% temp_tissue_blueprint_h &
+                    dataset$annotation$level3 %in% temp_celltype_blueprint_h
             )
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             if (is.null(input$cells_encode_m)) {
@@ -239,7 +260,7 @@ shinyServer(function(input, output) {
             keep <- which(
                 dataset$annotation[, "Biosample term name"] %in% temp_tissus_bgee_m &
                 dataset$annotation[, "Stage name"] %in% temp_dvp_bgee_m &
-                dataset$annotation[, "Library type"] %in% temp_library_bgee_m   
+                dataset$annotation[, "Library type"] %in% temp_library_bgee_m
             )
         } else { # modify accordingly for new datasets!
 
@@ -250,7 +271,7 @@ shinyServer(function(input, output) {
             workingMatrix <- workingMatrix[keep, keep]
             myLabels <- myLabels[keep]
         }
-        
+
         # merging user data in correlation matrix
         if(!is.null(userExpressionFileAnalysis()$correlations)) {
             userCorrelations <- userExpressionFileAnalysis()$correlations
@@ -265,7 +286,7 @@ shinyServer(function(input, output) {
         }
         return(list("mat" = workingMatrix, "myLabels" = myLabels))
     })
-    
+
     doTheClustering <- reactive({
         withProgress(value = 1, message = "Clustering: ", detail = "hierarchical clustering", {
             myData <- subsetMatrix()
@@ -277,7 +298,7 @@ shinyServer(function(input, output) {
         })
         return(list("dend" = dendro, "order" = myClust$order))
     })
-    
+
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
         if (input$highlight & !is.null(input$expressionFile)) {
@@ -287,7 +308,7 @@ shinyServer(function(input, output) {
         }
         return(matAA)
     })
-    
+
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -305,7 +326,7 @@ shinyServer(function(input, output) {
                 useRaster = TRUE
         )
     }
-    
+
     output$downloadHMpng <- downloadHandler("heatmap.png",
                                             content = function(file) {
                                                 png(file, width = 950, height = 950)
@@ -313,7 +334,7 @@ shinyServer(function(input, output) {
                                                 dev.off()
                                             },
                                             contentType = "image/png")
-    
+
     output$downloadHMpdf <- downloadHandler("heatmap.pdf",
                                             content = function(file) {
                                                 pdf(file, width = 13.85, height = 13.85)
@@ -321,9 +342,9 @@ shinyServer(function(input, output) {
                                                 dev.off()
                                             },
                                             contentType = "image/pdf")
-    
+
     output$myHeatmap <- renderPlot(myRenderPlot())
-    
+
     output$myPlotlyHeatmap <- renderPlotly({
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -346,7 +367,7 @@ shinyServer(function(input, output) {
                      showscale = FALSE
                      )
         # style
-        layout(p, 
+        layout(p,
                title = "Pairwise correlations",
                autosize = FALSE,
                width = 980,
@@ -357,7 +378,7 @@ shinyServer(function(input, output) {
                yaxis = list(title = "")
                )
     })
-    
+
     myRenderTreePlot <- function() {
         clusterDat <- doTheClustering()
         oldPar <- list(mar = par()$mar, cex = par()$cex)
@@ -368,7 +389,7 @@ shinyServer(function(input, output) {
         )
         par(oldPar) # not all par() can be set
     }
-    
+
     output$downloadTreePng <- downloadHandler("dendrogram.png",
                                             content = function(file) {
                                                 png(file, width = 500, height = 950)
@@ -376,7 +397,7 @@ shinyServer(function(input, output) {
                                                 dev.off()
                                             },
                                             contentType = "image/png")
-    
+
     output$downloadTreePdf <- downloadHandler("dendrogram.pdf",
                                             content = function(file) {
                                                 pdf(file, width = 7.29, height = 13.85)
@@ -384,9 +405,9 @@ shinyServer(function(input, output) {
                                                 dev.off()
                                             },
                                             contentType = "image/pdf")
-    
+
     output$myTree <- renderPlot(myRenderTreePlot())
-    
+
     output$tabSampleList <- renderDataTable(getSelectedDataset()$annotation)
-    
+
 })
