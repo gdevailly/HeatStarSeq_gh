@@ -252,24 +252,24 @@ shinyServer(function(input, output) {
             )
         } else if (input$dataset == "Bgee RNA-seq (mouse)") {
             if (is.null(input$tissus_bgee_m)) {
-                temp_tissus_bgee_m <- unique(bgee_mouse$annotation[, "Biosample term name"])
+                temp_tissus_bgee_m <- unique(bgee_mouse$annotation$tissue)
             } else {
                 temp_tissus_bgee_m <- input$tissus_bgee_m
             }
             if (is.null(input$dvp_bgee_m)) {
-                temp_dvp_bgee_m <- unique(bgee_mouse$annotation[, "Stage name"])
+                temp_dvp_bgee_m <- unique(bgee_mouse$annotation$stage)
             } else {
                 temp_dvp_bgee_m <- input$dvp_bgee_m
             }
             if (is.null(input$library_bgee_m)) {
-                temp_library_bgee_m <- unique(bgee_mouse$annotation[, "Library type"])
+                temp_library_bgee_m <- unique(bgee_mouse$annotation$libraryType)
             } else {
                 temp_library_bgee_m <- input$library_bgee_m
             }
             keep <- which(
-                dataset$annotation[, "Biosample term name"] %in% temp_tissus_bgee_m &
-                dataset$annotation[, "Stage name"] %in% temp_dvp_bgee_m &
-                dataset$annotation[, "Library type"] %in% temp_library_bgee_m
+                dataset$annotation$tissue %in% temp_tissus_bgee_m &
+                dataset$annotation$stage %in% temp_dvp_bgee_m &
+                dataset$annotation$libraryType %in% temp_library_bgee_m
             )
         } else { # modify accordingly for new datasets!
 
