@@ -114,6 +114,8 @@ blueprint_rnaseq <- list(
     "annotation" = lessMetadata
 )
 
+blueprint_rnaseq$annotation$name <- paste(blueprint_rnaseq$annotation$name, blueprint_rnaseq$annotation$level3)
+colnames(blueprint_rnaseq$annotation) <- c("name", "sampleSource", "cellType", "url")
 save(blueprint_rnaseq, file = "../../heatrnaseq/data/blueprint_rnaseq.RData")
 
 

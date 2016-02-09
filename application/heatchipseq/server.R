@@ -3,7 +3,7 @@ library(readr)
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output) {
-    
+
     # UI elements activations
     observe({
         if (is.null(input$expressionFile)) {
@@ -14,7 +14,7 @@ shinyServer(function(input, output) {
             shinyjs::show("downloadUserCorrelationTable")
         }
     })
-    
+
     observe({
         shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForCodexHuman")
@@ -29,7 +29,7 @@ shinyServer(function(input, output) {
             # fill this
         }
     })
-    
+
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
             # this remove from memmory non-selected datasets
@@ -49,7 +49,7 @@ shinyServer(function(input, output) {
             }
             setProgress(value = 1, detail = "done!")
         })
-        return(dataset)    
+        return(dataset)
     })
 
     userPeakFileAnalysis <- reactive({
@@ -78,41 +78,41 @@ shinyServer(function(input, output) {
         }
         return(list("peaks" = userPeakFile, "correlations" = userCorrelations))
     })
-    
+
     getCorrelationTable <- reactive({
         if(is.null(userPeakFileAnalysis()$correlations)) {
             NULL
         } else {
             data.frame(
-                "Experiment" = getSelectedDataset()$annotation$name, 
+                "Experiment" = getSelectedDataset()$annotation$name,
                 "Correlation" = userPeakFileAnalysis()$correlations,
                 stringsAsFactors = FALSE
             )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
         }
     })
-    
+
     output$tabUserPeaks <- renderDataTable(userPeakFileAnalysis()$peaks)
-    
+
     output$downloadUserPeaks <- downloadHandler("uploaded_peak_list.txt",
                                                  content = function(file) {
                                                      write.table(userPeakFileAnalysis()$peaks, file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                  },
                                                  contentType = "text/tsv")
-    
+
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
-    
+
     output$downloadUserCorrelationTable <- downloadHandler("heatChIPseq_correlations.txt",
                                                            content = function(file) {
                                                               write.table(getCorrelationTable(), file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                            },
                                                            contentType = "text/tsv")
-    
+
     subsetMatrix <- reactive({
         dataset <- getSelectedDataset()
         workingMatrix <- dataset$correlationMatrix
         keep<- 1:nrow(workingMatrix)
         # filtering is dataset-depedent...
-        
+
         if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             if (is.null(input$cells)) {
                 temp_cells <- unique(encode$annotation$cell_line)
@@ -128,8 +128,8 @@ shinyServer(function(input, output) {
                 dataset$annotation$cell_line %in% temp_cells &
                 dataset$annotation$TF %in% temp_TF
             )
-            
-        } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") { 
+
+        } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") {
             if (is.null(input$TF_ch)) {
                 temp_TF_ch <- unique(codex_human_chip$annotation$tf)
             } else {
@@ -156,8 +156,8 @@ shinyServer(function(input, output) {
                         dataset$annotation$tf %in% temp_TF_ch
                 )
             }
-            
-        } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") { 
+
+        } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") {
             if (is.null(input$TF_m)) {
                 temp_TF_m <- unique(codex$annotation$TF)
             } else {
@@ -184,8 +184,8 @@ shinyServer(function(input, output) {
                     dataset$annotation$TF %in% temp_TF_m
                 )
             }
-        } 
-        
+        }
+
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
         if(length(keep) >= 2) {
             workingMatrix <- workingMatrix[keep, keep]
@@ -199,7 +199,7 @@ shinyServer(function(input, output) {
         }
         return(list("mat" = workingMatrix, "myLabels" = myLabels))
     })
-    
+
     doTheClustering <- reactive({
         withProgress(value = 1, message = "Clustering: ", detail = "distance caluculation", {
             myClust <- hclust(dist(subsetMatrix()$mat), method = input$hclustMethod)
@@ -209,7 +209,7 @@ shinyServer(function(input, output) {
         })
         return(list("dend" = dendro, "order" = myClust$order))
     })
-    
+
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
         if (input$highlight & !is.null(input$peakFile)) {
@@ -219,7 +219,7 @@ shinyServer(function(input, output) {
         }
         return(matAA)
     })
-    
+
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -237,7 +237,7 @@ shinyServer(function(input, output) {
                 useRaster = TRUE
         )
     }
-    
+
     output$downloadHMpng <- downloadHandler("encode_heatmap.png",
                                             content = function(file) {
                                                 png(file, width = 950, height = 950)
@@ -245,7 +245,7 @@ shinyServer(function(input, output) {
                                                 dev.off()
                                             },
                                             contentType = "image/png")
-    
+
     output$downloadHMpdf <- downloadHandler("encode_heatmap.pdf",
                                             content = function(file) {
                                                 pdf(file, width = 13.85, height = 13.85)
@@ -253,9 +253,9 @@ shinyServer(function(input, output) {
                                                 dev.off()
                                             },
                                             contentType = "image/pdf")
-    
+
     output$myHeatmap <- renderPlot(myRenderPlot())
-    
+
     output$myPlotlyHeatmap <- renderPlotly({
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -278,7 +278,7 @@ shinyServer(function(input, output) {
                      showscale = FALSE
                      )
         # style
-        layout(p, 
+        layout(p,
                title = "Pairwise correlations",
                autosize = FALSE,
                width = 980,
@@ -289,27 +289,7 @@ shinyServer(function(input, output) {
                yaxis = list(title = "")
                )
     })
-    
-    output$tabTF <- renderDataTable({
-        TfTable <- as.data.frame(table(getSelectedDataset()$annotation$TF))
-        colnames(TfTable) <- c("TF", "Number of experiments")
-        TfTable <- TfTable[order(TfTable[,2], decreasing = T),]
-    })
-    
-    output$tabCells <- renderDataTable({
-        myColname <- "cell_line"
-        if(input$dataset == "CODEX ChIP-seq (mouse, mm10)") myColname <- "Cell type"
-        CellsTable <- as.data.frame(table(getSelectedDataset()$annotation[,myColname]))
-        colnames(CellsTable) <-c ("Cell line", "Number of experiments")
-        CellsTable <- CellsTable[order(CellsTable[,2], decreasing = T),]
-        return(CellsTable)
-    })
-    
-    output$tabCellsSub_m <- renderDataTable({
-        CellsTable <- as.data.frame(table(codex$annotation[,"Cell subtype"]))
-        colnames(CellsTable) <-c ("Cell subtype", "Number of experiments")
-        CellsTable <- CellsTable[order(CellsTable[,2], decreasing = T),]
-        return(CellsTable)
-    })
-    
+
+    output$tabSampleList <- renderDataTable(getSelectedDataset()$annotation)
+
 })

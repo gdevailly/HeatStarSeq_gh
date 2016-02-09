@@ -55,10 +55,11 @@ bgee_human$dataMatrix <- bgee_human$dataMatrix[nonZero, ]
 bgee_human$geneName <- bgee_human$geneName[nonZero]
 bgee_human$correlationMatrix <- cor(bgee_human$dataMatrix)
 bgee_human$annotation$name <- paste(bgee_human$annotation[, "Biosample term name"], bgee_human$annotation[, "File accession"])
-bgee_human$annotation <- bgee_human$annotation[, c(1, 2, 6, 3, 4, 5)] 
+bgee_human$annotation <- bgee_human$annotation[, c(1, 2, 6, 3, 4, 5)]
 lapply(bgee_human, head)
 row.names(bgee_human$annotation) <- NULL
 lapply(bgee_human, row.names)
+colnames(bgee_human$annotation) <- c("geoAccession", "tissue", "name", "stage", "libraryType", "url")
 
 object.size(bgee_human) # 37Mo
 

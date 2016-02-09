@@ -77,13 +77,12 @@ shinyServer(function(input, output) {
         return(dataset)
     })
 
-    userExpressionFileAnalysis <- reactive({
+    userExpressionFileAnalysis_1 <- reactive({
         userExpressionFileName <- input$expressionFile
         if (is.null(userExpressionFileName)){
             userExpressionFile <- NULL
             userCorrelations <- NULL
             normUserCorrelations <- NULL
-            normUserCorrelations_linear <- NULL
         } else {
             withProgress(value = 1, message = "User expression file: ", detail = "reading file", {
                 userExpressionFile_temp <- read_tsv(userExpressionFileName$datapath, col_names = input$header)[, 1:2]
@@ -108,9 +107,7 @@ shinyServer(function(input, output) {
                     as.matrix(c(userCorrelations, 1)),
                     normalize.quantiles.determine.target(dataset$correlationMatrix)
                 ) %>% as.vector
-                if (max(userCorrelations) != 0) {
-                    normUserCorrelations_linear <- userCorrelations * max(normUserCorrelations[-length(normUserCorrelations)]) / max(userCorrelations)
-                }
+                normUserCorrelations <- normUserCorrelations[-length(normUserCorrelations)]
                 userExpressionFile <- data.frame(
                     geneName = dataset$geneName,
                     value = userExpressionFile,
@@ -122,10 +119,22 @@ shinyServer(function(input, output) {
         return(list(
             "expression" = userExpressionFile,
             "correlations" = userCorrelations,
-            "quantNormCorrelations" = normUserCorrelations[-length(normUserCorrelations)],
-            "linearNormCorrelations" = normUserCorrelations_linear
+            "linearNormCorrelations" = NULL, # to be fill below
+            "quantNormCorrelations" = normUserCorrelations
         ))
     })
+
+    userExpressionFileAnalysis <- reactive({
+        userExpressionFileData <- userExpressionFileAnalysis_1()
+        userCorrelations <- userExpressionFileData$correlations
+        if (!is.null(input$expressionFile)){
+            if (input$maxCorrelation != 0) {
+                userExpressionFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
+            }
+        }
+        return(userExpressionFileData)
+    })
+
 
     output$tabUserExpressionFile <- renderDataTable({
         validate(
@@ -150,8 +159,8 @@ shinyServer(function(input, output) {
             data.frame(
                 "Experiment" = getSelectedDataset()$annotation$name,
                 "Correlation" = userExpressionFileAnalysis()$correlations,
-                "QuantNorm Correlation" = userExpressionFileAnalysis()$quantNormCorrelations,
                 "LinearNorm Correlation" = userExpressionFileAnalysis()$linearNormCorrelations,
+                "QuantNorm Correlation" = userExpressionFileAnalysis()$quantNormCorrelations,
                 stringsAsFactors = FALSE
             )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ]
     })
@@ -192,39 +201,39 @@ shinyServer(function(input, output) {
             )
         } else if (input$dataset == "Bgee RNA-seq (human)") {
             if (is.null(input$tissus_bgee_h)) {
-                temp_tissus_bgee_h <- unique(bgee_human$annotation[, "Biosample term name"])
+                temp_tissus_bgee_h <- unique(bgee_human$annotation$tissue)
             } else {
                 temp_tissus_bgee_h <- input$tissus_bgee_h
             }
             if (is.null(input$dvp_bgee_h)) {
-                temp_dvp_bgee_h <- unique(bgee_human$annotation[, "Stage name"])
+                temp_dvp_bgee_h <- unique(bgee_human$annotation$stage)
             } else {
                 temp_dvp_bgee_h <- input$dvp_bgee_h
             }
             if (is.null(input$library_bgee_h)) {
-                temp_library_bgee_h <- unique(bgee_human$annotation[, "Library type"])
+                temp_library_bgee_h <- unique(bgee_human$annotation$libraryType)
             } else {
                 temp_library_bgee_h <- input$library_bgee_h
             }
             keep <- which(
-                dataset$annotation[, "Biosample term name"] %in% temp_tissus_bgee_h &
-                dataset$annotation[, "Stage name"] %in% temp_dvp_bgee_h &
-                dataset$annotation[, "Library type"] %in% temp_library_bgee_h
+                dataset$annotation$tissue %in% temp_tissus_bgee_h &
+                dataset$annotation$stage %in% temp_dvp_bgee_h &
+                dataset$annotation$libraryType %in% temp_library_bgee_h
             )
         } else if (input$dataset == "Blueprint RNA-seq (human)") {
             if (is.null(input$tissue_blueprint_h)) {
-                temp_tissue_blueprint_h <- unique(blueprint_rnaseq$annotation$level1)
+                temp_tissue_blueprint_h <- unique(blueprint_rnaseq$annotation$sampleSource)
             } else {
                 temp_tissue_blueprint_h <- input$tissue_blueprint_h
             }
             if (is.null(input$celltype_blueprint_h)) {
-                temp_celltype_blueprint_h <- unique(blueprint_rnaseq$annotation$level3)
+                temp_celltype_blueprint_h <- unique(blueprint_rnaseq$annotation$cellType)
             } else {
                 temp_celltype_blueprint_h <- input$celltype_blueprint_h
             }
             keep <- which(
-                dataset$annotation$level1 %in% temp_tissue_blueprint_h &
-                    dataset$annotation$level3 %in% temp_celltype_blueprint_h
+                dataset$annotation$sampleSource %in% temp_tissue_blueprint_h &
+                    dataset$annotation$cellType %in% temp_celltype_blueprint_h
             )
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             if (is.null(input$cells_encode_m)) {
@@ -408,6 +417,12 @@ shinyServer(function(input, output) {
 
     output$myTree <- renderPlot(myRenderTreePlot())
 
-    output$tabSampleList <- renderDataTable(getSelectedDataset()$annotation)
+    output$tabSampleList <- renderDataTable({
+        myTable <- getSelectedDataset()$annotation
+        if(!is.null(myTable$url)) {
+            myTable$url <- paste0('<a href="', myTable$url, '">link</a>')
+        }
+        return(myTable)
+    }, escape = FALSE)
 
 })

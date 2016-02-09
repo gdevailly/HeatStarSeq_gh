@@ -18,10 +18,10 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
              p("How to cite:"),
              p("... unpublished")
              ),
-    
+
     tabPanel("Use application",
             sidebarLayout(
-                
+
                 sidebarPanel(
                     icon("home"),
                     a("Back to main page", href = URL_HEATSTARSEQ),
@@ -64,7 +64,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                          selectInput("cell_subtypes_ch", "Subset for cell subtypes(s) (empty to select all):",
                                                      choices = unique(codex_human_chip$annotation$cell_subtype)[order(unique(codex_human_chip$annotation$cell_subtype))],
                                                      selected = NULL, multiple = TRUE)
-                        )             
+                        )
                     ),
                     div(id = "widgetForCodexMouse",
                          selectInput("TF_m", "Subset for TF(s) (empty to select all):",
@@ -80,21 +80,21 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                           selectInput("cell_subtypes_m", "Subset for cell subtypes(s) (empty to select all):",
                                                       choices = unique(codex$annotation[,"Cell subtype"])[order(unique(codex$annotation[,"Cell subtype"]))],
                                                       selected = NULL, multiple = TRUE)
-                         )             
+                         )
                     ),
-                    selectInput("hclustMethod", 
+                    selectInput("hclustMethod",
                                 label = "Clusterisation method",
                                 choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                                 selected = "complete"),
-                    conditionalPanel(condition = "input.myPanels == 'Static Heatmap'",    
+                    conditionalPanel(condition = "input.myPanels == 'Static Heatmap'",
                                      numericInput("margin", label = "Label margin [1 - 50] (static heatmap only)", value = 20, min = 1, max = 50),
                                      numericInput("labCex", label = "Label size [0.1 - 3] (static heatmap only)", value = 1.2, min = 0.1, max = 3)
                     )
                 ),
-                
+
                 mainPanel(
                     tabsetPanel(
-                        tabPanel("My peaks", 
+                        tabPanel("My peaks",
                                  dataTableOutput("tabUserPeaks"),
                                  downloadButton("downloadUserPeaks", label = "Save as tab delimited .txt")
                                  ),
@@ -106,18 +106,17 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                  plotOutput("myHeatmap", width = "950px", height = "950px"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
                                  downloadButton("downloadHMpdf", label = "Save as pdf")
-                                 ), 
+                                 ),
                         tabPanel("Responsive Heatmap", plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px")),
-                        tabPanel("TF", dataTableOutput("tabTF")),
-                        tabPanel("Cells", dataTableOutput("tabCells"))
+                        tabPanel("Dataset samples table", dataTableOutput("tabSampleList"))
                         , id = "myPanels"
                     )
                 )
-                
+
             )
     ),
-    
+
     theme = "bootstrap.css"
-    
+
 )))
 
