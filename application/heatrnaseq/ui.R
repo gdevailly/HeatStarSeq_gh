@@ -122,7 +122,8 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                  plotOutput("myHeatmap", width = "950px", height = "950px"),
                                  img(src = "legend_small.png"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
-                                 downloadButton("downloadHMpdf", label = "Save as pdf")
+                                 downloadButton("downloadHMpdf", label = "Save as pdf"),
+                                 downloadButton("downloadHMsvg", label = "Save as svg")
                                  ),
                         tabPanel("Responsive Heatmap",
                                  plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
@@ -131,9 +132,13 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                         tabPanel("Tree",
                                  plotOutput("myTree", width = "500px", height = "950px"),
                                  downloadButton("downloadTreePng", label = "Save as png"),
-                                 downloadButton("downloadTreePdf", label = "Save as pdf")
+                                 downloadButton("downloadTreePdf", label = "Save as pdf"),
+                                 downloadButton("downloadTreeSvg", label = "Save as svg")
                                  ),
-                        tabPanel("Dataset samples table", dataTableOutput("tabSampleList"))
+                        tabPanel("Dataset samples table",
+                                 dataTableOutput("tabSampleList"),
+                                 downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
+                                 )
                         , id = "myPanels"
                     )
                 )

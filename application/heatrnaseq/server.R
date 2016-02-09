@@ -1,6 +1,8 @@
 library(gplots)
 library(readr)
 library(preprocessCore)
+library(svglite)
+
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output) {
@@ -352,6 +354,14 @@ shinyServer(function(input, output) {
                                             },
                                             contentType = "image/pdf")
 
+    output$downloadHMsvg <- downloadHandler("heatmap.svg",
+                                            content = function(file) {
+                                                svglite(file, width = 13.85, height = 13.85)
+                                                myRenderPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/svg")
+
     output$myHeatmap <- renderPlot(myRenderPlot())
 
     output$myPlotlyHeatmap <- renderPlotly({
@@ -415,6 +425,14 @@ shinyServer(function(input, output) {
                                             },
                                             contentType = "image/pdf")
 
+    output$downloadTreePdf <- downloadHandler("dendrogram.svg",
+                                              content = function(file) {
+                                                  svglite(file, width = 7.29, height = 13.85)
+                                                  myRenderTreePlot()
+                                                  dev.off()
+                                              },
+                                              contentType = "image/svg")
+
     output$myTree <- renderPlot(myRenderTreePlot())
 
     output$tabSampleList <- renderDataTable({
@@ -424,5 +442,14 @@ shinyServer(function(input, output) {
         }
         return(myTable)
     }, escape = FALSE)
+
+    output$downloadDatasetTable <- downloadHandler("dataset_table.txt",
+                                                         content = function(file) {
+                                                             write.table(
+                                                                 getSelectedDataset()$annotation,
+                                                                 file = file, row.names = FALSE, quote = FALSE, sep = "\t"
+                                                             )
+                                                         },
+                                                         contentType = "text/tsv")
 
 })
