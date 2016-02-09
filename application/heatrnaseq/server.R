@@ -237,18 +237,18 @@ shinyServer(function(input, output) {
             )
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             if (is.null(input$cells_encode_m)) {
-                temp_cells_encode_m <- unique(encode_mouse_rnaseq$annotation[, "Biosample term name"])
+                temp_cells_encode_m <- unique(encode_mouse_rnaseq$annotation$tissue)
             } else {
                 temp_cells_encode_m <- input$cells_encode_m
             }
             if (is.null(input$sampleType_encode_m)) {
-                temp_sampleType_encode_m <- unique(encode_mouse_rnaseq$annotation[, "Biosample type"])
+                temp_sampleType_encode_m <- unique(encode_mouse_rnaseq$annotation$sampleType)
             } else {
                 temp_sampleType_encode_m <- input$sampleType_encode_m
             }
             keep <- which(
-                dataset$annotation[, "Biosample term name"] %in% temp_cells_encode_m &
-                dataset$annotation[, "Biosample type"] %in% temp_sampleType_encode_m
+                dataset$annotation$tissue %in% temp_cells_encode_m &
+                dataset$annotation$sampleType %in% temp_sampleType_encode_m
             )
         } else if (input$dataset == "Bgee RNA-seq (mouse)") {
             if (is.null(input$tissus_bgee_m)) {

@@ -31,10 +31,9 @@ metadata[, "Biosample term name"] %>% unique
 metadata[, "Biosample type"] %>% unique
 metadata[, "File format"] %>% unique
 
-# many issues... damn
 t0 <- Sys.time()
-allFiles <- mclapply(metadata[, "File accession"], function(x) read_tsv(paste0(x, ".tsv"), col_types = "cc?????????????"), mc.preschedule = FALSE, mc.cores = 6)
-Sys.time() - t0 # 51 seconds
+allFiles <- mclapply(metadata[, "File accession"], function(x) read_tsv(paste0(x, ".tsv"), col_types = "cc?????????????"), mc.preschedule = FALSE, mc.cores = 9)
+Sys.time() - t0
 
 table(sapply(allFiles, nrow))
 # 65268 67472 69690
@@ -125,7 +124,7 @@ encode_mouse_rnaseq <- list(
     "geneName" = case1$geneName,
     "correlationMatrix" = case1$corMatrix,
     "annotation" = case1$metadata[, c("File accession", "Biosample term name", "Biosample type",
-                                      "Library depleted in", 
+                                      "Library depleted in",
                                       "File download URL")]
 )
 
@@ -141,11 +140,13 @@ nonZero <- which(rowSums(encode_mouse_rnaseq$dataMatrix) != 0)
 encode_mouse_rnaseq$dataMatrix <- encode_mouse_rnaseq$dataMatrix[nonZero, ]
 encode_mouse_rnaseq$geneName <- encode_mouse_rnaseq$geneName[nonZero]
 encode_mouse_rnaseq$correlationMatrix <- cor(encode_mouse_rnaseq$dataMatrix)
-encode_mouse_rnaseq$annotation <- encode_mouse_rnaseq$annotation[, c(1, 2, 6, 3, 4, 5)] 
+encode_mouse_rnaseq$annotation <- encode_mouse_rnaseq$annotation[, c(1, 2, 6, 3, 4, 5)]
 
 lapply(encode_mouse_rnaseq, head)
 row.names(encode_mouse_rnaseq$annotation) <- NULL
 lapply(encode_mouse_rnaseq, row.names)
+
+colnames(encode_mouse_rnaseq$annotation) <- c("encodeAccession", "tissue", "name", "sampleType", "rnaFraction", "url")
 
 object.size(encode_mouse_rnaseq) # 58 Mo
 
