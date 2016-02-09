@@ -86,7 +86,7 @@ dim(case1$corMatrix)
 # Sys.time() - a # 3 minutes
 
 case1$geneName <- sub("\\.[0-9]*", "", case1$geneName)
-    
+
 # mart <- useMart(biomart = "ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl", host = "www.ensembl.org")
 # t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = mart)
 # t2g <- dplyr::rename(t2g, target_id = ensembl_transcript_id, ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
@@ -132,7 +132,7 @@ encode_rnaseq <- list(
     "geneName" = case1$geneName,
     "correlationMatrix" = case1$corMatrix,
     "annotation" = case1$metadata[, c("File accession", "Biosample term name", "Biosample type",
-                                      "rnaFraction", 
+                                      "rnaFraction",
                                       "File download URL")]
 )
 
@@ -146,12 +146,13 @@ encode_rnaseq$dataMatrix <- encode_rnaseq$dataMatrix[nonZero, ]
 encode_rnaseq$geneName <- encode_rnaseq$geneName[nonZero]
 encode_rnaseq$correlationMatrix <- cor(encode_rnaseq$dataMatrix)
 encode_rnaseq$annotation$name <- paste(encode_rnaseq$annotation[, "Biosample term name"], encode_rnaseq$annotation[, "File accession"])
-encode_rnaseq$annotation <- encode_rnaseq$annotation[, c(1, 2, 6, 3, 4, 5)] 
+encode_rnaseq$annotation <- encode_rnaseq$annotation[, c(1, 2, 6, 3, 4, 5)]
 
 lapply(encode_rnaseq, head)
 row.names(encode_rnaseq$annotation) <- NULL
 lapply(encode_rnaseq, row.names)
 
+colnames(encode_rnaseq$annotation) <- c("encodeAccession", "tissue", "name", "sampleType", "rnaFraction", "url")
 object.size(encode_rnaseq) # 125 Mo
 
 setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap")

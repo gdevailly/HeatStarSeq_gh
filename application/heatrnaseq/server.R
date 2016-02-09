@@ -180,24 +180,24 @@ shinyServer(function(input, output) {
         # filtering is dataset-dependent...
         if (input$dataset == "ENCODE RNA-seq (human)") {
             if (is.null(input$cells)) {
-                temp_cells <- unique(encode_rnaseq$annotation[, "Biosample term name"])
+                temp_cells <- unique(encode_rnaseq$annotation$tissue)
             } else {
                 temp_cells <- input$cells
             }
             if (is.null(input$sampleType)) {
-                temp_sampleType <- unique(encode_rnaseq$annotation[, "Biosample type"])
+                temp_sampleType <- unique(encode_rnaseq$annotation$sampleType)
             } else {
                 temp_sampleType <- input$sampleType
             }
             if (is.null(input$rnaExtract)) {
-                temp_rnaExtract <- unique(encode_rnaseq$annotation[, "rnaFraction"])
+                temp_rnaExtract <- unique(encode_rnaseq$annotation$rnaFraction)
             } else {
                 temp_rnaExtract <- input$rnaExtract
             }
             keep <- which(
-                dataset$annotation[, "Biosample term name"] %in% temp_cells &
-                dataset$annotation[, "Biosample type"] %in% temp_sampleType &
-                dataset$annotation[, "rnaFraction"] %in% temp_rnaExtract
+                dataset$annotation$tissue %in% temp_cells &
+                dataset$annotation$sampleType %in% temp_sampleType &
+                dataset$annotation$rnaFraction %in% temp_rnaExtract
             )
         } else if (input$dataset == "Bgee RNA-seq (human)") {
             if (is.null(input$tissus_bgee_h)) {
