@@ -79,12 +79,22 @@ shinyServer(function(input, output) {
         return(dataset)
     })
 
+    ### spearman
+    getSpearmanCorMatrix <- reactive({
+        withProgress(value = 1, message = "Spearman", {
+            speCor <- cor(getSelectedDataset()$dataMatrix, method = "spearman")
+        })
+        return(speCor)
+    })
+    ### end of spearman
+
     userExpressionFileAnalysis_1 <- reactive({
         userExpressionFileName <- input$expressionFile
         if (is.null(userExpressionFileName)){
             userExpressionFile <- NULL
             userCorrelations <- NULL
             normUserCorrelations <- NULL
+            spearmanUserCorrelations <- NULL
         } else {
             withProgress(value = 1, message = "User expression file: ", detail = "reading file", {
                 userExpressionFile_temp <- read_tsv(userExpressionFileName$datapath, col_names = input$header)[, 1:2]
@@ -110,6 +120,9 @@ shinyServer(function(input, output) {
                     normalize.quantiles.determine.target(dataset$correlationMatrix)
                 ) %>% as.vector
                 normUserCorrelations <- normUserCorrelations[-length(normUserCorrelations)]
+                ### spearmam
+                spearmanUserCorrelations <- cor(userExpressionFile, dataset$dataMatrix, method = "spearman") %>% as.vector
+                ### end of spearman
                 userExpressionFile <- data.frame(
                     geneName = dataset$geneName,
                     value = userExpressionFile,
@@ -122,7 +135,8 @@ shinyServer(function(input, output) {
             "expression" = userExpressionFile,
             "correlations" = userCorrelations,
             "linearNormCorrelations" = NULL, # to be fill below
-            "quantNormCorrelations" = normUserCorrelations
+            "quantNormCorrelations" = normUserCorrelations,
+            "spearmanUserCorrelations" = spearmanUserCorrelations
         ))
     })
 
@@ -163,6 +177,7 @@ shinyServer(function(input, output) {
                 "Correlation" = userExpressionFileAnalysis()$correlations,
                 "LinearNorm Correlation" = userExpressionFileAnalysis()$linearNormCorrelations,
                 "QuantNorm Correlation" = userExpressionFileAnalysis()$quantNormCorrelations,
+                "spearmanUserCorrelations" = userExpressionFileAnalysis()$spearmanUserCorrelations,
                 stringsAsFactors = FALSE
             )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ]
     })
@@ -178,6 +193,11 @@ shinyServer(function(input, output) {
     subsetMatrix <- reactive({
         dataset <- getSelectedDataset()
         workingMatrix <- dataset$correlationMatrix
+        ### spearman
+        if (input$correlationCorrection == "spearman") {
+            workingMatrix <- getSpearmanCorMatrix()
+        }
+        ### end of spearman
         keep<- 1:nrow(workingMatrix)
         # filtering is dataset-dependent...
         if (input$dataset == "ENCODE RNA-seq (human)") {
@@ -290,6 +310,10 @@ shinyServer(function(input, output) {
                 userCorrelations <- userExpressionFileAnalysis()$quantNormCorrelations
             } else if (input$correlationCorrection == "Linear scaling") {
                 userCorrelations <- userExpressionFileAnalysis()$linearNormCorrelations
+                ### spearman
+            } else if (input$correlationCorrection == "spearman") {
+                userCorrelations <- userExpressionFileAnalysis()$spearmanUserCorrelations
+                ### end of spearman
             }
             workingMatrix <- rbind(workingMatrix, userCorrelations[keep])
             workingMatrix <- cbind(workingMatrix, c(userCorrelations[keep], 1))
