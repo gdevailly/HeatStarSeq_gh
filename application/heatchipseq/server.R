@@ -115,18 +115,18 @@ shinyServer(function(input, output) {
 
         if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             if (is.null(input$cells)) {
-                temp_cells <- unique(encode$annotation$cell_line)
+                temp_cells <- unique(encode$annotation$cellLine)
             } else {
                 temp_cells <- input$cells
             }
             if (is.null(input$TF)) {
-                temp_TF <- unique(encode$annotation$TF)
+                temp_TF <- unique(encode$annotation$tf)
             } else {
                 temp_TF <- input$TF
             }
             keep <- which(
-                dataset$annotation$cell_line %in% temp_cells &
-                dataset$annotation$TF %in% temp_TF
+                dataset$annotation$cellLine %in% temp_cells &
+                dataset$annotation$tf %in% temp_TF
             )
 
         } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") {

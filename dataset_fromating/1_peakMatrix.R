@@ -12,14 +12,14 @@ Sys.time() - a # instant
 
 sapply(list(merged_data, umerged_data, annotation), dim)
 colnames(merged_data) <- c("chr", "start", "end", "experiment")
-head(merged_data) 
+head(merged_data)
 colnames(annotation) <- c("peakFile", "name", "TF", "antibody", "cell_line", "treatment", "lab")
 annotation <- cbind("index" = rownames(annotation), annotation)
 head(annotation)
 
 # creation of a binary data matrix
 templateVector <- vector(mode = "logical", length = nrow(annotation))
-names(templateVector) <- 1:nrow(annotation)   
+names(templateVector) <- 1:nrow(annotation)
 
 createBoolVectorForLine <- function(line) {
     templateVector[as.numeric(strsplit(merged_data[line, "experiment"], split=",")[[1]]) + 1] <- TRUE # they start at 0, hence the "+1", thanks R...
@@ -71,5 +71,9 @@ encode <- list("dataMatrix" = dataMatrix,
                "regionMetaData" = regionMetaData,
                "correlationMatrix" = correlationMatrix,
                "annotation" = annotation)
+encode$annotation <- encode$annotation[, 2:8]
+encode$annotation$url <- "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeRegTfbsClustered/"
+names(encode$annotation) <- c("peakFile", "name", "tf", "antibody", "cellLine", "treatment", "laboratory", "url")
+
 object.size(encode) # 2Go :-S
-save(encode, file = "heatmap_shinyApp/data/encode.RData")
+save(encode, file = "heatchipseq/data/encode.RData")
