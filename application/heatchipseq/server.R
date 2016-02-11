@@ -213,7 +213,10 @@ shinyServer(function(input, output) {
 
     doTheClustering <- reactive({
         withProgress(value = 1, message = "Clustering: ", detail = "distance caluculation", {
-            myClust <- hclust(dist(subsetMatrix()$mat), method = input$hclustMethod)
+            myData <- subsetMatrix()
+            myMat <- myData$mat
+            colnames(myMat) <- rownames(myMat) <- myData$myLabels
+            myClust <- hclust(dist(myMat), method = input$hclustMethod)
             setProgress(value = 1, detail = "hierarchical clustering")
             dendro <- as.dendrogram(myClust)
             setProgress(value = 1, detail = "done!")
