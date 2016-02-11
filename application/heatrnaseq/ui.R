@@ -135,7 +135,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                  downloadButton("downloadTreePdf", label = "Save as pdf"),
                                  downloadButton("downloadTreeSvg", label = "Save as svg")
                                  ),
-                        tabPanel("Dataset samples table",
+                        tabPanel("Samples metadata",
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
                                  )

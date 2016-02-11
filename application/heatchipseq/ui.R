@@ -26,7 +26,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     icon("home"),
                     a("Back to main page", href = URL_HEATSTARSEQ),
                     h3("1 - Select a dataset"),
-                    selectInput("dataset", label = NULL, choices = c(
+                    selectInput("selectedDataset", label = NULL, choices = c(
                         "ENCODE TFBS ChIP-seq (human, hg19)",
                         "CODEX ChIP-seq (human, hg19)",
                         "CODEX ChIP-seq (mouse, mm10)"
@@ -40,7 +40,6 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     img(src = "legend_small.png"),
                     h3("3 - Heatmap customisation"),
                     checkboxInput("highlight", "Highlight my experiment in the heatmap", FALSE),
-                    #conditionalPanel(condition = "input.dataset == 'ENCODE TFBS ChIP-seq (human, hg19)'",
                     div(id = "widgetForEncodeHuman",
                         selectInput("TF", "Subset for TF(s) (empty to select all):",
                                     choices = unique(encode$annotation$tf)[order(unique(encode$annotation$tf))],
@@ -49,7 +48,6 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                     choices = levels(factor(encode$annotation$cellLine))[order(levels(factor(encode$annotation$cellLine)))],
                                     selected = NULL, multiple = TRUE)
                     ),
-                    #conditionalPanel(condition = "input.dataset == 'CODEX ChIP-seq (mouse, mm10)'",
                     div(id = "widgetForCodexHuman",
                         selectInput("TF_ch", "Subset for TF(s) (empty to select all):",
                                     choices = unique(codex_human_chip$annotation$tf)[order(unique(codex_human_chip$annotation$tf))],
@@ -57,28 +55,28 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                         radioButtons("filterCellsBy_ch", label = "Filter by", choices = list("Cell type", "Cell subtype")),
                         conditionalPanel(condition = "input.filterCellsBy_ch == 'Cell type'",
                                          selectInput("cell_types_ch", "Subset for cell type(s) (empty to select all):",
-                                                     choices = unique(codex_human_chip$annotation$cell_type)[order(unique(codex_human_chip$annotation$cell_type))],
+                                                     choices = unique(codex_human_chip$annotation$cellType)[order(unique(codex_human_chip$annotation$cellType))],
                                                      selected = NULL, multiple = TRUE)
                         ),
                         conditionalPanel(condition = "input.filterCellsBy_ch == 'Cell subtype'",
                                          selectInput("cell_subtypes_ch", "Subset for cell subtypes(s) (empty to select all):",
-                                                     choices = unique(codex_human_chip$annotation$cell_subtype)[order(unique(codex_human_chip$annotation$cell_subtype))],
+                                                     choices = unique(codex_human_chip$annotation$cellSubtype)[order(unique(codex_human_chip$annotation$cellSubtype))],
                                                      selected = NULL, multiple = TRUE)
                         )
                     ),
                     div(id = "widgetForCodexMouse",
                          selectInput("TF_m", "Subset for TF(s) (empty to select all):",
-                                     choices = unique(codex$annotation$TF)[order(unique(codex$annotation$TF))],
+                                     choices = unique(codex$annotation$tf)[order(unique(codex$annotation$tf))],
                                      selected = NULL, multiple = TRUE),
                          radioButtons("filterCellsBy", label = "Filter by", choices = list("Cell type", "Cell subtype")),
                          conditionalPanel(condition = "input.filterCellsBy == 'Cell type'",
                                           selectInput("cell_types_m", "Subset for cell type(s) (empty to select all):",
-                                                      choices = unique(codex$annotation[,"Cell type"])[order(unique(codex$annotation[,"Cell type"]))],
+                                                      choices = unique(codex$annotation$cellType)[order(unique(codex$annotation$cellType))],
                                                       selected = NULL, multiple = TRUE)
                          ),
                          conditionalPanel(condition = "input.filterCellsBy == 'Cell subtype'",
                                           selectInput("cell_subtypes_m", "Subset for cell subtypes(s) (empty to select all):",
-                                                      choices = unique(codex$annotation[,"Cell subtype"])[order(unique(codex$annotation[,"Cell subtype"]))],
+                                                      choices = unique(codex$annotation$cellSubtype)[order(unique(codex$annotation$cellSubtype))],
                                                       selected = NULL, multiple = TRUE)
                          )
                     ),
@@ -108,7 +106,10 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                  downloadButton("downloadHMpdf", label = "Save as pdf")
                                  ),
                         tabPanel("Responsive Heatmap", plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px")),
-                        tabPanel("Dataset samples table", dataTableOutput("tabSampleList"))
+                        tabPanel("Samples metadata",
+                                 dataTableOutput("tabSampleList"),
+                                 downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
+                        )
                         , id = "myPanels"
                     )
                 )

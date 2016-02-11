@@ -1,5 +1,7 @@
 library(gplots)
 library(readr)
+library(preprocessCore)
+library(svglite)
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output) {
@@ -19,31 +21,32 @@ shinyServer(function(input, output) {
         shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForCodexHuman")
         shinyjs::hide("widgetForCodexMouse")
-        if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+        if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             shinyjs::show("widgetForEncodeHuman")
-        } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") {
+        } else if (input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
             shinyjs::show("widgetForCodexHuman")
-        } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") {
+        } else if (input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
             shinyjs::show("widgetForCodexMouse")
-        } else if (input$dataset == "other (soon)") {
+        } else if (input$selectedDataset == "other (soon)") {
             # fill this
         }
     })
 
+    # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
             # this remove from memmory non-selected datasets
             load("data/encode_preload.RData")
-            load("data/codex_currated_preload.RData")
+            load("data/codex_preload.RData")
             load("data/codex_human_chip_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
-            if(input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+            if(input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
                 load("data/encode.RData")
                 dataset <- encode
-            } else if(input$dataset == "CODEX ChIP-seq (mouse, mm10)") {
-                load("data/codex_currated.RData")
+            } else if(input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
+                load("data/codex.RData")
                 dataset <- codex
-            } else if(input$dataset == "CODEX ChIP-seq (human, hg19)") {
+            } else if(input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
                 load("data/codex_human_chip.RData")
                 dataset <- codex_human_chip
             }
@@ -113,7 +116,7 @@ shinyServer(function(input, output) {
         keep<- 1:nrow(workingMatrix)
         # filtering is dataset-depedent...
 
-        if (input$dataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+        if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             if (is.null(input$cells)) {
                 temp_cells <- unique(encode$annotation$cellLine)
             } else {
@@ -129,7 +132,7 @@ shinyServer(function(input, output) {
                 dataset$annotation$tf %in% temp_TF
             )
 
-        } else if (input$dataset == "CODEX ChIP-seq (human, hg19)") {
+        } else if (input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
             if (is.null(input$TF_ch)) {
                 temp_TF_ch <- unique(codex_human_chip$annotation$tf)
             } else {
@@ -137,51 +140,51 @@ shinyServer(function(input, output) {
             }
             if (input$filterCellsBy_ch == "Cell type") {
                 if (is.null(input$cell_types_ch)) {
-                    temp_cell_types_ch <- unique(codex_human_chip$annotation$cell_type)
+                    temp_cell_types_ch <- unique(codex_human_chip$annotation$cellType)
                 } else {
                     temp_cell_types_ch <- input$cell_types_ch
                 }
                 keep <- which(
-                    dataset$annotation$cell_type %in% temp_cell_types_ch &
-                        dataset$annotation$tf %in% temp_TF_ch
+                    dataset$annotation$cellType %in% temp_cell_types_ch &
+                    dataset$annotation$tf %in% temp_TF_ch
                 )
-            } else if (input$filterCellsBy == "Cell subtype") {
+            } else if (input$filterCellsBy_ch == "Cell subtype") {
                 if(is.null(input$cell_subtypes_ch)) {
-                    temp_cell_subtypes_ch <- codex_human_chip$annotation$cell_subtype
+                    temp_cell_subtypes_ch <- codex_human_chip$annotation$cellSubtype
                 } else {
                     temp_cell_subtypes_ch <- input$cell_subtypes_ch
                 }
                 keep <- which(
-                    dataset$annotation$cell_subtype %in% temp_cell_subtypes_ch &
-                        dataset$annotation$tf %in% temp_TF_ch
+                    dataset$annotation$cellSubtype %in% temp_cell_subtypes_ch &
+                    dataset$annotation$tf %in% temp_TF_ch
                 )
             }
 
-        } else if (input$dataset == "CODEX ChIP-seq (mouse, mm10)") {
+        } else if (input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
             if (is.null(input$TF_m)) {
-                temp_TF_m <- unique(codex$annotation$TF)
+                temp_TF_m <- unique(codex$annotation$tf)
             } else {
                 temp_TF_m <- input$TF_m
             }
             if (input$filterCellsBy == "Cell type") {
                 if (is.null(input$cell_types_m)) {
-                    temp_cell_types_m <- unique(codex$annotation[,"Cell type"])
+                    temp_cell_types_m <- unique(codex$annotation$cellType)
                 } else {
                     temp_cell_types_m <- input$cell_types_m
                 }
                 keep <- which(
-                    dataset$annotation[,"Cell type"] %in% temp_cell_types_m &
-                    dataset$annotation$TF %in% temp_TF_m
+                    dataset$annotation$cellType %in% temp_cell_types_m &
+                    dataset$annotation$tf %in% temp_TF_m
                 )
             } else if (input$filterCellsBy == "Cell subtype") {
                 if(is.null(input$cell_subtypes_m)) {
-                    temp_cell_subtypes_m <- codex$annotation[,"Cell subtype"]
+                    temp_cell_subtypes_m <- codex$annotation$cellSubtype
                 } else {
                     temp_cell_subtypes_m <- input$cell_subtypes_m
                 }
                 keep <- which(
-                    dataset$annotation[,"Cell subtype"] %in% temp_cell_subtypes_m &
-                    dataset$annotation$TF %in% temp_TF_m
+                    dataset$annotation$cellSubtype %in% temp_cell_subtypes_m &
+                    dataset$annotation$tf %in% temp_TF_m
                 )
             }
         }
@@ -290,6 +293,21 @@ shinyServer(function(input, output) {
                )
     })
 
-    output$tabSampleList <- renderDataTable(getSelectedDataset()$annotation)
+    output$tabSampleList <- renderDataTable({
+        myTable <- getSelectedDataset()$annotation
+        if(!is.null(myTable$url)) {
+            myTable$url <- paste0('<a href="', myTable$url, '">link</a>')
+        }
+        return(myTable)
+    }, escape = FALSE)
+
+    output$downloadDatasetTable <- downloadHandler("dataset_table.txt",
+                                                   content = function(file) {
+                                                       write.table(
+                                                           getSelectedDataset()$annotation,
+                                                           file = file, row.names = FALSE, quote = FALSE, sep = "\t"
+                                                       )
+                                                   },
+                                                   contentType = "text/tsv")
 
 })

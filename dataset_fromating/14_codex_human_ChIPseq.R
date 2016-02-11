@@ -23,18 +23,18 @@ command[grep("GSM1291199_TAL1.bed", command, fixed = TRUE)] # file not found
 command[grep("GSM1085400_TAL1.bed", command, fixed = TRUE)] # file not found
 # to: bg200@cam.ac.uk.
 # Dear HSCL team,
-# 
+#
 # I am a Postdoc at the Rolsin Institute (Edinburgh) in Anagha Joshi's group.
 # I am trying to download several peak files from the CODEX human database.
 # I have been mostly successful, but three files seems to escape my reach: "Files not found"
 # http://codex.stemcells.cam.ac.uk/data/bed/hg19/GSM1291197_TAL1.bed
 # http://codex.stemcells.cam.ac.uk/data/bed/hg19/GSM1291199_TAL1.bed
 # http://codex.stemcells.cam.ac.uk/data/bed/hg19/GSM1085400_TAL1.bed
-# 
+#
 # Could you please provide me the correct link for those file? And maybe correct the links on the codex table?
-# 
+#
 # Kind regards,
-# 
+#
 # Guillaume
 #
 # reply: this were remanant of re-process files, ie dupplicate entries
@@ -46,12 +46,12 @@ t0 <- Sys.time()
 peakList <- lapply(metadata$filename, function(x) read_tsv(x, col_names = FALSE))
 Sys.time() - t0 # 9s
 
-metadata$name <- sub(".bed", "", metadata$filename, fixed = TRUE) 
+metadata$name <- sub(".bed", "", metadata$filename, fixed = TRUE)
 names(peakList) <- metadata$name
 peakList <- lapply(peakList, function(x) x[, 1:3])
 peakList <- lapply(1:length(peakList), function(x) {
     peakList[[x]]$exp <- names(peakList)[x]
-    return(peakList[[x]])        
+    return(peakList[[x]])
 })
 
 a <- Sys.time()
@@ -83,16 +83,16 @@ dim(codexMerged)
 # [1] 702011      4
 metadata <- read_tsv("CODEX_hgxx_metadata.txt", col_names = FALSE)
 metadata <- metadata[-nrow(metadata),]
-colnames(metadata) <- c("cell_type", "cell_subtype", "tf", "gse", "gsm", "url")
+colnames(metadata) <- c("cellType", "cellSubtype", "tf", "gse", "gsm", "url")
 metadata$filename <- strsplit(metadata$url, split = "/") %>% lapply(function(x) tail(x, 1)) %>% unlist
-metadata$name <- sub(".bed", "", metadata$filename, fixed = TRUE) 
+metadata$name <- sub(".bed", "", metadata$filename, fixed = TRUE)
 metadata <- subset(metadata, !(metadata$filename %in% c("GSM1291197_TAL1.bed", "GSM1291199_TAL1.bed", "GSM1085400_TAL1.bed")))
 
 templateVector <- vector(mode = "logical", length = nrow(metadata))
 names(templateVector) <- metadata$name
 
 createBoolVectorForLine <- function(line) {
-    templateVector[strsplit(codexMerged[line, "X4"], split=",")[[1]]] <- TRUE 
+    templateVector[strsplit(codexMerged[line, "X4"], split=",")[[1]]] <- TRUE
     return(templateVector)
 }
 t0 <- Sys.time()
@@ -126,7 +126,7 @@ codex_human_chip <- list("dataMatrix" = dataMatrix,
               "annotation" = metadata)
 codex_human_chip$metadata <- codex_human_chip$metadata[, c(8, 1:6)]
 
-unique(codex_human_chip$annotation$cell_type)
+unique(codex_human_chip$annotation$cellType)
 # [1] "Acute Myeloid Leukemia"
 # [2] "acute myeloid leukemia"
 # [3] "Acute myeloid leukemia (AML)"
@@ -172,7 +172,7 @@ unique(codex_human_chip$annotation$cell_type)
 # [43] "Trophectoderm cell"
 # [44] "Umbilical Cord Blood Stem and Progenitor Cells"
 
-ct <- factor(codex_human_chip$annotation$cell_type)
+ct <- factor(codex_human_chip$annotation$cellType)
 lct <- levels(ct)
 
 lct[lct == "acute myeloid leukemia"] <- "Acute Myeloid Leukemia"
@@ -186,18 +186,19 @@ lct[lct == "Macrophage"] <- "macrophage"
 lct[lct == "T_ALL"] <- "T-lymphoblastic leukemia (T-ALL)"
 
 levels(ct) <- lct
-codex_human_chip$annotation$cell_type <- as.character(ct)
-unique(codex_human_chip$annotation$cell_type)
+codex_human_chip$annotation$cellType <- as.character(ct)
+unique(codex_human_chip$annotation$cellType)
 
-unique(codex_human_chip$annotation$cell_subtype)
-ct <- factor(codex_human_chip$annotation$cell_subtype)
+unique(codex_human_chip$annotation$cellSubtype)
+ct <- factor(codex_human_chip$annotation$cellSubtype)
 lct <- levels(ct)
 lct[lct == "[CL] Kasumi-1 acute myeloid leukaemia +mismatch siRNA."] <- "[CL] Kasumi-1 acute myeloid leukaemia +mismatch siRNA"
 lct[lct == "[PC] Peripherial blood derived proerythroblast"] <- "[PC] Peripheral blood derived proerythroblast"
 levels(ct) <- lct
-codex_human_chip$annotation$cell_subtype <- as.character(ct)
+codex_human_chip$annotation$cellSubtype <- as.character(ct)
 # maybe jurkat also
-
+codex_human_chip$annotation <- codex_human_chip$annotation[, c(1:6, 8)]
+codex_human_chip$annotation$name <- paste(codex_human_chip$annotation$name, codex_human_chip$annotation$cellSubtype)
 object.size(codex_human_chip) # 67Mo
 save(codex_human_chip, file = "../../heatchipseq/data/codex_human_chip.RData")
 

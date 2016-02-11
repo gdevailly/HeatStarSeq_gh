@@ -6,7 +6,7 @@ setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap")
 codexMD <- read_tsv("data/CODEX_mm10/CODEX_mm10.txt")
 
 # download file
-codexMD$getURL <- paste0("wget ", codexMD$peakURL) 
+codexMD$getURL <- paste0("wget ", codexMD$peakURL)
 # write.table(codexMD$getURL, file = "data/CODEX_mm10/peakFiles/getPeakFile.sh", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "/t")
 codexMD$getURL <- NULL
 
@@ -22,7 +22,7 @@ filesList[(filesList == "GSM1350476_RORgamma%28t%29.bed")]
 codexMD[631, "filename"] <- "GSM1350476_RORgamma(t).bed"
 filesList[!(filesList %in% codexMD$filename)]
 codexMD$filename[!(codexMD$filename %in% filesList)]
-codexMD$name <- sub(".bed", "", codexMD$filename, fixed = TRUE) 
+codexMD$name <- sub(".bed", "", codexMD$filename, fixed = TRUE)
 #
 a <- Sys.time()
 peakList <- lapply(codexMD$filename, function(x) read_tsv(paste0("data/CODEX_mm10/peakFiles/", x), col_names = FALSE))
@@ -32,7 +32,7 @@ names(peakList) <- codexMD$name
 peakList <- lapply(peakList, function(x) x[,1:3])
 peakList <- lapply(1:length(peakList), function(x) {
                         peakList[[x]]$exp <- names(peakList)[x]
-                        return(peakList[[x]])        
+                        return(peakList[[x]])
                     })
 
 a <- Sys.time()
@@ -63,7 +63,7 @@ dim(codexMerged)
 codexMD <- read_tsv("data/CODEX_mm10/CODEX_mm10.txt")
 codexMD$filename <- strsplit(codexMD$peakURL, split = "/") %>% lapply(function(x) tail(x, 1)) %>% unlist
 codexMD[631, "filename"] <- "GSM1350476_RORgamma(t).bed"
-codexMD$name <- sub(".bed", "", codexMD$filename, fixed = TRUE) 
+codexMD$name <- sub(".bed", "", codexMD$filename, fixed = TRUE)
 filesList <- list.files("data/CODEX_mm10/peakFiles/")
 filesList[!(filesList %in% codexMD$filename)]
 codexMD$filename[!(codexMD$filename %in% filesList)]
@@ -73,7 +73,7 @@ templateVector <- vector(mode = "logical", length = nrow(codexMD))
 names(templateVector) <- codexMD$name
 
 createBoolVectorForLine <- function(line) {
-    templateVector[strsplit(codexMerged[line, "X4"], split=",")[[1]]] <- TRUE 
+    templateVector[strsplit(codexMerged[line, "X4"], split=",")[[1]]] <- TRUE
     return(templateVector)
 }
 
@@ -108,5 +108,38 @@ codex <- list("dataMatrix" = dataMatrix,
                "regionMetaData" = regionMetaData,
                "correlationMatrix" = correlationMatrix,
                "annotation" = codexMD[,c("Cell type", "Cell subtype", "TF", "name")])
+
+
+ct <- factor(codex$annotation[,"Cell type"])
+lct <- levels(ct)
+table(ct)
+lct[lct == "embryonic stem cell"] <- "Embryonic Stem Cell"
+lct[lct == "Embryonic stem cell"] <- "Embryonic Stem Cell"
+lct[lct == "Embryonic Stem cell"] <- "Embryonic Stem Cell"
+lct[lct == "embryonic stem cells"] <- "Embryonic Stem Cell"
+lct[lct == "Embryonic stem cells"] <- "Embryonic Stem Cell"
+lct[lct == "Embryonic stem cells"] <- "Embryonic Stem Cell"
+lct[lct == "Embryonic Stem cells"] <- "Embryonic Stem Cell"
+lct[lct == "Embryonic Stem Cells"] <- "Embryonic Stem Cell"
+lct[lct == "Embyonic stem cell"] <- "Embryonic Stem Cell"
+lct[lct == "ES cells"] <- "Embryonic Stem Cell"
+lct[lct == "Erythroid progenitor"] <- "Erythroid Progenitors"
+lct[lct == "Haematopoietic progenitors"] <- "Haematopoietic Progenitor"
+lct[lct == "Haematopoietic progenitor"] <- "Haematopoietic Progenitor"
+lct[lct == "Hematopoietic Progenitor"] <- "Haematopoietic Progenitor"
+lct[lct == "Hematopoietic Progenitor Cells"] <- "Haematopoietic Progenitor"
+lct[lct == "Macrophages"] <- "Macrophage"
+lct[lct == "Embryonic fibroblast cells"] <- "Mouse Embryonic fibroblasts"
+lct[lct == "Mouse ErythroLeukaemic "] <- "Mouse ErythroLeukaemic"
+lct[lct == "Myeloid progenitor cells"] <- "Myeloid Progenitors"
+lct[lct == "neural progenitor cells"] <- "Neural progenitor cells"
+lct[lct == "Bone Marrow "] <- "Bone Marrow"
+levels(ct) <- lct
+table(ct)
+codex$annotation[,"Cell type"] <- as.character(ct)
+colnames(codex$annotation) <- c("cellType", "cellSubtype", "tf", "name")
+codex$annotation$url <- codexMD$peakURL
+codex$annotation$name <- paste(codex$annotation$name, codex$annotation$cellSubtype)
+
 object.size(codex) # 1.8Go :-S
-save(codex, file = "heatmap_shinyApp/data/codex.RData")
+save(codex, file = "heatchipseq/data/codex.RData")
