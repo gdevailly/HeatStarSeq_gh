@@ -84,9 +84,9 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                 label = "Clusterisation method",
                                 choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                                 selected = "complete"),
-                    conditionalPanel(condition = "input.myPanels == 'Static Heatmap'",
-                                     numericInput("margin", label = "Label margin [1 - 50] (static heatmap only)", value = 20, min = 1, max = 50),
-                                     numericInput("labCex", label = "Label size [0.1 - 3] (static heatmap only)", value = 1.2, min = 0.1, max = 3)
+                    div(id = "widgetForLabels",
+                        sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1),
+                        sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1)
                     )
                 ),
 
@@ -106,6 +106,12 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                  downloadButton("downloadHMpdf", label = "Save as pdf")
                                  ),
                         tabPanel("Responsive Heatmap", plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px")),
+                        tabPanel("Tree",
+                                 plotOutput("myTree", width = "500px", height = "950px"),
+                                 downloadButton("downloadTreePng", label = "Save as png"),
+                                 downloadButton("downloadTreePdf", label = "Save as pdf"),
+                                 downloadButton("downloadTreeSvg", label = "Save as svg")
+                        ),
                         tabPanel("Samples metadata",
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")

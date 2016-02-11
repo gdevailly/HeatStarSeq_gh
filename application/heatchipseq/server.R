@@ -32,6 +32,14 @@ shinyServer(function(input, output) {
         }
     })
 
+    observe({
+        if(input$myPanels == "Static Heatmap" | input$myPanels == "Tree") {
+            shinyjs::show("widgetForLabels")
+        } else {
+            shinyjs::hide("widgetForLabels")
+        }
+    })
+
     # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
@@ -292,6 +300,43 @@ shinyServer(function(input, output) {
                yaxis = list(title = "")
                )
     })
+
+    myRenderTreePlot <- function() {
+        clusterDat <- doTheClustering()
+        oldPar <- list(mar = par()$mar, cex = par()$cex)
+        par(mar = c(5, 4, 4, input$margin), cex = input$labCex)
+        plot(
+            clusterDat$dend,
+            horiz = TRUE
+        )
+        par(oldPar) # not all par() can be set
+    }
+
+    output$downloadTreePng <- downloadHandler("dendrogram.png",
+                                              content = function(file) {
+                                                  png(file, width = 500, height = 950)
+                                                  myRenderTreePlot()
+                                                  dev.off()
+                                              },
+                                              contentType = "image/png")
+
+    output$downloadTreePdf <- downloadHandler("dendrogram.pdf",
+                                              content = function(file) {
+                                                  pdf(file, width = 7.29, height = 13.85)
+                                                  myRenderTreePlot()
+                                                  dev.off()
+                                              },
+                                              contentType = "image/pdf")
+
+    output$downloadTreePdf <- downloadHandler("dendrogram.svg",
+                                              content = function(file) {
+                                                  svglite(file, width = 7.29, height = 13.85)
+                                                  myRenderTreePlot()
+                                                  dev.off()
+                                              },
+                                              contentType = "image/svg")
+
+    output$myTree <- renderPlot(myRenderTreePlot())
 
     output$tabSampleList <- renderDataTable({
         myTable <- getSelectedDataset()$annotation
