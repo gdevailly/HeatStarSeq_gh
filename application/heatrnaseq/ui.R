@@ -40,7 +40,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                     checkboxInput("header", strong("My expression file contains a header."), FALSE),
                     fileInput("expressionFile", "Upload your expression file:", accept = "text/tab-separated-values"),
                     h3("3 - Plot customisation"),
-                    checkboxInput("highlight", "Highlight my experiment in the heatmap", FALSE),
+                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), FALSE),
                     # we addapt filtering widgets to the various datasets
                     div(id = "widgetForBgeeHuman",
                          selectInput("tissus_bgee_h", "Subset for tissue (empty to select all):",
@@ -91,21 +91,27 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                                  choices = unique(bgee_mouse$annotation$libraryType)[order(unique(bgee_mouse$annotation$libraryType))],
                                                  selected = NULL, multiple = TRUE)
                     ),
-                    selectInput("hclustMethod",
-                                label = "Clusterisation method",
-                                choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
-                                selected = "complete"),
-                    div(id = "widgetForLabels",
-                                     sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1),
-                                     sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1)
-                    ),
                     selectInput("correlationCorrection",
                                 label = "Uploaded experiment correlation correction:",
                                 choices = list("None", "Linear scaling", "Quantile normalisation"),
                                 selected = "None"),
                     sliderInput("maxCorrelation",
                                 label = "Maximum expected correlation value for Linear scaling correction",
-                                min = 0.1, max = 1, value = 0.95, step = 0.01)
+                                min = 0.1, max = 1, value = 0.95, step = 0.01),
+                    actionButton("advClustOptions", label = "Advance clustering options"),
+                    div(id = "widgetForClustOptions",
+                        selectInput("distOption", label = "Distance calculation:",
+                                    choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
+                                    selected = 1),
+                        selectInput("hclustMethod",
+                                    label = "Clusterisation method",
+                                    choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
+                                    selected = "complete")
+                    ),
+                    div(id = "widgetForLabels",
+                        sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1),
+                        sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1)
+                    )
                 ),
 
                 mainPanel(

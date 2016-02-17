@@ -1,7 +1,7 @@
-library(gplots)
 library(readr)
 library(preprocessCore)
 library(svglite)
+library(cba)
 
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
@@ -46,6 +46,11 @@ shinyServer(function(input, output) {
         } else {
             shinyjs::hide("widgetForLabels")
         }
+    })
+
+    observe({
+        junkVar <- input$advClustOptions
+        shinyjs::toggle("widgetForClustOptions")
     })
 
     # output computations
@@ -303,7 +308,15 @@ shinyServer(function(input, output) {
             myData <- subsetMatrix()
             myMat <- myData$mat
             colnames(myMat) <- rownames(myMat) <- myData$myLabels
-            myClust <- hclust(dist(myMat), method = input$hclustMethod)
+            if (input$distOption == "1 - correlations") {
+                d <- as.dist(1 - myMat)
+            } else {
+                d <- dist(myMat, method = input$distOption)
+            }
+            myClust <- hclust(d, method = input$hclustMethod)
+            co <- order.optimal(d, myClust$merge)
+            myClust$merge <- co$merge
+            myClust$order <- co$order
             dendro <- as.dendrogram(myClust)
             setProgress(value = 1, detail = "done!")
         })
