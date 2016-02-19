@@ -1,4 +1,3 @@
-# UI
 source("data/server_adresses.R")
 shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
 
@@ -37,9 +36,9 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     textInput("nameOfPeakFile", "Name of your experiment", value="my ChIP experiment"),
                     checkboxInput("header", "My peak file contains a header.", FALSE),
                     fileInput("peakFile", "Upload your peak file:", accept = "text/tab-separated-values"),
-                    img(src = "legend_small.png"),
-                    h3("3 - Heatmap customisation"),
+                    h3("3 - Plot customisation"),
                     checkboxInput("highlight", "Highlight my experiment in the heatmap", FALSE),
+                    # we addapt filtering widgets to the various datasets
                     div(id = "widgetForEncodeHuman",
                         selectInput("TF", "Subset for TF(s) (empty to select all):",
                                     choices = unique(encode$annotation$tf)[order(unique(encode$annotation$tf))],
@@ -80,10 +79,23 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                                       selected = NULL, multiple = TRUE)
                          )
                     ),
-                    selectInput("hclustMethod",
-                                label = "Clusterisation method",
-                                choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
-                                selected = "complete"),
+                    selectInput("correlationCorrection",
+                                label = "Uploaded experiment correlation correction:",
+                                choices = list("None", "Linear scaling"),
+                                selected = "None"),
+                    sliderInput("maxCorrelation",
+                                label = "Maximum expected correlation value for Linear scaling correction",
+                                min = 0.1, max = 1, value = 0.95, step = 0.01),
+                    actionButton("advClustOptions", label = "Advance clustering options"),
+                    div(id = "widgetForClustOptions",
+                        selectInput("distOption", label = "Distance calculation:",
+                                    choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
+                                    selected = 1),
+                        selectInput("hclustMethod",
+                                    label = "Clusterisation method",
+                                    choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
+                                    selected = "complete")
+                    ),
                     div(id = "widgetForLabels",
                         sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1),
                         sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1)
@@ -102,10 +114,15 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                  ),
                         tabPanel("Static Heatmap",
                                  plotOutput("myHeatmap", width = "950px", height = "950px"),
+                                 img(src = "legend_small.png"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
-                                 downloadButton("downloadHMpdf", label = "Save as pdf")
+                                 downloadButton("downloadHMpdf", label = "Save as pdf"),
+                                 downloadButton("downloadHMsvg", label = "Save as svg")
                                  ),
-                        tabPanel("Responsive Heatmap", plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px")),
+                        tabPanel("Responsive Heatmap",
+                                 plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
+                                 img(src = "legend_small.png")
+                        ),
                         tabPanel("Tree",
                                  plotOutput("myTree", width = "500px", height = "950px"),
                                  downloadButton("downloadTreePng", label = "Save as png"),

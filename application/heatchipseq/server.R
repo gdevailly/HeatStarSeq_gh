@@ -1,7 +1,7 @@
-library(gplots)
 library(readr)
-library(preprocessCore)
 library(svglite)
+library(cba)
+
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output) {
@@ -40,6 +40,11 @@ shinyServer(function(input, output) {
         }
     })
 
+    observe({
+        junkVar <- input$advClustOptions
+        shinyjs::toggle("widgetForClustOptions")
+    })
+
     # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
@@ -63,7 +68,7 @@ shinyServer(function(input, output) {
         return(dataset)
     })
 
-    userPeakFileAnalysis <- reactive({
+    userPeakFileAnalysis_1 <- reactive({
         userPeakFileName <- input$peakFile
         if (is.null(userPeakFileName)){
             userPeakFile <- NULL
@@ -87,7 +92,18 @@ shinyServer(function(input, output) {
                 setProgress(value = 1, detail = "done!")
             })
         }
-        return(list("peaks" = userPeakFile, "correlations" = userCorrelations))
+        return(list("peaks" = userPeakFile, "correlations" = userCorrelations, "linearNormCorrelations" = NULL))
+    })
+
+    userPeakFileAnalysis <- reactive({
+        userPeakFileData <- userPeakFileAnalysis_1()
+        userCorrelations <- userPeakFileData$correlations
+        if (!is.null(input$expressionFile)){
+            if (input$maxCorrelation != 0) {
+                userPeakFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
+            }
+        }
+        return(userPeakFileData)
     })
 
     getCorrelationTable <- reactive({
@@ -97,6 +113,7 @@ shinyServer(function(input, output) {
             data.frame(
                 "Experiment" = getSelectedDataset()$annotation$name,
                 "Correlation" = userPeakFileAnalysis()$correlations,
+                "Scaled Correlation" = userPeakFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
             )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
         }
@@ -212,12 +229,19 @@ shinyServer(function(input, output) {
     })
 
     doTheClustering <- reactive({
-        withProgress(value = 1, message = "Clustering: ", detail = "distance caluculation", {
+        withProgress(value = 1, message = "Clustering: ", detail = "hierarchical clustering", {
             myData <- subsetMatrix()
             myMat <- myData$mat
             colnames(myMat) <- rownames(myMat) <- myData$myLabels
-            myClust <- hclust(dist(myMat), method = input$hclustMethod)
-            setProgress(value = 1, detail = "hierarchical clustering")
+            if (input$distOption == "1 - correlations") {
+                d <- as.dist(1 - myMat)
+            } else {
+                d <- dist(myMat, method = input$distOption)
+            }
+            myClust <- hclust(d, method = input$hclustMethod)
+            co <- order.optimal(d, myClust$merge)
+            myClust$merge <- co$merge
+            myClust$order <- co$order
             dendro <- as.dendrogram(myClust)
             setProgress(value = 1, detail = "done!")
         })
@@ -252,7 +276,7 @@ shinyServer(function(input, output) {
         )
     }
 
-    output$downloadHMpng <- downloadHandler("encode_heatmap.png",
+    output$downloadHMpng <- downloadHandler("heatmap.png",
                                             content = function(file) {
                                                 png(file, width = 950, height = 950)
                                                 myRenderPlot()
@@ -260,13 +284,21 @@ shinyServer(function(input, output) {
                                             },
                                             contentType = "image/png")
 
-    output$downloadHMpdf <- downloadHandler("encode_heatmap.pdf",
+    output$downloadHMpdf <- downloadHandler("heatmap.pdf",
                                             content = function(file) {
                                                 pdf(file, width = 13.85, height = 13.85)
                                                 myRenderPlot()
                                                 dev.off()
                                             },
                                             contentType = "image/pdf")
+
+    output$downloadHMsvg <- downloadHandler("heatmap.svg",
+                                            content = function(file) {
+                                                svglite(file, width = 13.85, height = 13.85)
+                                                myRenderPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/svg")
 
     output$myHeatmap <- renderPlot(myRenderPlot())
 
@@ -312,7 +344,7 @@ shinyServer(function(input, output) {
             clusterDat$dend,
             horiz = TRUE
         )
-        par(oldPar) # not all par() can be set
+        par(oldPar)
     }
 
     output$downloadTreePng <- downloadHandler("dendrogram.png",
@@ -331,7 +363,7 @@ shinyServer(function(input, output) {
                                               },
                                               contentType = "image/pdf")
 
-    output$downloadTreePdf <- downloadHandler("dendrogram.svg",
+    output$downloadTreeSvg <- downloadHandler("dendrogram.svg",
                                               content = function(file) {
                                                   svglite(file, width = 7.29, height = 13.85)
                                                   myRenderTreePlot()

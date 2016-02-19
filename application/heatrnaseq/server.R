@@ -1,5 +1,4 @@
 library(readr)
-library(preprocessCore)
 library(svglite)
 library(cba)
 
@@ -89,7 +88,6 @@ shinyServer(function(input, output) {
         if (is.null(userExpressionFileName)){
             userExpressionFile <- NULL
             userCorrelations <- NULL
-            normUserCorrelations <- NULL
         } else {
             withProgress(value = 1, message = "User expression file: ", detail = "reading file", {
                 userExpressionFile_temp <- read_tsv(userExpressionFileName$datapath, col_names = input$header)[, 1:2]
@@ -110,11 +108,6 @@ shinyServer(function(input, output) {
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
                 userCorrelations <- cor(userExpressionFile, dataset$dataMatrix) %>% as.vector
-                normUserCorrelations <- normalize.quantiles.use.target(
-                    as.matrix(c(userCorrelations, 1)),
-                    normalize.quantiles.determine.target(dataset$correlationMatrix)
-                ) %>% as.vector
-                normUserCorrelations <- normUserCorrelations[-length(normUserCorrelations)]
                 userExpressionFile <- data.frame(
                     geneName = dataset$geneName,
                     value = userExpressionFile,
@@ -126,8 +119,7 @@ shinyServer(function(input, output) {
         return(list(
             "expression" = userExpressionFile,
             "correlations" = userCorrelations,
-            "linearNormCorrelations" = NULL, # to be fill below
-            "quantNormCorrelations" = normUserCorrelations
+            "linearNormCorrelations" = NULL # to be fill below
         ))
     })
 
@@ -166,8 +158,7 @@ shinyServer(function(input, output) {
             data.frame(
                 "Experiment" = getSelectedDataset()$annotation$name,
                 "Correlation" = userExpressionFileAnalysis()$correlations,
-                "LinearNorm Correlation" = userExpressionFileAnalysis()$linearNormCorrelations,
-                "QuantNorm Correlation" = userExpressionFileAnalysis()$quantNormCorrelations,
+                "Scaled Correlation" = userExpressionFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
             )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ]
     })
@@ -419,7 +410,7 @@ shinyServer(function(input, output) {
             clusterDat$dend,
             horiz = TRUE
         )
-        par(oldPar) # not all par() can be set
+        par(oldPar)
     }
 
     output$downloadTreePng <- downloadHandler("dendrogram.png",
@@ -438,7 +429,7 @@ shinyServer(function(input, output) {
                                             },
                                             contentType = "image/pdf")
 
-    output$downloadTreePdf <- downloadHandler("dendrogram.svg",
+    output$downloadTreeSvg <- downloadHandler("dendrogram.svg",
                                               content = function(file) {
                                                   svglite(file, width = 7.29, height = 13.85)
                                                   myRenderTreePlot()

@@ -1,4 +1,3 @@
-# UI
 source("data/server_adresses.R")
 shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
 
@@ -93,7 +92,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                     ),
                     selectInput("correlationCorrection",
                                 label = "Uploaded experiment correlation correction:",
-                                choices = list("None", "Linear scaling", "Quantile normalisation"),
+                                choices = list("None", "Linear scaling"),
                                 selected = "None"),
                     sliderInput("maxCorrelation",
                                 label = "Maximum expected correlation value for Linear scaling correction",

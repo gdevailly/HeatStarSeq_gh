@@ -24,7 +24,7 @@ head hg19.cage_peak_phase1and2combined_tpm.osc.data.txt | awk '{ print $1, $2,  
 setwd("/mnt/ris-fas1a/linux_groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/data/CAGE_hg38/")
 
 library(readr)
-library(magrittr)
+library(dplyr)
 library(GenomicRanges)
 library(parallel)
 library(ggplot2)
@@ -39,7 +39,7 @@ cageData <- list(
     data = read_tsv("hg19.cage_peak_phase1and2combined_tpm.osc.data.txt", col_names = FALSE)
 )
 Sys.time() - a # 1 minute
-
+cageData <- lapply(cageData, as.data.frame)
 lapply(cageData, dim)
 list(
     header1 = head(cageData$header1),
@@ -59,6 +59,8 @@ regionLocations %>% as.data.frame(stringsAsFactors = FALSE) -> regionLocations
 regionLocations$name <- rep("no_name", length.out = nrow(regionLocations))
 regionLocations$score <- rep(0, length.out = nrow(regionLocations))
 regionLocations <- regionLocations[, c(1,2,3,5,6,4)]
+cageMatrix <- as.matrix(cageData$data[, -1])
+regionLocationsGR <- with(regionLocations, GRanges(chr, IRanges(as.numeric(start), as.numeric(end)), strand = strand))
 
 # write.table(regionLocations, file = "all_cage_regions.bed", sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
 
@@ -69,9 +71,6 @@ regionLocations <- regionLocations[, c(1,2,3,5,6,4)]
 # wc -l all_cage_regions.s.bed # 201802
 # wc -l all_cage_regions.merged.bed # 201802 youpi !
 
-regionLocationsGR <- with(regionLocations, GRanges(chr, IRanges(as.numeric(start), as.numeric(end)), strand = strand))
-
-cageMatrix <- as.matrix(cageData$data[, -1])
 
 # summary(rowSums(cageMatrix))
 # Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
@@ -81,11 +80,13 @@ cageMatrix <- as.matrix(cageData$data[, -1])
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
 # 138700  680300  795000  857100  928900 6453000
 
-t0 <- Sys.time()
-myCor <- cor(cageMatrix)
-Sys.time() - t0 # 20 minutes ...
+# t0 <- Sys.time()
+# myCor <- cor(cageMatrix)
+# Sys.time() - t0 # 20 minutes ...
+#
+# save(myCor, file = "myCorMatrics_cage.RData")
+load("myCorMatrics_cage.RData")
 
-save(myCor, file = "myCorMatrics_cage.RData")
 
 # a <- Sys.time()
 # pdf(file = "../../Rplots/heatmap_all_socre.pdf", width = 13.85, height = 13.85)
@@ -111,18 +112,23 @@ expNames <- cageData$header2[1, -1] %>% as.matrix %>% as.vector()
 expNames <- sub("tpm.", "", expNames, fixed = TRUE)
 expNames <- gsub("%20", "_", expNames, fixed = TRUE)
 expNames <- gsub("%2c", "", expNames, fixed = TRUE)
+expNames <- gsub("%2e", "", expNames, fixed = TRUE)
+expNames <- gsub("%2f", "", expNames, fixed = TRUE)
 expNames <- gsub("%3a", "_", expNames, fixed = TRUE)
 expNames <- gsub("%28", "", expNames, fixed = TRUE)
 expNames <- gsub("%29", "", expNames, fixed = TRUE)
 expNames <- gsub("%27", "", expNames, fixed = TRUE)
-expNames <- gsub("%2b", "_", expNames, fixed = TRUE)
+expNames <- gsub("%2b", "+", expNames, fixed = TRUE)
+expNames <- gsub("%5e", "", expNames, fixed = TRUE)
 expNames <- gsub("_-_", "_", expNames, fixed = TRUE)
+expNames <- gsub("___", "_", expNames, fixed = TRUE)
+expNames <- gsub("__", "_", expNames, fixed = TRUE)
 
 head(expNames)
 tail(expNames)
 
 length(expNames)
-write.table(expNames, file = "cage_exp_name.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+# write.table(expNames, file = "cage_exp_name.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
 grep("_rep", expNames, fixed = TRUE) %>% length # 661 with replicates
 
 # dataset is to big, we remove time course data
@@ -134,16 +140,54 @@ notTimeCourse <- expNames[-grep("[0-9]hr|day[0-9][0-9]", expNames, fixed = FALSE
 length(timeCourse) # 771
 length(notTimeCourse) # 1058
 # visual check of our RegExp result
-write.table(timeCourse, file = "cage_exp_name_timeCourse.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
-write.table(notTimeCourse, file = "cage_exp_name_notTimeCourse.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+# write.table(timeCourse, file = "cage_exp_name_timeCourse.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+# write.table(notTimeCourse, file = "cage_exp_name_notTimeCourse.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+removeThose <- grep("[0-9]hr|day[0-9][0-9]", expNames, fixed = FALSE)
+notTimeCourse <- expNames[-grep("[0-9]hr|day[0-9][0-9]", expNames, fixed = FALSE)]
+dim(cageMatrix)
+cageMatrix <- cageMatrix[, -removeThose]
+dim(cageMatrix)
+
+which(rowSums(cageMatrix) == 0) %>% length # 219
+
+regionLocations <- regionLocations[which(rowSums(cageMatrix) != 0), ]
+regionLocationsGR <- with(regionLocations, GRanges(chr, IRanges(as.numeric(start), as.numeric(end)), strand = strand))
+cageMatrix <- cageMatrix[which(rowSums(cageMatrix) != 0), ]
+
+dim(cageMatrix)
+regionLocationsGR
+length(notTimeCourse)
+
+cellType <- notTimeCourse
+cellType <- gsub("_donor[0-9]*", "", cellType)
+cellType <- gsub("_biol_rep[0.9]*", "", cellType)
+cellType <- gsub("_tech_rep[0.9]*", "", cellType)
+cellType <- gsub("_MC-[0.9]*", "", cellType)
+cellType <- gsub("_donation[0.9]*", "", cellType)
+cellType <- gsub("_ENCODE", "", cellType)
+cellType <- gsub("_lineage[0.9]", "", cellType)
+cellType <- gsub("_derived[0.9]", "", cellType)
+cellType <- gsub("_pluriselect[0.9]", "", cellType)
+cellType <- gsub("_control[0.9]", "", cellType)
+
+cellType <- gsub("\\.[[:alnum:]]*\\.[[:alnum:]]*-[[:alnum:]]*$", "", cellType)
+cellType <- gsub("SOC-57-02", "", cellType)
+cellType <- gsub("SOC-57-02-G", "", cellType)
 
 
+head(cellType, 20)
 
+anno <- data.frame(
+    "name" = notTimeCourse,
+    "tissue" = cellType,
+    stringsAsFactors = FALSE
+)
+anno$isCellType <- rep(FALSE, nrow(anno))
+anno[grep("_cell_line", anno$tissue), "isCellType"] <- TRUE
 
-
-
-
-
+write.table(anno,  file = "cage_exp_anno.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
+write.table(unique(anno$tissue),  file = "cage_exp_anno_small.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
 
 
 
