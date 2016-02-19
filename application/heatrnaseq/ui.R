@@ -108,8 +108,8 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1),
-                        sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1)
+                        sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1),
+                        sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)
                     )
                 ),
 

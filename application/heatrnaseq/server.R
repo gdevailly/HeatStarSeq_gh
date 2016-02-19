@@ -156,9 +156,9 @@ shinyServer(function(input, output) {
             need(!is.null(input$expressionFile), "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
             data.frame(
-                "Experiment" = getSelectedDataset()$annotation$name,
-                "Correlation" = userExpressionFileAnalysis()$correlations,
-                "Scaled Correlation" = userExpressionFileAnalysis()$linearNormCorrelations,
+                "experiment" = getSelectedDataset()$annotation$name,
+                "correlation" = userExpressionFileAnalysis()$correlations,
+                "scaledCorrelation" = userExpressionFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
             )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ]
     })

@@ -92,13 +92,17 @@ shinyServer(function(input, output) {
                 setProgress(value = 1, detail = "done!")
             })
         }
-        return(list("peaks" = userPeakFile, "correlations" = userCorrelations, "linearNormCorrelations" = NULL))
+        return(list(
+            "peaks" = userPeakFile,
+            "correlations" = userCorrelations,
+            "linearNormCorrelations" = NULL # to be fill below
+        ))
     })
 
     userPeakFileAnalysis <- reactive({
         userPeakFileData <- userPeakFileAnalysis_1()
         userCorrelations <- userPeakFileData$correlations
-        if (!is.null(input$expressionFile)){
+        if (!is.null(input$peakFile)){
             if (input$maxCorrelation != 0) {
                 userPeakFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
             }
@@ -106,26 +110,31 @@ shinyServer(function(input, output) {
         return(userPeakFileData)
     })
 
-    getCorrelationTable <- reactive({
-        if(is.null(userPeakFileAnalysis()$correlations)) {
-            NULL
-        } else {
-            data.frame(
-                "Experiment" = getSelectedDataset()$annotation$name,
-                "Correlation" = userPeakFileAnalysis()$correlations,
-                "Scaled Correlation" = userPeakFileAnalysis()$linearNormCorrelations,
-                stringsAsFactors = FALSE
-            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
-        }
-    })
 
-    output$tabUserPeaks <- renderDataTable(userPeakFileAnalysis()$peaks)
+    output$tabUserPeaks <- renderDataTable({
+        validate(
+            need(!is.null(input$peakFile), "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
+        )
+        userPeakFileAnalysis()$peaks
+    })
 
     output$downloadUserPeaks <- downloadHandler("uploaded_peak_list.txt",
                                                  content = function(file) {
                                                      write.table(userPeakFileAnalysis()$peaks, file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                  },
                                                  contentType = "text/tsv")
+
+    getCorrelationTable <- reactive({
+        validate(
+            need(!is.null(input$peakFile), "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
+        )
+            data.frame(
+                "experiment" = getSelectedDataset()$annotation$name,
+                "correlation" = userPeakFileAnalysis()$correlations,
+                "scaledCorrelation" = userPeakFileAnalysis()$linearNormCorrelations,
+                stringsAsFactors = FALSE
+            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
+    })
 
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
 
