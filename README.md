@@ -3,6 +3,8 @@ by Guillaume Devailly, Anna Mantsoki, and Anagha Joshi
 
 Contact: [@G_Devailly](https://twitter.com/G_Devailly) / guillaume.devailly _at_ roslin.ed.ac.uk
 
+![HeatRNAseq screenshot](heatstarseq_screenshot.png)
+
 ## Summary
 
 ###### How to use Heat\*Seq
@@ -45,3 +47,15 @@ If you created a mirror of Heat\*Seq, I will be very pleased if you contact me s
 ## How to add new datasets
 
 ### Gene expression data
+**Formatting the dataset**
+
+One needs to create a R list object, hereafter named `newDataset`, which contain the following elements (the element name matters, not the order of them in the list):
+- `newDataset$dataMatrix`, a numeric matrix of one row per [GENCODE gene](http://www.gencodegenes.org/) and one column per sample. Each value should be a measure of gene expression (usually FPKM or TPM) for that gene in that sample. I would strongly advice to remove genes with no expression in the dataset `which(rowSums(newDataset$dataMatrix) != 0)`, to not name the rows and columns, and to replace all NAs by 0s.
+- `newDataset$geneName`, a character vector of as many elements as there is rows in dataMatrix, containing the [GENCODE gene](http://www.gencodegenes.org/) name of each gene, in the same order as in the dataMatrix. Use GENCODE name without the number of trancripts, ie ENSG00000134046 and not ENSG00000134046.5.
+- `newDataset$correlationMatrix`, the outpout of `cor(newDataset$dataMatrix)`:
+```
+newDataset$correlationMatrix <- cor(newDataset$dataMatrix)
+```
+- ``
+
+**Generating a newDataset_preload.RData**
