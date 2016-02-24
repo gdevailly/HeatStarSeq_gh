@@ -7,18 +7,18 @@ Contact: [@G_Devailly](https://twitter.com/G_Devailly) / guillaume.devailly _at_
 
 ## Summary
 
-**About this repository**
+**[About this repository](https://github.com/gdevailly/HeatStarSeq_gh#about--this-repository)**
 
-**How to use Heat\*Seq**
+**[How to use Heat\*Seq](https://github.com/gdevailly/HeatStarSeq_gh#how-to-use-heatseq)**
 
-- The public server
-- Running Heat\*Seq locally
-- Creating your Heat\*Seq server
+- [The public server](https://github.com/gdevailly/HeatStarSeq_gh#the-public-server)
+- [Running Heat\*Seq locally](https://github.com/gdevailly/HeatStarSeq_gh#running-heatseq-locally)
+- [Creating your Heat\*Seq server](https://github.com/gdevailly/HeatStarSeq_gh#creating-your-heatseq-server)
 
-**How to add new datasets**
+**[How to add new datasets](https://github.com/gdevailly/HeatStarSeq_gh#how-to-add-new-datasets)**
 
-- Gene expression data
-- ChIP-seq data
+- [Gene expression data](https://github.com/gdevailly/HeatStarSeq_gh#gene-expression-data)
+- [ChIP-seq data](https://github.com/gdevailly/HeatStarSeq_gh#chip-seq-data)
 
 ## About  this repository
 The `application` folder contains subfolder, each of which conatins a [Shiny Application](http://shiny.rstudio.com/). The `dataset_fromating` folder containg R scripts documenting the prosess of pre-formationg datasets, and exploratory works on the applications.
