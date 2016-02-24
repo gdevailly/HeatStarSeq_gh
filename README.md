@@ -7,14 +7,21 @@ Contact: [@G_Devailly](https://twitter.com/G_Devailly) / guillaume.devailly _at_
 
 ## Summary
 
-###### How to use Heat\*Seq
+**About this repository**
+
+**How to use Heat\*Seq**
+
 - The public server
 - Running Heat\*Seq locally
 - Creating your Heat\*Seq server
 
-###### How to add new datasets
+**How to add new datasets**
+
 - Gene expression data
 - ChIP-seq data
+
+## About  this repository
+The `application` folder contains subfolder, each of which conatins a [Shiny Application](http://shiny.rstudio.com/). The `dataset_fromating` folder containg R scripts documenting the prosess of pre-formationg datasets, and exploratory works on the applications.
 
 ## How to use Heat\*Seq
 
@@ -57,7 +64,7 @@ One needs to create a R list object, hereafter named `newDataset`, which contain
 ```R
 newDataset$correlationMatrix <- cor(newDataset$dataMatrix)
 ```
-- `newDataset$annotation`, a data.frame (with string as character, not factor) of one line per experiments in the datatset. The number of line of the annotation table must equal the number of columns of the dataMatrix. The annotation table MUST contain a `name` column containing UNIQUE character strings describing the experiment. It is strongly advised to add a `url` column storing a link to the original experiment, and to add one or more column for subseting the dataset, such as a cell type column or a library type column. Please, nullify the rownames of the annotation table before saving the object:
+- `newDataset$annotation`, a data.frame (with string as character, not factor) of one line per experiments in the datatset. The number of line of the annotation table must equal the number of columns of the dataMatrix, and be in the same order. The annotation table MUST contain a `name` column containing UNIQUE character strings describing the experiment. It is strongly advised to add a `url` column storing a link to the original experiment, and to add one or more column for subseting the dataset, such as a cell type column or a library type column. Please, nullify the rownames of the annotation table before saving the object:
 ```R
 row.names(newDataset$annotation) <- NULL
 ```
@@ -178,5 +185,143 @@ Finally, modify the tedious `subsetMatrix` reactive function, inserting the foll
         }
 ```
 Please, look into the `} else if (input$dataset == "Bgee RNA-seq (human)") {` section to see how to include multiple filtering conditions.
+
+After debugging for typos, missing commas, parenthesis and brackets, it should work! Please, do push a merge request if you implemented a new dataset, or updated an old one!
+
+
+### ChIP-seq data
+
+**1) Formatting the dataset**
+
+One needs to create a R list object, hereafter named `newDataset`, which contain the following elements (the element name matters, not the order of them in the list):
+- `newDataset$dataMatrix`, a boolean matrix of one row per genomic regions (they should be no overlaping reigion, please merge the overlaping regions) and one column per sample. A cell with `TRUE` means that that experiment (column) had a peak overlaping that region (row). I would strongly advice to remove regions with no peaks in the dataset `which(!any(newDataset$dataMatrix))`, to not name the rows and columns, and to replace all NAs by `FALSE`.
+- `newDataset$regionMetaData`, a [GRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) object of as many ranges as there is rows in dataMatrix, containing the genomic coordinates of the dataMatrix, in the same order as in the dataMatrix. Use `chr1`, `chr2`, ..., `chrX`, as seqnames. One can build such an object from a bed table loaded as an R data.frame:
+```R
+newDataset$regionMetaData <- with(bed_as_dataFrane, GRanges(chr, IRanges(start, end)))
+```
+- `newDataset$correlationMatrix`, the output of `cor(newDataset$dataMatrix)`:
+```R
+newDataset$correlationMatrix <- cor(newDataset$dataMatrix)
+```
+- `newDataset$annotation`, a data.frame (with string as character, not factor) of one line per experiments in the datatset. The number of line of the annotation table must equal the number of columns of the dataMatrix, and be in the same order. The annotation table MUST contain a `name` column containing UNIQUE character strings describing the experiment. It is strongly advised to add a `url` column storing a link to the original experiment, and to add one or more column for subseting the dataset, such as a transcription factor column, a cell type column or a library type column. Please, nullify the rownames of the annotation table before saving the object:
+```R
+row.names(newDataset$annotation) <- NULL
+```
+- The, the `newDataset` object should be saved in the relevant directory:
+```R
+save(newDataset, file = "heatchipseq/data/newDataset.RData")
+```
+
+**2) Generating a newDataset_preload.RData**
+
+Depending on the number of experiments, those dataset can be quite heavy, so we will load only one at a time on the shiny server. However, each dataset need to be preloaded. One can generate a `newDataset_perload.RData` by doing the following:
+```R
+load("heatchipseq/data/newDataset.RData")
+nullifyDataForFasterPreloading <- function(myList) {
+    myList[["dataMatrix"]] <- NULL
+    myList[["regionMetaData"]] <- NULL
+    myList[["correlationMatrix"]] <- NULL
+    return(myList)
+}
+object.size(newDataset)
+newDataset <- nullifyDataForFasterPreloading(newDataset)
+object.size(newDataset)
+save(newDataset, file = "heatchipseq/data/newDataset_preload.RData")
+```
+Which is what is done in [this script](dataset_fromating/8_data_preload_ChIPseq.R).
+
+**3) Edit the shiny app to accept the new dataset**
+- In the [gobal.R](application/heatchipseq/global.R), add the following line at the end:
+```R
+[...]
+load("data/codex_human_chip_preload.RData")
+load("data/newDataset_preload.RData") # <- this line
+```
+- In the [ui.R](application/heatchipseq/ui.R), modify the `selectInput("dataset",` function:
+```R
+                    selectInput("selectedDataset", label = NULL, choices = c(
+                        "ENCODE TFBS ChIP-seq (human, hg19)",
+                        "CODEX ChIP-seq (human, hg19)",
+                        "CODEX ChIP-seq (mouse, mm10)",
+                        "New Dataset (species, genome)"
+                    )),
+```
+We will now setup the subseting widget for the new dataset. Subseting is done according to relevant column(s) of the `annotation` table. One can add subseting option for transcription factor, cell line/tissue, library preparation method, laboratory of origin, etc. Look for the line `# we addapt filtering widgets to the various datasets` and insert a new `div` function below the other filtering widgets for other datasets:
+```R
+                    div(id = "widgetForNewDataset",
+                        selectInput("TF_newDataset", "Subset for TF(s) (empty to select all):",
+                                    choices = unique(newDataset$annotation$tf)[order(unique(newDataset$annotation$tf))],
+                                    selected = NULL, multiple = TRUE),
+                        selectInput("cells_newDataset", "Subset for cell line(s) (empty to select all):",
+                                    choices = unique(newDataset$annotation$tissue)[order(unique(newDataset$annotation$tissue))],
+                                    selected = NULL, multiple = TRUE)
+                    ),
+```
+Here we only add two subseting fields, but one can include as many as she/he wants. Look for `div(id = "widgetForCodexHuman",` to see more complex filtering fields.
+- In the [server.R](application/heatchipseq/server.R), modify the second `observe({` function so that the filtering widget is displayed only when this dataset was selected:
+```R
+observe({
+        shinyjs::hide("widgetForEncodeHuman")
+        shinyjs::hide("widgetForCodexHuman")
+        shinyjs::hide("widgetForCodexMouse")
+        shinyjs::hide("widgetForNewDataset") # <- insert this line, same string as in the div() defined in the ui.R
+        if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+            shinyjs::show("widgetForEncodeHuman")
+        } else if (input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
+            shinyjs::show("widgetForCodexHuman")
+        } else if (input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
+            shinyjs::show("widgetForCodexMouse")
+        } else if (input$dataset == "New Dataset (species, genome)") {  # <- insert this line, same sting as the dataset string defined in the ui.R
+            shinyjs::show("widgetForNewDataset") # <- insert this line
+        }
+    })
+
+```
+Modify the `getSelectedDataset` reactive function, so that the dataset is loaded when the user select it:
+```R
+    getSelectedDataset <- reactive({
+        withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
+            load("data/encode_preload.RData")
+            load("data/codex_preload.RData")
+            load("data/codex_human_chip_preload.RData")
+            load("data/newDataset_preload.RData") # <- insert this line
+            setProgress(value = 1, detail = "loading new dataset")
+            if(input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
+                load("data/encode.RData")
+                dataset <- encode
+            } else if(input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
+                load("data/codex.RData")
+                dataset <- codex
+            } else if(input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
+                load("data/codex_human_chip.RData")
+                dataset <- codex_human_chip
+            } else if (input$dataset == "New Dataset (species, genome)") {  # <- insert this line
+                load("data/newDataset.RData")  # <- insert this line
+                dataset <- newDataset  # <- insert this line
+            }
+            setProgress(value = 1, detail = "done!")
+        })
+        return(dataset)
+    })
+```
+Finally, modify the tedious `subsetMatrix` reactive function, inserting the following at the bottom of the big chunk of `if else`:
+```R
+        } else if (input$dataset == "the new dataset (relevant species)") { # should match ui.R
+            if (is.null(input$TF_newDataset)) { # input name shoud match ui.R
+                temp_tf_newDataset <- unique(newDataset$annotation$tf)
+            } else {
+                temp_tf_newDataset <- input$TF_newDataset
+            }
+            if (is.null(input$cells_newDataset)) {  # input name shoud match ui.R
+                temp_tissue_newDataset <- unique(newDataset$annotation$tissue)
+            } else {
+                temp_tissue_newDataset <- input$cells_newDataset
+            }
+            keep <- which(
+                dataset$annotation$tf %in% temp_tf_newDataset &
+                dataset$annotation$tissue %in% temp_tissue_newDataset
+            )
+        }
+```
 
 After debugging for typos, missing commas, parenthesis and brackets, it should work! Please, do push a merge request if you implemented a new dataset, or updated an old one!
