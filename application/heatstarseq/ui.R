@@ -44,14 +44,9 @@ shinyUI(
 
         tabPanel(
             "About",
-            h2("Heat*Seq"),
-            h4("Correlation heatmaps for hight-througput sequencing experiments"),
-            p("by Guillaume Devailly, Anna Mantsoki, and Anagha Joshi"),
-            p("Source: ", a("https://github.com/gdevailly/HeatStarSeq_gh", href = "https://github.com/gdevailly/HeatStarSeq_gh")),
-            p(),
-            p("Provided to you by The Roslin Institute and BBSRC"),
-            img(src = "The_Roslin_Institute_logo.gif"),
-            img(src = "BBSRC_logo.gif")
+            includeHTML("www/Instructions_heatstarseq.html"),
+            a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
+            a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/")
 
         ),
 

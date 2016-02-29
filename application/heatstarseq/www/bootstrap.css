@@ -7023,3 +7023,11 @@ a.list-group-item-danger.active:focus {
 .popover {
   color: #2c3e50;
 }
+/*
+formating of instructions
+*/
+#instructions {
+    max-width: 800px;
+    margin: auto;
+    text-align: justify;
+}
