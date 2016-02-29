@@ -11,7 +11,7 @@
     <a href="#_Selecting_a_dataset">2.1 Selecting a dataset</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Loading_a_peak_file">2.2 Loading a peak file</a>
+    <a href="#_Loading_an_expression_file">2.2 Loading an expression file</a>
 </p>
 <p style="padding-left: 3em;">
     <a href="#_Looking_at_the_Correlation_table">2.3 Looking at the Correlation table</a>
@@ -41,7 +41,7 @@
     <a href="#_Where_can_I_find_the_source_code">3.2 Where can I find the source code?</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Can_you_add_this_dataset_on_HeatChIPseq">3.3 Can you add this dataset on HeatChIPseq? One of your dataset does not seemed up to date, can you update it?</a>
+    <a href="#_Can_you_add_this_dataset_on_HeatRNAseq">3.3 Can you add this dataset on HeatRNAseq? One of your dataset does not seemed up to date, can you update it?</a>
 </p>
 <p style="padding-left: 3em;">
     <a href="#_Could_you_implement_this_new_feature">3.4 Could you implement this new feature?</a>
@@ -64,48 +64,54 @@
     <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
 </h3>
 <p>
-    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there is 3 datasets available: Transcription Factor (TF)
-	ChIP-seq from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a> in human (hg19), and
-    <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a> TF ChIP-seq for human (hg19) or mouse (mm10).
+    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there is 5 datasets available: RNA-seq
+	from <a href="https://www.encodeproject.org/search/?type=Experiment&assay_title=RNA-seq">ENCODE</a> in human and mouse, from 
+    <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a> in human and mouse, and from 
+	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a> in human.
 </p>
 <p class="text-muted">
-    The dataset will only be loaded when you will have uploaded a peak file, or once you will have focused on a plot panels.
+    The dataset will only be loaded when you will have uploaded a expression file, or once you will have focused on a plot panels.
 </p>
 <h3>
-    <a name="_Loading_a_peak_file"></a>2.2 Loading a peak file
+    <a name="_Loading_a_expression_file"></a>2.2 Loading an expression file
 </h3>
 <p>
-	You can now upload a peak file (a list of genomic coordinates). Note that this is not mandatory, and you can jump to section
-    <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accept tab-delimited text file following a bed
-    format: first column must be chromosome names (chr1, chr2, chrX, etc.), the second must be region start, and the third region ends. Any additional column
-    will be discarded (peak name, score, strand, etc.). Please, be sure to untick the <strong>My peak file contains a header</strong> option if your file do
+	You can now upload an expression file. Note that this is not mandatory, and you can jump to section
+    <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accept tab-delimited text file: the first column 
+	must be <a href="http://www.gencodegenes.org/">GENCODE</a> gene names (ENSG00000134046, ENSMUSG00000024513), the second must be expression value. We
+	recommand using Transcript per million (TPM) or Fragment per kilobase pes million (FPKM) metrics. Any additional column
+    will be discarded. Please, be sure to untick the <strong>My expression file contains a header</strong> option if your file do
     not contains any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
     modify the label of your experiment in the plots.
 </p>
 <p class="text-muted">
-    The maximum size you can upload is 10 Mb. If your bed file is larger than that, try keeping only the first three columns of it to reduce file size. If
-	after removing the non-essential columns the file is still bigger than 10 Mb and you are confident you want to analyse that many region,
+    HeatRNAseq computes Pearson correlation coefficient between experiments, so the unit of gene expression measure has little effect
+	(any linear transformation of gene expression values will return the same correlation coefficient). Just be sure to take into account the gene-length
+	effect.
+</p>
+<p class="text-muted">
+    The maximum size you can upload is 10 Mb. If your expression file is larger than that, try keeping only the first two columns of it to reduce file size. If
+	after removing the non-essential columns the file is still bigger than 10 Mb and you are confident you want to analyse that many genes,
     <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @) and we will consider increasing the size limit.
 </p>
 <p>
     Once the upload is complete, a subtle progress bar will appears on top of the page, and quick description of the on-going steps can be found on the top
-    right of the page. It should take less than a minute for 30.000 regions. The <strong>My peaks</strong> tab should now display a table of your coordinates.
+    right of the page. It should take less than a minute. The <strong>My expression file</strong> tab should now display your gene expression table.
 </p>
 <p>
-	You can download <strong>an example file</strong>. It contains coordinates for human CpG island (hg19) fetch from the
-    <a href="http://genome.ucsc.edu/cgi-bin/hgTables">UCSC table browser</a>, so it will work only with human datasets. The file contains a header, so leave
-    the <strong>My peak file contains a header</strong> option ticked.
+	You can download <strong>an example file</strong>. It contains DESCRIPTION, so it will work only with human datasets. The file contains a header, so leave
+    the <strong>My expression file contains a header</strong> option ticked.
 </p>
 <p class="text-muted">
-    Currently, the easiest way to unload a peak file without uploading a new one is to come back to the main page and open a new HeatChIPseq window.
+    Currently, the easiest way to unload a expression file without uploading a new one is to come back to the main page and open a new HeatRNAseq window.
 </p>
 <h3>
     <a name="_Looking_at_the_Correlation_table"></a>2.3 Looking at the Correlation table
 </h3>
 <p>
-	If you uploaded a peak file, the <strong>Correlation table</strong> tab should now display a 3 column table. The first column contains the name of
+	If you uploaded an expression file, the <strong>Correlation table</strong> tab should now display a 3 column table. The first column contains the name of
     <strong>experiments</strong> in the selected dataset, the second column contains the <strong>correlation</strong> coefficient between the uploaded
-    coordinates and the corresponding experiment in the dataset. The third column contains <strong>scaled correlation</strong> values that we will discuss on
+    file and the corresponding experiment in the dataset. The third column contains <strong>scaled correlation</strong> values that we will discuss on
     section <a href="#_Correlation_correction:">2.8</a>. At the bottom of the page, you will find a <strong>Save as tab delimited .txt</strong> download
     button, allowing you to download a copy of the correlation table as a tab delimited text file. Those file can be imported into many datasheet software
     including Microsoft Excel.
@@ -118,7 +124,7 @@
     <a name="_Static_heatmap"></a>2.4 Static heatmap
 </h3>
 <p class="text-muted">
-    The heatmap can take up to a minute to be displayed, and a bit longer if you are importing a new peak file or switching datasets.
+    The heatmap can take up to a minute to be displayed, and a bit longer if you are importing a new expression file or switching datasets.
 </p>
 <p>
     The <strong>static heatmap</strong> tab will display a clustered heatmap representation of the correlation matrix: each row and column represent a single
@@ -128,13 +134,13 @@
 </p>
 <ul>
     <li>
-        The <strong>Highlight my experiment in the heatmap</strong> tick box. When checked, if you uploaded a peak file, the row and line corresponding to your
+        The <strong>Highlight my experiment in the heatmap</strong> tick box. When checked, if you uploaded an expression file, the row and line corresponding to your
         experiment will be highlighted: a 0 correlation value will be displayed in yellow, a 0.5 value in bright green, and a 1 correlation value still in
         black. This can help you localised your experiment in crowded heatmaps.
     </li>
     <li>
         One or several <strong>subset</strong> options: You can restrict the experiments to be displayed using those fields. They may vary a bit between
-		datasets. You can select experiment concerning one or several <strong>transcription factors</strong> (TFs), as well as select experiment done in one or several 
+		datasets. You can select experiment concerning done in one or several
         <strong>cell types</strong>. Leaving the field empty will select all experiments.
     </li>
 </ul>
@@ -143,7 +149,7 @@
     criteria. You can look for available experiment in the Samples metadata tab.
 </p>
 <p class="text-muted">
-    The uploaded peak list will never be filtered out, and will always be displayed in the heatmap.
+    The uploaded expression file will never be filtered out, and will always be displayed in the heatmap.
 </p>
 <ul>
     <li>
@@ -237,8 +243,8 @@
 </h3>
 <p>
     Sometimes, the maximum correlation of a user peak file with any experiment in the dataset can be quite low. In some situations, when the user is confident
-    that the top hits are relevant, this may be evidence of strong "batch effect" that could reflect artefact of library preparation method, peak calling or
-	ChIP efficiency. Those low correlation value might bias the clustering (due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>).
+    that the top hits are relevant, this may be evidence of strong "batch effect" that could reflect artefact of library preparation method, quantification method or
+	RNA integrity. Those low correlation value might bias the clustering (due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>).
 	The user can manually correct this effect using the <strong>Linear scaling</strong> method on the <strong>Uploaded experiment correlation correction</strong> option.
 	The correlation values will be linearly	up-scaled so the maximum correlation value will now be equal to the value of the
     <strong>Maximum expected correlation value for linear scaling correction </strong>slider (default 0.95). The resulting transformed correlation value can be
@@ -266,7 +272,7 @@
     The source code can be find on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 <h3>
-    <a name="_Can_you_add_this_dataset_on_HeatChIPseq"></a>3.3 Can you add this dataset on HeatChIPseq? One of your dataset does not seemed up to date, can you update it?
+    <a name="_Can_you_add_this_dataset_on_HeatRNAseq"></a>3.3 Can you add this dataset on HeatRNAseq? One of your dataset does not seemed up to date, can you update it?
 </h3>
 <p>
     Please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @) and we will have a look. A well curated dataset can be
@@ -280,12 +286,12 @@
     feature that will improve the usability of this application.
 </p>
 <h3>
-    <a name="_I_have_uploaded_a_peak_file"></a>3.5 I have uploaded a peak file. How do I remove it?
+    <a name="_I_have_uploaded_a_peak_file"></a>3.5 I have uploaded an expression file. How do I remove it?
 </h3>
 <p>
-    At the moment, there is no option to remove a peak file. You can replace it with any other peak file clicking the <strong>Browse</strong> button again. To
-    remove a peak file without uploading a new one, the simplest method is to open a new HeatChIPseq session by going <strong>Back to the main page</strong>.
-    Refreshing the HeatChIPseq page may result in slightly erratic outcome.
+    At the moment, there is no option to remove an expression file. You can replace it with any other expression file clicking the <strong>Browse</strong> button again. To
+    remove an expression file without uploading a new one, the simplest method is to open a new HeatRNAseq session by going <strong>Back to the main page</strong>.
+    Refreshing the HeatRNAseq page may result in slightly erratic outcome.
 </p>
 <div>
     <h1>
@@ -293,12 +299,15 @@
     </h1>
 </div>
 <p>
-    <strong>HeatChIPseq</strong>
+    <strong>HeatRNAseq</strong>
     is a part of <strong>Heat*Seq</strong>, an attempt to make genome-wide comparison of high throughput sequencing experiments easier. It was developed by
 	Guillaume Devailly, Anna Mantsoki and Anagha Joshi at the <a href="http://www.roslin.ed.ac.uk/">Roslin Institute</a>, and funded by the
 	<a href="http://www.bbsrc.ac.uk/">Biotechnology and Biological Sciences Research Council</a>. It use <a href="https://www.r-project.org/">R</a>
 	<a href="https://www.rstudio.com/products/shiny/">shiny</a>, <a href="https://plot.ly/">plot.ly</a>, and various <a href="https://cran.r-project.org/">CRAN</a>
-	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a>
-	and <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a>. Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
+	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from 
+	<a href="https://www.encodeproject.org/search/?type=Experiment&assay_title=RNA-seq">ENCODE</a>, 
+    <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a> and  
+	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a>.
+	Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 </div>
