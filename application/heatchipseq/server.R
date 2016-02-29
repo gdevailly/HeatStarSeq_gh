@@ -8,7 +8,7 @@ shinyServer(function(input, output) {
 
     # UI elements activations
     observe({
-        if (is.null(input$expressionFile)) {
+        if (is.null(input$peakFile)) {
             shinyjs::hide("downloadUserPeaks")
             shinyjs::hide("downloadUserCorrelationTable")
         } else {
@@ -33,7 +33,7 @@ shinyServer(function(input, output) {
     })
 
     observe({
-        if(input$myPanels == "Static Heatmap" | input$myPanels == "Tree") {
+        if(input$myPanels == "Static heatmap" | input$myPanels == "Tree") {
             shinyjs::show("widgetForLabels")
         } else {
             shinyjs::hide("widgetForLabels")
@@ -224,6 +224,9 @@ shinyServer(function(input, output) {
         }
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
+        validate(
+            need(length(keep) >= 2, "Less than 3 experiments match your criteria. Please selecet more experiments.")
+        )
         if(length(keep) >= 2) {
             workingMatrix <- workingMatrix[keep, keep]
             myLabels <- myLabels[keep]

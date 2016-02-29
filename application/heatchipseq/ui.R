@@ -1,25 +1,15 @@
 source("data/server_adresses.R")
+
 shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
 
     tabPanel("Instructions",
              icon("home"),
              a("Back to main page", href = URL_HEATSTARSEQ),
-             h2("Welcome !"),
-             h3("Intsructions:"),
-             p("1 - load a peak file."),
-             p("2 - wait."),
-             p("3 - I will write some interesting stuff here in the future."),
-             h3("FAQ"),
-             p("..."),
-             h3("Info"),
-             p("Source code available on GitHub (soon)."),
-             p("Made by the Josh group (add link)."),
-             p("How to cite:"),
-             p("... unpublished")
-             ),
+             includeHTML("www/Instructions_heatchipseq.html")
+    ),
 
     tabPanel("Use application",
-            sidebarLayout(
+             sidebarLayout(
 
                 sidebarPanel(
                     icon("home"),
@@ -33,18 +23,18 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     h3("2 - Load your data"),
                     p("Upload a bed-like peak file. Tab delimited, first three columns must be chromsome, peak start and peak end.
                       Maximum size: 10MB. Please, use the same reference genome version than the selected dataset."),
+                    checkboxInput("header", "My peak file contains a header.", TRUE),
+                    fileInput("peakFile", strong("Upload your peak file:"), accept = "text/tab-separated-values"),
                     textInput("nameOfPeakFile", "Name of your experiment", value="my ChIP experiment"),
-                    checkboxInput("header", "My peak file contains a header.", FALSE),
-                    fileInput("peakFile", "Upload your peak file:", accept = "text/tab-separated-values"),
                     h3("3 - Plot customisation"),
-                    checkboxInput("highlight", "Highlight my experiment in the heatmap", FALSE),
+                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), FALSE),
                     # we addapt filtering widgets to the various datasets
                     div(id = "widgetForEncodeHuman",
                         selectInput("TF", "Subset for TF(s) (empty to select all):",
                                     choices = unique(encode$annotation$tf)[order(unique(encode$annotation$tf))],
                                     selected = NULL, multiple = TRUE),
                         selectInput("cells", "Subset for cell line(s) (empty to select all):",
-                                    choices = levels(factor(encode$annotation$cellLine))[order(levels(factor(encode$annotation$cellLine)))],
+                                    choices = unique(encode$annotation$cellLine)[order(unique(encode$annotation$cellLine))],
                                     selected = NULL, multiple = TRUE)
                     ),
                     div(id = "widgetForCodexHuman",
@@ -84,7 +74,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                 choices = list("None", "Linear scaling"),
                                 selected = "None"),
                     sliderInput("maxCorrelation",
-                                label = "Maximum expected correlation value for Linear scaling correction",
+                                label = "Maximum expected correlation value for linear scaling correction",
                                 min = 0.1, max = 1, value = 0.95, step = 0.01),
                     actionButton("advClustOptions", label = "Advance clustering options"),
                     div(id = "widgetForClustOptions",
@@ -112,14 +102,14 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                  dataTableOutput("tabUserCorrelationTable"),
                                  downloadButton("downloadUserCorrelationTable", label = "Save as tab delimited .txt")
                                  ),
-                        tabPanel("Static Heatmap",
+                        tabPanel("Static heatmap",
                                  plotOutput("myHeatmap", width = "950px", height = "950px"),
                                  img(src = "legend_small.png"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
                                  downloadButton("downloadHMpdf", label = "Save as pdf"),
                                  downloadButton("downloadHMsvg", label = "Save as svg")
                                  ),
-                        tabPanel("Responsive Heatmap",
+                        tabPanel("Responsive heatmap",
                                  plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
                                  img(src = "legend_small.png")
                         ),

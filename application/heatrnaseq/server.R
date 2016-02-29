@@ -40,7 +40,7 @@ shinyServer(function(input, output) {
     })
 
     observe({
-        if(input$myPanels == "Static Heatmap" | input$myPanels == "Tree") {
+        if(input$myPanels == "Static heatmap" | input$myPanels == "Tree") {
             shinyjs::show("widgetForLabels")
         } else {
             shinyjs::hide("widgetForLabels")
