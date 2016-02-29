@@ -282,9 +282,7 @@ shinyServer(function(input, output) {
         # merging user data in correlation matrix
         if(!is.null(userExpressionFileAnalysis()$correlations)) {
             userCorrelations <- userExpressionFileAnalysis()$correlations
-            if (input$correlationCorrection == "Quantile normalisation") {
-                userCorrelations <- userExpressionFileAnalysis()$quantNormCorrelations
-            } else if (input$correlationCorrection == "Linear scaling") {
+            if (input$correlationCorrection == "Linear scaling") {
                 userCorrelations <- userExpressionFileAnalysis()$linearNormCorrelations
             }
             workingMatrix <- rbind(workingMatrix, userCorrelations[keep])

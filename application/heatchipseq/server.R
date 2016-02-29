@@ -233,8 +233,12 @@ shinyServer(function(input, output) {
         }
         # merging user data in correlation matrix
         if(!is.null(userPeakFileAnalysis()$correlations)) {
-            workingMatrix <- rbind(workingMatrix, userPeakFileAnalysis()$correlations[keep])
-            workingMatrix <- cbind(workingMatrix, c(userPeakFileAnalysis()$correlations[keep], 1))
+            userCorrelations <- userPeakFileAnalysis()$correlations
+            if (input$correlationCorrection == "Linear scaling") {
+                userCorrelations <- userPeakFileAnalysis()$linearNormCorrelations
+            }
+            workingMatrix <- rbind(workingMatrix, userCorrelations[keep])
+            workingMatrix <- cbind(workingMatrix, c(userCorrelations[keep], 1))
             myLabels <- c(myLabels, input$nameOfPeakFile)
         }
         return(list("mat" = workingMatrix, "myLabels" = myLabels))
