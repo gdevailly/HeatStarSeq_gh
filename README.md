@@ -26,7 +26,7 @@ The `application` folder contains subfolder, each of which conatins a [Shiny App
 ## How to use Heat\*Seq
 
 ### The public server
-Heat\*Seq is available for now [at this address](http://www.chipcompare.roslin.ed.ac.uk/).
+Heat\*Seq is available for now [at this address](http://www.heatstarseq.roslin.ed.ac.uk/).
 **The Application is still in early development.**
 **The url of the public server WILL change in the near future.**
 
