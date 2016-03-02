@@ -28,7 +28,6 @@ The `application` folder contains subfolder, each of which conatins a [Shiny App
 ### The public server
 Heat\*Seq is available for now [at this address](http://www.heatstarseq.roslin.ed.ac.uk/).
 **The Application is still in early development.**
-**The url of the public server WILL change in the near future.**
 
 ### Running Heat\*Seq locally
 Download the Github folder (for example, from [here](https://github.com/gdevailly/HeatStarSeq_gh/archive/master.zip)). Extract the  .zip archive. You will need R (at least 3.2), and need to install several R packages from CRAN and Bioconductor (package list to come soon). Launch R, and goes to one of the two following directories `application/heatrnaseq/` or `application/heatchipseq/`, using for example the `setwd()` R command. Finally, execute the following:
