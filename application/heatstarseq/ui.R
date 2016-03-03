@@ -14,7 +14,7 @@ shinyUI(
                           actionButton("rnaButton", "HeatRNAseq", class = "btn-success", style = "font-size:150%"),
                           href = URL_HEATRNASEQ
                       ), align = "center"),
-                      "Data file format you could upload:",
+                      "Format of file  you can upload:",
                       p("Tab-delimited file of expression values (2 columns)."),
                       dataTableOutput("RNAseqExempleTable")
                ),
@@ -24,8 +24,8 @@ shinyUI(
                           actionButton("chipButton", "HeatChIPseq", class = "btn-info", style = "font-size:150%"),
                           href = URL_HEATCHIPSEQ
                       ), align = "center"),
-                      "Data file format you could upload:",
-                      p("Tab-delimited bed-like file of peak coordinates (minimum 3 columns)."),
+                      "Format of file  you can upload:",
+                      p("Tab-delimited bed file of peak coordinates (3 columns)."),
                       dataTableOutput("ChIPseqExempleTable")
                ),
                column(4,
@@ -34,8 +34,8 @@ shinyUI(
                           actionButton("cageButton", "HeatCAGEseq", class = "btn-warning", style = "font-size:150%"),
                           href = URL_HEATCAGESEQ
                       ), align = "center"),
-                      "Data file format you could upload:",
-                      p("Tab-delimited bed-like file of peak coordinates, strand and expression value (minimum 5 columns)."),
+                      "Format of file  you can upload:",
+                      p("Tab-delimited bed file of peak coordinates, name, expression value and strand (6 columns)."),
                       dataTableOutput("CAGEseqExempleTable")
                )
             )
