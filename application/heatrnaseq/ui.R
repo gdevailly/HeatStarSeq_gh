@@ -17,6 +17,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                     selectInput("dataset", label = NULL, choices = c(
                         "Bgee RNA-seq (human)",
                         "Blueprint RNA-seq (human)",
+                        "Roadmap Epigenomics RNA-seq (human)",
                         "ENCODE RNA-seq (human)",
                         "Bgee RNA-seq (mouse)",
                         "ENCODE RNA-seq (mouse)"
@@ -47,6 +48,11 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                     selected = NULL, multiple = TRUE),
                         selectInput("celltype_blueprint_h", "Cell type (empty to select all):",
                                     choices = unique(blueprint_rnaseq$annotation$cellType)[order(unique(blueprint_rnaseq$annotation$cellType))],
+                                    selected = NULL, multiple = TRUE)
+                    ),
+                    div(id = "widgetForRoadmapHuman",
+                        selectInput("celltype_roadmap_h", "Cell type (empty to select all):",
+                                    choices = unique(roadmap_rnaseq$annotation$name)[order(unique(roadmap_rnaseq$annotation$name))],
                                     selected = NULL, multiple = TRUE)
                     ),
                     div(id = "widgetForEncodeHuman",

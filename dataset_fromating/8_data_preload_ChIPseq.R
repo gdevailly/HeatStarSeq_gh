@@ -47,12 +47,14 @@ load("data/bgee_human.RData")
 load("data/bgee_mouse.RData")
 load("data/encode_mouse_rnaseq.RData")
 load("data/blueprint_rnaseq.RData")
+load("data/roadmap_rnaseq.RData")
 
 names(encode_rnaseq)
 names(bgee_human)
 names(bgee_mouse)
 names(encode_mouse_rnaseq)
 names(blueprint_rnaseq)
+names(roadmap_rnaseq)
 
 nullifyDataForFasterPreloading <- function(myList) {
     myList[["dataMatrix"]] <- NULL
@@ -76,10 +78,14 @@ object.size(encode_mouse_rnaseq)
 object.size(blueprint_rnaseq)
 blueprint_rnaseq <- nullifyDataForFasterPreloading(blueprint_rnaseq)
 object.size(blueprint_rnaseq)
+object.size(roadmap_rnaseq)
+roadmap_rnaseq <- nullifyDataForFasterPreloading(roadmap_rnaseq)
+object.size(roadmap_rnaseq)
 
 save(encode_rnaseq, file = "data/encode_rnaseq_preload.RData")
 save(bgee_human, file = "data/bgee_human_preload.RData")
 save(bgee_mouse, file = "data/bgee_mouse_preload.RData")
 save(encode_mouse_rnaseq, file = "data/encode_mouse_rnaseq_preload.RData")
 save(blueprint_rnaseq, file = "data/blueprint_rnaseq_preload.RData")
+save(roadmap_rnaseq, file = "data/roadmap_rnaseq_preload.RData")
 

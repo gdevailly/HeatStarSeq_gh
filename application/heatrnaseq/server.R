@@ -20,6 +20,7 @@ shinyServer(function(input, output) {
     observe({
         shinyjs::hide("widgetForBgeeHuman")
         shinyjs::hide("widgetForBlueprintHuman")
+        shinyjs::hide("widgetForRoadmapHuman")
         shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForEncodeMouse")
         shinyjs::hide("widgetForBgeeMouse")
@@ -30,6 +31,8 @@ shinyServer(function(input, output) {
             shinyjs::show("widgetForBgeeHuman")
         } else if (input$dataset == "Blueprint RNA-seq (human)") {
             shinyjs::show("widgetForBlueprintHuman")
+        } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
+            shinyjs::show("widgetForRoadmapHuman")
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             shinyjs::show("widgetForEncodeMouse")
         } else if (input$dataset == "Bgee RNA-seq (mouse)") {
@@ -59,6 +62,8 @@ shinyServer(function(input, output) {
             load("data/bgee_human_preload.RData")
             load("data/encode_mouse_rnaseq_preload.RData")
             load("data/bgee_mouse_preload.RData")
+            load("data/blueprint_rnaseq_preload.RData")
+            load("data/roadmap_rnaseq_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
             if (input$dataset == "ENCODE RNA-seq (human)") {
                 load("data/encode_rnaseq.RData")
@@ -69,6 +74,9 @@ shinyServer(function(input, output) {
             } else if (input$dataset == "Blueprint RNA-seq (human)") {
                 load("data/blueprint_rnaseq.RData")
                 dataset <- blueprint_rnaseq
+            } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
+                load("data/roadmap_rnaseq.RData")
+                dataset <- roadmap_rnaseq
             } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
                 load("data/encode_mouse_rnaseq.RData")
                 dataset <- encode_mouse_rnaseq
@@ -231,7 +239,16 @@ shinyServer(function(input, output) {
             }
             keep <- which(
                 dataset$annotation$sampleSource %in% temp_tissue_blueprint_h &
-                    dataset$annotation$cellType %in% temp_celltype_blueprint_h
+                dataset$annotation$cellType %in% temp_celltype_blueprint_h
+            )
+        } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
+            if (is.null(input$celltype_roadmap_h)) {
+                temp_celltype_roadmap_h <- unique(roadmap_rnaseq$annotation$name)
+            } else {
+                temp_celltype_roadmap_h <- input$celltype_roadmap_h
+            }
+            keep <- which(
+                dataset$annotation$name %in% temp_celltype_roadmap_h
             )
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             if (is.null(input$cells_encode_m)) {
@@ -274,7 +291,10 @@ shinyServer(function(input, output) {
         }
 
         myLabels <- dataset$annotation$name
-        if(length(keep) >= 2) {
+        validate(
+            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please selecet more experiments.")
+        )
+        if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]
             myLabels <- myLabels[keep]
         }
