@@ -25,6 +25,11 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                     h3("2 - Load your data (optional)"),
                     p("Upload a tab delimited text file of at least two columns. First column must contains ensemble gene id, second column must contains normalised expression value
                       (ie FPKM or TPM)"),
+                    p("You can download ",
+                      downloadLink("downloadExempleFile", label = " an example file"),
+                      ". It is a mouse RNA-seq experiment from the brain, kindly provided by Dr. Arbeitman.
+                      It corresponds to the NP1071 sample from ",
+                      a("this GEO dataset", href = "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70732"), "."),
                     checkboxInput("header", strong("My expression file contains a header."), TRUE),
                     fileInput("expressionFile", "Upload your expression file:", accept = "text/tab-separated-values"),
                     textInput("nameOfExpressionFile", "Name of your experiment", value="my RNA-seq"),

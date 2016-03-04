@@ -44,7 +44,7 @@
     <a href="#_Can_you_add_this_dataset_on_HeatRNAseq">3.3 Can you add this dataset on HeatRNAseq? One of your dataset does not seemed up to date, can you update it?</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Could_you_implement_this_new_feature">3.4 Could you implement this new feature?</a>
+    <a href="#_Could_you_implement_this_new_feature">3.4 Could you implement this new feature? / I want to report a bug.</a>
 </p>
 <p style="padding-left: 3em;">
     <a href="#_I_have_uploaded_a_peak_file">3.5 I have uploaded a peak file. How do I remove it?</a>
@@ -52,6 +52,7 @@
 <h4 style="padding-left: 1em;">
     <a href="#_About">4 About</a>
 </h4>
+<img src="screenshot.png" alt="HeatRNAseq screenshot" width="800"> 
 <div>
     <h1>
         <a name="_Instructions"></a>2 Instructions
@@ -98,10 +99,20 @@
     Once the upload is complete, a subtle progress bar will appears on top of the page, and quick description of the on-going steps can be found on the top
     right of the page. It should take less than a minute. The <strong>My expression file</strong> tab should now display your gene expression table.
 </p>
+
 <p>
-	You can download <strong>an example file</strong>. It contains DESCRIPTION, so it will work only with human datasets. The file contains a header, so leave
-    the <strong>My expression file contains a header</strong> option ticked.
+	You can download 
+	<a href="rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt" download>this example file</a>.
+	It is a mouse RNA-seq experiment from the brain, kindly provided by Dr. Arbeitman.
+	Use a mouse dataset (for example Bgee mouse), and leave the "My expression file contains a header" otpion ticked.
+	It corresponds to the NP1071 sample from 
+    <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70732")>this GEO dataset</a>
+	supporting <a href="http://www.g3journal.org/content/6/1/221.full">this study</a>.
+	It is quite easy to rebuild. From the bottom of the GEO page, download the GSE70732_Mouse_all_regions_FPKM_data_all_genes.xlsx.gz file.
+	Extract the archive, and open the xlsx file into excel. Keep the first column, and delete all expression column but the last one (named FPKM_NP1071_GTGGCC_R1),
+	and then save the table as a tab-delimited text file. 
 </p>
+
 <p class="text-muted">
     Currently, the easiest way to unload a expression file without uploading a new one is to come back to the main page and open a new HeatRNAseq window.
 </p>
@@ -158,8 +169,8 @@
     </li>
     <li>
 		The <strong>Advance clustering options</strong> button will show and hide the <strong>Distance calculation</strong> and<strong>Clusterisation method</strong> options.
-		The default value are fine, but you can select your favourite one anyway. Values are passed to the R<a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
-		and<a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
+		The default value are fine, but you can select your favourite one anyway. Values are passed to the R <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
+		and <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
         <strong>1 - correlations</strong> distance method: instead of using the dist() function on correlation values, we use 1 - correlations as a measure of
         distance between experiments (a correlation of 0.75 will give a distance of 0.25).
     </li>
@@ -279,7 +290,7 @@
     implemented / updated within a working day.
 </p>
 <h3>
-    <a name="_Could_you_implement_this_new_feature"></a>3.4 Could you implement this new feature?
+    <a name="_Could_you_implement_this_new_feature"></a>3.4 Could you implement this new feature? / I want to report a bug.
 </h3>
 <p>
     Please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @). We will be very pleased to consider implementing any

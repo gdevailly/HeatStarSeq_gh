@@ -474,4 +474,10 @@ shinyServer(function(input, output) {
                                                          },
                                                          contentType = "text/tsv")
 
+    output$downloadExempleFile <- downloadHandler("rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt",
+                                                   content = function(file) {
+                                                       file.copy("www/rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt", file)
+                                                   },
+                                                   contentType = "text/tsv")
+
 })
