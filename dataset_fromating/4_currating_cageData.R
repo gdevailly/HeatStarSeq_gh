@@ -189,5 +189,30 @@ anno[grep("_cell_line", anno$tissue), "isCellType"] <- TRUE
 write.table(anno,  file = "cage_exp_anno.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
 write.table(unique(anno$tissue),  file = "cage_exp_anno_small.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
 
+t0 <- Sys.time()
+correlationMatrix <- cor(cageMatrix)
+Sys.time() - t0 # 7 min
+
+fantom5_human_cage <- list(
+    "dataMatrix" = cageMatrix,
+    "regionMetaData" = regionLocationsGR,
+    "correlationMatrix" =  correlationMatrix,
+    "annotation" = anno
+)
+
+fantom5_human_cage$anno$url <- "http://fantom.gsc.riken.jp/5/datafiles/latest/extra/CAGE_peaks/"
+colnames(fantom5_human_cage$dataMatrix) <- NULL
+colnames(fantom5_human_cage$correlationMatrix) <- NULL
+rownames(fantom5_human_cage$dataMatrix) <- NULL
+rownames(fantom5_human_cage$correlationMatrix) <- NULL
+rownames(fantom5_human_cage$annotation) <- NULL
+
+
+save(fantom5_human_cage, file = "../../heatcageseq/data/fantom5_human_cage.RData")
+
+
+
+
+
 
 

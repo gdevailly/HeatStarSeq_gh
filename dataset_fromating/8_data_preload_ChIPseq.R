@@ -89,3 +89,26 @@ save(encode_mouse_rnaseq, file = "data/encode_mouse_rnaseq_preload.RData")
 save(blueprint_rnaseq, file = "data/blueprint_rnaseq_preload.RData")
 save(roadmap_rnaseq, file = "data/roadmap_rnaseq_preload.RData")
 
+# CAGE seq
+setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/heatcageseq/")
+library(GenomicRanges)
+library(magrittr)
+
+load("data/fantom5_human_cage.RData")
+
+names(fantom5_human_cage)
+
+nullifyDataForFasterPreloading <- function(myList) {
+    myList[["dataMatrix"]] <- NULL
+    myList[["regionMetaData"]] <- NULL
+    myList[["correlationMatrix"]] <- NULL
+    return(myList)
+}
+
+object.size(fantom5_human_cage)
+fantom5_human_cage <- nullifyDataForFasterPreloading(fantom5_human_cage)
+object.size(fantom5_human_cage)
+
+save(fantom5_human_cage, file = "data/fantom5_human_cage_preload.RData")
+
+
