@@ -17,7 +17,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatCAGEseq",
                     h3("1 - Select a dataset"),
                     selectInput("selectedDataset", label = NULL, choices = c(
                         "FANTOM5 (human, hg19)",
-                        "FANTOM5 (mouse, mm10) (soon)"
+                        "FANTOM5 (mouse, mm9) (soon)"
                     )),
                     h3("2 - Load your data"),
                     p("Upload a 6 column bed file, with the score column scoring CAGE expression.
