@@ -406,4 +406,10 @@ shinyServer(function(input, output) {
                                                    },
                                                    contentType = "text/tsv")
 
+    output$downloadExempleFile <- downloadHandler("chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed",
+                                                  content = function(file) {
+                                                      file.copy("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", file)
+                                                  },
+                                                  contentType = "text/tsv")
+
 })

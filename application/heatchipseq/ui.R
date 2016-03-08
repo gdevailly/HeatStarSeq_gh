@@ -23,6 +23,11 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     h3("2 - Load your data"),
                     p("Upload a bed-like peak file. Tab delimited, first three columns must be chromsome, peak start and peak end.
                       Maximum size: 10MB. Please, use the same reference genome version than the selected dataset."),
+                    p("You can download ",
+                    downloadLink("downloadExempleFile", label = " an example file"),
+                      ". It is a human ESR1 (ERalpha) ChIP-seq experiment in MCF7 cells, kindly provided by Dr. Stromblad.
+                      It corresponds to the MCF7_ERa_E2_ChIP sample from ",
+                      a("this GEO dataset", href = "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73320"), "."),
                     checkboxInput("header", "My peak file contains a header.", TRUE),
                     fileInput("peakFile", strong("Upload your peak file:"), accept = "text/tab-separated-values"),
                     textInput("nameOfPeakFile", "Name of your experiment", value="my ChIP experiment"),

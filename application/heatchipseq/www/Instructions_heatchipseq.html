@@ -44,7 +44,7 @@
     <a href="#_Can_you_add_this_dataset_on_HeatChIPseq">3.3 Can you add this dataset on HeatChIPseq? One of your dataset does not seemed up to date, can you update it?</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Could_you_implement_this_new_feature">3.4 Could you implement this new feature?</a>
+    <a href="#_Could_you_implement_this_new_feature">3.4 Could you implement this new feature? | I want to report a bug.</a>
 </p>
 <p style="padding-left: 3em;">
     <a href="#_I_have_uploaded_a_peak_file">3.5 I have uploaded a peak file. How do I remove it?</a>
@@ -91,13 +91,20 @@
     Once the upload is complete, a subtle progress bar will appears on top of the page, and quick description of the on-going steps can be found on the top
     right of the page. It should take less than a minute for 30.000 regions. The <strong>My peaks</strong> tab should now display a table of your coordinates.
 </p>
-<p>
-	You can download <strong>an example file</strong>. It contains coordinates for human CpG island (hg19) fetch from the
-    <a href="http://genome.ucsc.edu/cgi-bin/hgTables">UCSC table browser</a>, so it will work only with human datasets. The file contains a header, so leave
-    the <strong>My peak file contains a header</strong> option ticked.
-</p>
 <p class="text-muted">
     Currently, the easiest way to unload a peak file without uploading a new one is to come back to the main page and open a new HeatChIPseq window.
+</p>
+<p>
+	You can download 
+	<a href="chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed" download>this example file</a>.
+	It is a human ESR1 (ERalpha) ChIP-seq experiment from MCF7 cells, kindly provided by Dr. Str&ouml;mblad.
+	Use a human dataset (for example ENCODE TFBS), and untick the "My peak file contains a header" otpion.
+	It corresponds to the MCF7_ERa_E2_ChIP sample from 
+    <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73320")>this GEO dataset</a>
+	supporting <a href="http://www.impactjournals.com/oncotarget/index.php?journal=oncotarget&page=article&op=view&path[]=6081">this study</a>.
+	It is quite easy to rebuild. Goe to the MCF7_ERa_E2_ChIP <a href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1890761" >sample page</a> and 
+	download the GSM1890761_ERa_Input_peaks.bed.gz file.
+	Extract the archive, and you can now uploaded it into HeatChIPseq! 
 </p>
 <h3>
     <a name="_Looking_at_the_Correlation_table"></a>2.3 Looking at the Correlation table
@@ -273,7 +280,7 @@
     implemented / updated within a working day.
 </p>
 <h3>
-    <a name="_Could_you_implement_this_new_feature"></a>3.4 Could you implement this new feature?
+    <a name="_Could_you_implement_this_new_feature"></a>3.4 Could you implement this new feature? | I want to report a bug.
 </h3>
 <p>
     Please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @). We will be very pleased to consider implementing any
