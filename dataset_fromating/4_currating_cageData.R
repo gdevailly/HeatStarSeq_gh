@@ -183,11 +183,11 @@ anno <- data.frame(
     "tissue" = cellType,
     stringsAsFactors = FALSE
 )
-anno$isCellType <- rep(FALSE, nrow(anno))
-anno[grep("_cell_line", anno$tissue), "isCellType"] <- TRUE
+anno$isCellLine <- rep(FALSE, nrow(anno))
+anno[grep("_cell_line", anno$tissue), "isCellLine"] <- TRUE
 
-write.table(anno,  file = "cage_exp_anno.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
-write.table(unique(anno$tissue),  file = "cage_exp_anno_small.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
+# write.table(anno,  file = "cage_exp_anno.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
+# write.table(unique(anno$tissue),  file = "cage_exp_anno_small.txt", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t") # regExp result checking
 
 t0 <- Sys.time()
 correlationMatrix <- cor(cageMatrix)
@@ -206,7 +206,6 @@ colnames(fantom5_human_cage$correlationMatrix) <- NULL
 rownames(fantom5_human_cage$dataMatrix) <- NULL
 rownames(fantom5_human_cage$correlationMatrix) <- NULL
 rownames(fantom5_human_cage$annotation) <- NULL
-
 
 save(fantom5_human_cage, file = "../../heatcageseq/data/fantom5_human_cage.RData")
 

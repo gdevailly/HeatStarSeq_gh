@@ -85,4 +85,15 @@ write.table(exemple2, file = "exemple2.cage.hg19.bed",  row.names = FALSE, col.n
 write.table(exemple3, file = "exemple3.cage.hg19.bed",  row.names = FALSE, col.names = FALSE, quote = FALSE, sep = "\t")
 
 
+exemple4 <- data.frame(
+    chr = regionLocations[, 1],
+    start = as.character(regionLocations[, 2]),
+    end = as.character(regionLocations[, 3]),
+    name = "ex4",
+    score = myData[, 320],
+    strand = regionLocations[, 4],
+    stringsAsFactors = FALSE
+)
+exemple4 <- subset(exemple4, exemple4$score != 0)
+write.table(exemple4, file = "exemple4.cage.hg19.bed",  row.names = FALSE, col.names = FALSE, quote = FALSE, sep = "\t")
 
