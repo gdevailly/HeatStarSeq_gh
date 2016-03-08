@@ -62,19 +62,21 @@ shinyServer(function(input, output) {
         } else {
             withProgress(value = 1, message = "Usercage file: ", detail = "reading file", {
                 userCageFile <- read_tsv(userCageFileName$datapath, col_names = input$header)[, 1:6]
-                colnames(userPeakFile) <- c("chr","start","end")
                 setProgress(value = 1, detail = "intersecting CAGE regions")
-                # userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
+                colnames(userCageFile) <- c("chr", "start", "end", "name", "score", "strand")
+                userCageFileGR <- with(userCageFile, GRanges(chr, IRanges(start, end), strand = strand, score = score))
                 dataset <- getSelectedDataset()
-                # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what it is uploading...
-                # Which encode region overlaps?
-                # we ignore peaks presents only in user peak lists for some reasons.
-                # suppressWarnings(userOverlap <- overlapsAny(dataset$regionMetaData, userPeakFileGR))
+                # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what he/her is uploading...
+                # Which region overlaps?
+                # we ignore peaks presents only in user peak lists.
+                suppressWarnings(userOverlap <- findOverlaps(dataset$regionMetaData, userCageFileGR, select = "arbitrary"))
+                userCuratedValues <- numeric(nrow(dataset$dataMatrix))
+                userCuratedValues[!is.na(userOverlap)] <- userCageFile[userOverlap[!is.na(userOverlap)], "score"]
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
-                # userCorrelations <- cor(userOverlap,
-                #                         dataset$dataMatrix
-                #                         ) %>% as.vector
+                userCorrelations <- cor(userCuratedValues,
+                                         dataset$dataMatrix
+                                        ) %>% as.vector
                 setProgress(value = 1, detail = "done!")
             })
         }
@@ -96,14 +98,14 @@ shinyServer(function(input, output) {
         return(userCageFileData)
     })
 
-    output$tabUserPeaks <- renderDataTable({
+    output$tabUserCageFile <- renderDataTable({
         validate(
             need(!is.null(input$cageFile), "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
         )
         userCageFileAnalysis()$peaks
     })
 
-    output$downloadUserPeaks <- downloadHandler("uploaded_cage_file.txt",
+    output$downloadUserCageFile <- downloadHandler("uploaded_cage_file.txt",
                                                  content = function(file) {
                                                      write.table(userCageFileAnalysis()$peaks, file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                  },
@@ -170,7 +172,7 @@ shinyServer(function(input, output) {
             }
             workingMatrix <- rbind(workingMatrix, userCorrelations[keep])
             workingMatrix <- cbind(workingMatrix, c(userCorrelations[keep], 1))
-            myLabels <- c(myLabels, input$nameOfPeakFile)
+            myLabels <- c(myLabels, input$nameOfCageFile)
         }
         return(list("mat" = workingMatrix, "myLabels" = myLabels))
     })
@@ -197,7 +199,7 @@ shinyServer(function(input, output) {
 
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
-        if (input$highlight & !is.null(input$peakFile)) {
+        if (input$highlight & !is.null(input$cageFile)) {
             # we increase user cor value by 2 to do the color trick
             matAA$mat[, ncol(matAA$mat)] <- matAA$mat[, ncol(matAA$mat)] + 2
             matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] <- matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] + 2

@@ -200,7 +200,7 @@ fantom5_human_cage <- list(
     "annotation" = anno
 )
 
-fantom5_human_cage$anno$url <- "http://fantom.gsc.riken.jp/5/datafiles/latest/extra/CAGE_peaks/"
+fantom5_human_cage$annotation$url <- "http://fantom.gsc.riken.jp/5/datafiles/latest/extra/CAGE_peaks/"
 colnames(fantom5_human_cage$dataMatrix) <- NULL
 colnames(fantom5_human_cage$correlationMatrix) <- NULL
 rownames(fantom5_human_cage$dataMatrix) <- NULL
