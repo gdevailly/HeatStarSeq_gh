@@ -18,6 +18,10 @@ vignettes/*.pdf
 # Word version of instructions
 .docx
 
+# heavy file
+application/heatcageseq/data/fantom5_human_cage.RData
+
+
 # =========================
 # Operating System Files
 # =========================
