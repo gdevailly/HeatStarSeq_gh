@@ -9,24 +9,18 @@ shinyServer(function(input, output) {
     # UI elements activations
     observe({
         if (is.null(input$peakFile)) {
-            shinyjs::hide("downloadUserPeaks")
+            shinyjs::hide("downloadUserCageFile")
             shinyjs::hide("downloadUserCorrelationTable")
         } else {
-            shinyjs::show("downloadUserPeaks")
+            shinyjs::show("downloadUserCageFile")
             shinyjs::show("downloadUserCorrelationTable")
         }
     })
 
     observe({
-        shinyjs::hide("widgetForEncodeHuman")
-        shinyjs::hide("widgetForCodexHuman")
-        shinyjs::hide("widgetForCodexMouse")
-        if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
-            shinyjs::show("widgetForEncodeHuman")
-        } else if (input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
-            shinyjs::show("widgetForCodexHuman")
-        } else if (input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
-            shinyjs::show("widgetForCodexMouse")
+        shinyjs::hide("widgetForFantom5Human")
+        if (input$selectedDataset == "FANTOM5 (human, hg19)") {
+            shinyjs::show("widgetForFantom5Human")
         } else if (input$selectedDataset == "other (soon)") {
             # fill this
         }
@@ -49,96 +43,87 @@ shinyServer(function(input, output) {
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
             # this remove from memmory non-selected datasets
-            load("data/encode_preload.RData")
-            load("data/codex_preload.RData")
-            load("data/codex_human_chip_preload.RData")
+            load("data/fantom5_human_cage_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
-            if(input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
-                load("data/encode.RData")
-                dataset <- encode
-            } else if(input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
-                load("data/codex.RData")
-                dataset <- codex
-            } else if(input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
-                load("data/codex_human_chip.RData")
-                dataset <- codex_human_chip
+            if(input$selectedDataset == "FANTOM5 (human, hg19)") {
+                load("data/fantom5_human_cage.RData")
+                dataset <- fantom5_human_cage
             }
             setProgress(value = 1, detail = "done!")
         })
         return(dataset)
     })
 
-    userPeakFileAnalysis_1 <- reactive({
-        userPeakFileName <- input$peakFile
-        if (is.null(userPeakFileName)){
-            userPeakFile <- NULL
+    userCageFileAnalysis_1 <- reactive({
+        userCageFileName <- input$cageFile
+        if (is.null(userCageFileName)){
+            userCageFile <- NULL
             userCorrelations <- NULL
         } else {
-            withProgress(value = 1, message = "User peak file: ", detail = "reading file", {
-                userPeakFile <- read_tsv(userPeakFileName$datapath, col_names = input$header)[, 1:3]
+            withProgress(value = 1, message = "Usercage file: ", detail = "reading file", {
+                userCageFile <- read_tsv(userCageFileName$datapath, col_names = input$header)[, 1:6]
                 colnames(userPeakFile) <- c("chr","start","end")
-                setProgress(value = 1, detail = "intersecting peaks")
-                userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
+                setProgress(value = 1, detail = "intersecting CAGE regions")
+                # userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
                 dataset <- getSelectedDataset()
                 # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what it is uploading...
                 # Which encode region overlaps?
                 # we ignore peaks presents only in user peak lists for some reasons.
-                suppressWarnings(userOverlap <- overlapsAny(dataset$regionMetaData, userPeakFileGR))
+                # suppressWarnings(userOverlap <- overlapsAny(dataset$regionMetaData, userPeakFileGR))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
-                userCorrelations <- cor(userOverlap,
-                                        dataset$dataMatrix
-                                        ) %>% as.vector
+                # userCorrelations <- cor(userOverlap,
+                #                         dataset$dataMatrix
+                #                         ) %>% as.vector
                 setProgress(value = 1, detail = "done!")
             })
         }
         return(list(
-            "peaks" = userPeakFile,
+            "peaks" = userCageFile,
             "correlations" = userCorrelations,
             "linearNormCorrelations" = NULL # to be fill below
         ))
     })
 
-    userPeakFileAnalysis <- reactive({
-        userPeakFileData <- userPeakFileAnalysis_1()
-        userCorrelations <- userPeakFileData$correlations
-        if (!is.null(input$peakFile)){
+    userCageFileAnalysis <- reactive({
+        userCageFileData <- userCageFileAnalysis_1()
+        userCorrelations <- userCageFileData$correlations
+        if (!is.null(input$cageFile)){
             if (input$maxCorrelation != 0) {
-                userPeakFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
+                userCageFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
             }
         }
-        return(userPeakFileData)
+        return(userCageFileData)
     })
-
 
     output$tabUserPeaks <- renderDataTable({
         validate(
-            need(!is.null(input$peakFile), "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$cageFile), "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
         )
-        userPeakFileAnalysis()$peaks
+        userCageFileAnalysis()$peaks
     })
 
-    output$downloadUserPeaks <- downloadHandler("uploaded_peak_list.txt",
+    output$downloadUserPeaks <- downloadHandler("uploaded_cage_file.txt",
                                                  content = function(file) {
-                                                     write.table(userPeakFileAnalysis()$peaks, file = file, row.names = FALSE, quote = FALSE, sep = "\t")
+                                                     write.table(userCageFileAnalysis()$peaks, file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                  },
                                                  contentType = "text/tsv")
 
     getCorrelationTable <- reactive({
         validate(
-            need(!is.null(input$peakFile), "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$cageFile), "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
         )
             data.frame(
                 "experiment" = getSelectedDataset()$annotation$name,
-                "correlation" = userPeakFileAnalysis()$correlations,
-                "scaledCorrelation" = userPeakFileAnalysis()$linearNormCorrelations,
+                "correlation" = userCageFileAnalysis()$correlations,
+                "scaledCorrelation" = userCageFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
-            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
+            )[order(userCageFileAnalysis()$correlations, decreasing = TRUE),]
     })
 
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
 
-    output$downloadUserCorrelationTable <- downloadHandler("heatChIPseq_correlations.txt",
+    output$downloadUserCorrelationTable <- downloadHandler("heatCAGEseq_correlations.txt",
                                                            content = function(file) {
                                                               write.table(getCorrelationTable(), file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                            },
@@ -150,77 +135,23 @@ shinyServer(function(input, output) {
         keep<- 1:nrow(workingMatrix)
         # filtering is dataset-depedent...
 
-        if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
-            if (is.null(input$cells)) {
-                temp_cells <- unique(encode$annotation$cellLine)
+        if (input$selectedDataset == "FANTOM5 (human, hg19)") {
+            if (is.null(input$f5h_cells)) {
+                temp_f5h_cells <- unique(fantom5_human_cage$annotation$tissue)
             } else {
-                temp_cells <- input$cells
+                temp_f5h_cells <- input$f5h_cells
             }
-            if (is.null(input$TF)) {
-                temp_TF <- unique(encode$annotation$tf)
-            } else {
-                temp_TF <- input$TF
+            if (input$f5h_isCellLine == "all") {
+                temp_f5h_isCellLine <- rep(TRUE, nrow(fantom5_human_cage$annotation))
+            } else if (input$f5h_isCellLine == "only cell line") {
+                temp_f5h_isCellLine <- fantom5_human_cage$annotation$isCellType
+            } else if (input$f5h_isCellLine == "only non cell line") {
+                temp_f5h_isCellLine <- !fantom5_human_cage$annotation$isCellType
             }
             keep <- which(
-                dataset$annotation$cellLine %in% temp_cells &
-                dataset$annotation$tf %in% temp_TF
+                dataset$annotation$tissue %in% temp_f5h_cells &
+                temp_f5h_isCellLine
             )
-
-        } else if (input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
-            if (is.null(input$TF_ch)) {
-                temp_TF_ch <- unique(codex_human_chip$annotation$tf)
-            } else {
-                temp_TF_ch <- input$TF_ch
-            }
-            if (input$filterCellsBy_ch == "Cell type") {
-                if (is.null(input$cell_types_ch)) {
-                    temp_cell_types_ch <- unique(codex_human_chip$annotation$cellType)
-                } else {
-                    temp_cell_types_ch <- input$cell_types_ch
-                }
-                keep <- which(
-                    dataset$annotation$cellType %in% temp_cell_types_ch &
-                    dataset$annotation$tf %in% temp_TF_ch
-                )
-            } else if (input$filterCellsBy_ch == "Cell subtype") {
-                if(is.null(input$cell_subtypes_ch)) {
-                    temp_cell_subtypes_ch <- codex_human_chip$annotation$cellSubtype
-                } else {
-                    temp_cell_subtypes_ch <- input$cell_subtypes_ch
-                }
-                keep <- which(
-                    dataset$annotation$cellSubtype %in% temp_cell_subtypes_ch &
-                    dataset$annotation$tf %in% temp_TF_ch
-                )
-            }
-
-        } else if (input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
-            if (is.null(input$TF_m)) {
-                temp_TF_m <- unique(codex$annotation$tf)
-            } else {
-                temp_TF_m <- input$TF_m
-            }
-            if (input$filterCellsBy == "Cell type") {
-                if (is.null(input$cell_types_m)) {
-                    temp_cell_types_m <- unique(codex$annotation$cellType)
-                } else {
-                    temp_cell_types_m <- input$cell_types_m
-                }
-                keep <- which(
-                    dataset$annotation$cellType %in% temp_cell_types_m &
-                    dataset$annotation$tf %in% temp_TF_m
-                )
-            } else if (input$filterCellsBy == "Cell subtype") {
-                if(is.null(input$cell_subtypes_m)) {
-                    temp_cell_subtypes_m <- codex$annotation$cellSubtype
-                } else {
-                    temp_cell_subtypes_m <- input$cell_subtypes_m
-                }
-                keep <- which(
-                    dataset$annotation$cellSubtype %in% temp_cell_subtypes_m &
-                    dataset$annotation$tf %in% temp_TF_m
-                )
-            }
         }
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
@@ -232,10 +163,10 @@ shinyServer(function(input, output) {
             myLabels <- myLabels[keep]
         }
         # merging user data in correlation matrix
-        if(!is.null(userPeakFileAnalysis()$correlations)) {
-            userCorrelations <- userPeakFileAnalysis()$correlations
+        if(!is.null(userCageFileAnalysis()$correlations)) {
+            userCorrelations <- userCageFileAnalysis()$correlations
             if (input$correlationCorrection == "Linear scaling") {
-                userCorrelations <- userPeakFileAnalysis()$linearNormCorrelations
+                userCorrelations <- userCageFileAnalysis()$linearNormCorrelations
             }
             workingMatrix <- rbind(workingMatrix, userCorrelations[keep])
             workingMatrix <- cbind(workingMatrix, c(userCorrelations[keep], 1))
@@ -406,10 +337,10 @@ shinyServer(function(input, output) {
                                                    },
                                                    contentType = "text/tsv")
 
-    output$downloadExempleFile <- downloadHandler("chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed",
-                                                  content = function(file) {
-                                                      file.copy("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", file)
-                                                  },
-                                                  contentType = "text/tsv")
+    # output$downloadExempleFile <- downloadHandler("chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed",
+    #                                               content = function(file) {
+    #                                                   file.copy("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", file)
+    #                                               },
+    #                                               contentType = "text/tsv")
 
 })

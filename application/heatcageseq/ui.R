@@ -34,12 +34,12 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatCAGEseq",
                     checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), FALSE),
                     # we addapt filtering widgets to the various datasets
                     div(id = "widgetForFantom5Human",
-                        selectInput("cells", "Subset for cell type(s) (empty to select all):",
+                        selectInput("f5h_cells", "Subset for cell type(s) (empty to select all):",
                                     choices = unique(fantom5_human_cage$annotation$tissue)[order(unique(fantom5_human_cage$annotation$tissue))],
                                     selected = NULL, multiple = TRUE),
-                        selectInput("isCellLine", "Cell lines or not? (empty to select all)",
-                                    choices = c("cell line", "non cell line"),
-                                    selected = NULL, multiple = TRUE)
+                        selectInput("f5h_isCellLine", "Cell lines or not? (empty to select all)",
+                                    choices = c("all", "only cell line", "only non cell line"),
+                                    selected = NULL, multiple = FALSE)
                     ),
                     selectInput("correlationCorrection",
                                 label = "Uploaded experiment correlation correction:",
