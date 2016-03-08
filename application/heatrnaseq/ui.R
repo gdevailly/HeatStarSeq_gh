@@ -23,8 +23,8 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                         "ENCODE RNA-seq (mouse)"
                     )),
                     h3("2 - Load your data (optional)"),
-                    p("Upload a tab delimited text file of at least two columns. First column must contains ensemble gene id, second column must contains normalised expression value
-                      (ie FPKM or TPM)"),
+                    p("Upload a tab delimited text file of at least two columns. First column must contains ensemble gene id,
+                       second column must contains normalised expression value(ie FPKM or TPM). Maximum size: 10MB."),
                     p("You can download ",
                       downloadLink("downloadExempleFile", label = " an example file"),
                       ". It is a mouse RNA-seq experiment from the brain, kindly provided by Dr. Arbeitman.
