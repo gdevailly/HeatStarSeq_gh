@@ -19,8 +19,11 @@ shinyServer(function(input, output) {
 
     observe({
         shinyjs::hide("widgetForFantom5Human")
+        shinyjs::hide("widgetForFantom5Mouse")
         if (input$selectedDataset == "FANTOM5 (human, hg19)") {
             shinyjs::show("widgetForFantom5Human")
+        } else if (input$selectedDataset == "FANTOM5 (mouse, mm9)") {
+                shinyjs::show("widgetForFantom5Mouse")
         } else if (input$selectedDataset == "other (soon)") {
             # fill this
         }
@@ -44,10 +47,14 @@ shinyServer(function(input, output) {
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
             # this remove from memmory non-selected datasets
             load("data/fantom5_human_cage_preload.RData")
+            load("data/fantom5_mouse_cage_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
             if(input$selectedDataset == "FANTOM5 (human, hg19)") {
                 load("data/fantom5_human_cage.RData")
                 dataset <- fantom5_human_cage
+            } else if(input$selectedDataset == "FANTOM5 (mouse, mm9)") {
+                load("data/fantom5_mouse_cage.RData")
+                dataset <- fantom5_mouse_cage
             }
             setProgress(value = 1, detail = "done!")
         })
@@ -153,6 +160,15 @@ shinyServer(function(input, output) {
             keep <- which(
                 dataset$annotation$tissue %in% temp_f5h_cells &
                 temp_f5h_isCellLine
+            )
+        } else if (input$selectedDataset == "FANTOM5 (mouse, mm9)") {
+            if (is.null(input$f5m_cells)) {
+                temp_f5m_cells <- unique(fantom5_mouse_cage$annotation$tissue)
+            } else {
+                temp_f5m_cells <- input$f5m_cells
+            }
+            keep <- which(
+                dataset$annotation$tissue %in% temp_f5m_cells
             )
         }
 

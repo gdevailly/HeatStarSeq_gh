@@ -95,8 +95,9 @@ library(GenomicRanges)
 library(magrittr)
 
 load("data/fantom5_human_cage.RData")
-
+load("data/fantom5_mouse_cage.RData")
 names(fantom5_human_cage)
+names(fantom5_mouse_cage)
 
 nullifyDataForFasterPreloading <- function(myList) {
     myList[["dataMatrix"]] <- NULL
@@ -108,7 +109,11 @@ nullifyDataForFasterPreloading <- function(myList) {
 object.size(fantom5_human_cage)
 fantom5_human_cage <- nullifyDataForFasterPreloading(fantom5_human_cage)
 object.size(fantom5_human_cage)
+object.size(fantom5_mouse_cage)
+fantom5_mouse_cage <- nullifyDataForFasterPreloading(fantom5_mouse_cage)
+object.size(fantom5_mouse_cage)
 
 save(fantom5_human_cage, file = "data/fantom5_human_cage_preload.RData")
+save(fantom5_mouse_cage, file = "data/fantom5_mouse_cage_preload.RData")
 
 

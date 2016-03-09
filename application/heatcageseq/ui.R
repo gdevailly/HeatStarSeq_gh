@@ -17,7 +17,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatCAGEseq",
                     h3("1 - Select a dataset"),
                     selectInput("selectedDataset", label = NULL, choices = c(
                         "FANTOM5 (human, hg19)",
-                        "FANTOM5 (mouse, mm9) (soon)"
+                        "FANTOM5 (mouse, mm9)"
                     )),
                     h3("2 - Load your data"),
                     p("Upload a 6 column bed file, with the score column scoring CAGE expression.
@@ -40,6 +40,11 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatCAGEseq",
                         selectInput("f5h_isCellLine", "Cell lines or not? (empty to select all)",
                                     choices = c("all", "only cell line", "only non cell line"),
                                     selected = NULL, multiple = FALSE)
+                    ),
+                    div(id = "widgetForFantom5Mouse",
+                        selectInput("f5m_cells", "Subset for cell type(s) (empty to select all):",
+                                    choices = unique(fantom5_mouse_cage$annotation$tissue)[order(unique(fantom5_mouse_cage$annotation$tissue))],
+                                    selected = NULL, multiple = TRUE)
                     ),
                     selectInput("correlationCorrection",
                                 label = "Uploaded experiment correlation correction:",
