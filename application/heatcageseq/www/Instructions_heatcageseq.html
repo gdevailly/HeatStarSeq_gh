@@ -30,7 +30,10 @@
 </p>
 <p style="padding-left: 3em;">
     <a href="#_Correlation_correction">2.8 Correlation correction</a>
-</p style="padding-left: 3em;">
+</p>
+<p style="padding-left: 3em;">
+    <a href="#_About_the_datasets">2.9 About the datasets</a>
+</p>
 <h4 style="padding-left: 1em;">
     <a href="#_FAQ">3 FAQ</a>
 </h4>
@@ -80,7 +83,7 @@
     format, and requires at least 6 columns: first column must be chromosome names (chr1, chr2, chrX, etc.), the second must be region start, the third region ends,
 	the fourth region name (not used, but must be present), the fifth must be a score reflectiong CAGE expression value, such as RPM values or tag count, and the sixth
 	must contains strand information. Any additional column
-    will be discarded. Please, be sure to untick the <strong>My peak file contains a header</strong> option if your file do
+    will be discarded. Please, be sure to untick the <strong>My bed file contains a header</strong> option if your file do
     not contains any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
     modify the label of your experiment in the plots.
 </p>
@@ -94,7 +97,7 @@
     right of the page. It should take less than a minute for 100.000 regions. The <strong>My bed file</strong> tab should now display a table of your coordinates.
 </p>
 <p class="text-muted">
-    Currently, the easiest way to unload a peak file without uploading a new one is to come back to the main page and open a new HeatCAGEseq window.
+    Currently, the easiest way to unload a bed file without uploading a new one is to come back to the main page and open a new HeatCAGEseq window.
 </p>
 <p>
 
@@ -103,7 +106,7 @@
     <a name="_Looking_at_the_Correlation_table"></a>2.3 Looking at the Correlation table
 </h3>
 <p>
-	If you uploaded a peak file, the <strong>Correlation table</strong> tab should now display a 3 column table. The first column contains the name of
+	If you uploaded a bed file, the <strong>Correlation table</strong> tab should now display a 3 column table. The first column contains the name of
     <strong>experiments</strong> in the selected dataset, the second column contains the <strong>correlation</strong> coefficient between the uploaded
     coordinates and the corresponding experiment in the dataset. The third column contains <strong>scaled correlation</strong> values that we will discuss on
     section <a href="#_Correlation_correction:">2.8</a>. At the bottom of the page, you will find a <strong>Save as tab delimited .txt</strong> download
@@ -128,22 +131,22 @@
 </p>
 <ul>
     <li>
-        The <strong>Highlight my experiment in the heatmap</strong> tick box. When checked, if you uploaded a peak file, the row and line corresponding to your
+        The <strong>Highlight my experiment in the heatmap</strong> tick box. When checked, if you uploaded a bed file, the row and line corresponding to your
         experiment will be highlighted: a 0 correlation value will be displayed in yellow, a 0.5 value in bright green, and a 1 correlation value still in
         black. This can help you localised your experiment in crowded heatmaps.
     </li>
     <li>
         One or several <strong>subset</strong> options: You can restrict the experiments to be displayed using those fields. They may vary a bit between
-		datasets. You can select experiment concerning one or several <strong>transcription factors</strong> (TFs), as well as select experiment done in one or several 
+		datasets. You can usualy select experiment concerning one or several  
         <strong>cell types</strong>. Leaving the field empty will select all experiments.
     </li>
 </ul>
 <p class="text-muted">
-    If only two or less experiments from the dataset match your criteria, the heatmap will not be displayed. Please be less stringent in your filtering
+    If only three or less experiments from the dataset match your criteria, the heatmap will not be displayed. Please be less stringent in your filtering
     criteria. You can look for available experiment in the Samples metadata tab.
 </p>
 <p class="text-muted">
-    The uploaded peak list will never be filtered out, and will always be displayed in the heatmap.
+    The uploaded experiment will never be filtered out, and will always be displayed in the heatmap.
 </p>
 <ul>
     <li>
@@ -152,8 +155,8 @@
     </li>
     <li>
 		The <strong>Advance clustering options</strong> button will show and hide the <strong>Distance calculation</strong> and<strong>Clusterisation method</strong> options.
-		The default value are fine, but you can select your favourite one anyway. Values are passed to the R<a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
-		and<a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
+		The default value are fine, but you can select your favourite one anyway. Values are passed to the R <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
+		and <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
         <strong>1 - correlations</strong> distance method: instead of using the dist() function on correlation values, we use 1 - correlations as a measure of
         distance between experiments (a correlation of 0.75 will give a distance of 0.25).
     </li>
@@ -176,8 +179,8 @@
 </h3>
 <p>
     The <strong>responsive heatmap </strong>tab displays an interactive plot provided through the <a href="https://plot.ly/">plot.ly</a> API. It can takes tens
-    of seconds to be displayed on powerful computer running later version of Firefox and Chrome, but takes somewhat longer to load on Safari, Internet explorer
-    and Edge (blame plot.ly). It represent the same version of the <strong>Static heatmap</strong> presented in the previous section, without the side
+    of seconds to be displayed on powerful computer running later version of Firefox and Chrome, Safari, Internet explorer or
+    Edge. It represent the same version of the <strong>Static heatmap</strong> presented in the previous section, without the side
     dendrograms (trees). Most of the options are the same as for <strong>Static heatmap</strong>, so please check section <a href="#_Static_heatmap">2.4</a>
     for more information. Additional options are available on the responsive heatmap itself:
 </p>
@@ -233,12 +236,12 @@
     for that experiment.
 </p>
 <h3>
-    <a name="_Correlation_correction:"></a>2.8 Correlation correction
+    <a name="_Correlation_correction"></a>2.8 Correlation correction
 </h3>
 <p>
     Sometimes, the maximum correlation of a user peak file with any experiment in the dataset can be quite low. In some situations, when the user is confident
-    that the top hits are relevant, this may be evidence of strong "batch effect" that could reflect artefact of library preparation method, peak calling or
-	ChIP efficiency. Those low correlation value might bias the clustering (due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>).
+    that the top hits are relevant, this may be evidence of strong "batch effect" that could reflect artefact of library preparation method or diferences in bioinformatic pipeline.
+	Those low correlation value might bias the clustering (due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>).
 	The user can manually correct this effect using the <strong>Linear scaling</strong> method on the <strong>Uploaded experiment correlation correction</strong> option.
 	The correlation values will be linearly	up-scaled so the maximum correlation value will now be equal to the value of the
     <strong>Maximum expected correlation value for linear scaling correction </strong>slider (default 0.95). The resulting transformed correlation value can be
@@ -247,6 +250,12 @@
 <p class="text-muted">
     The linear scaling of correlation value will not change the ordering of the values, only scaled the value (ie he third most correlated experiment will be
     the same with or without scaling).
+</p>
+<h3>
+    <a name="_About_the_datasets"></a>2.9 About the datasets
+</h3>
+<p>
+
 </p>
 <div>
     <h1>
@@ -266,7 +275,7 @@
     The source code can be find on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 <h3>
-    <a name="_Can_you_add_this_dataset_on_HeatChIPseq"></a>3.3 Can you add this dataset on HeatChIPseq? One of your dataset does not seemed up to date, can you update it?
+    <a name="_Can_you_add_this_dataset_on_HeatChIPseq"></a>3.3 Can you add this dataset on HeatCAGEseq? One of your dataset does not seemed up to date, can you update it?
 </h3>
 <p>
     Please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @) and we will have a look. A well curated dataset can be
@@ -280,12 +289,12 @@
     feature that will improve the usability of this application.
 </p>
 <h3>
-    <a name="_I_have_uploaded_a_peak_file"></a>3.5 I have uploaded a peak file. How do I remove it?
+    <a name="_I_have_uploaded_a_peak_file"></a>3.5 I have uploaded a bed file. How do I remove it?
 </h3>
 <p>
-    At the moment, there is no option to remove a peak file. You can replace it with any other peak file clicking the <strong>Browse</strong> button again. To
-    remove a peak file without uploading a new one, the simplest method is to open a new HeatChIPseq session by going <strong>Back to the main page</strong>.
-    Refreshing the HeatChIPseq page may result in slightly erratic outcome.
+    At the moment, there is no option to remove a bed file. You can replace it with any other bed file clicking the <strong>Browse</strong> button again. To
+    remove a bed file without uploading a new one, the simplest method is to open a new HeatCAGEseq session by going <strong>Back to the main page</strong>.
+    Refreshing the HeatCAGEseq page may result in slightly erratic outcome.
 </p>
 <div>
     <h1>
@@ -293,12 +302,12 @@
     </h1>
 </div>
 <p>
-    <strong>HeatChIPseq</strong>
+    <strong>HeatCAGEseq</strong>
     is a part of <strong>Heat*Seq</strong>, an attempt to make genome-wide comparison of high throughput sequencing experiments easier. It was developed by
 	Guillaume Devailly, Anna Mantsoki and Anagha Joshi at the <a href="http://www.roslin.ed.ac.uk/">Roslin Institute</a>, and funded by the
 	<a href="http://www.bbsrc.ac.uk/">Biotechnology and Biological Sciences Research Council</a>. It use <a href="https://www.r-project.org/">R</a>
 	<a href="https://www.rstudio.com/products/shiny/">shiny</a>, <a href="https://plot.ly/">plot.ly</a>, and various <a href="https://cran.r-project.org/">CRAN</a>
-	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a>
-	and <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a>. Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
+	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from <a href="http://fantom.gsc.riken.jp/5/">FANTOM5</a>.
+	Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 </div>
