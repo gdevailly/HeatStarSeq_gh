@@ -128,7 +128,8 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                  img(src = "legend_small.png"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
                                  downloadButton("downloadHMpdf", label = "Save as pdf"),
-                                 downloadButton("downloadHMsvg", label = "Save as svg")
+                                 downloadButton("downloadHMsvg", label = "Save as svg"),
+                                 downloadButton("downloadHMdata", label = "Export data as tab delimited .txt")
                                  ),
                         tabPanel("Responsive heatmap",
                                  plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),

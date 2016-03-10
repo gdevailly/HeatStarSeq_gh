@@ -316,6 +316,16 @@ shinyServer(function(input, output) {
                                             },
                                             contentType = "image/svg")
 
+    output$downloadHMdata <- downloadHandler("clusteredMatrix.txt",
+                                             content = function(file) {
+                                                 matData <- subsetMatrix()
+                                                 clusterDat <- doTheClustering()
+                                                 clusteredMatrix <- matData$mat[clusterDat$order, clusterDat$order]
+                                                 colnames(clusteredMatrix) <- rownames(clusteredMatrix) <- matData$myLabels[clusterDat$order]
+                                                 write.table(clusteredMatrix, file = file, quote = FALSE, sep = "\t")
+                                             },
+                                             contentType = "text/tsv")
+
     output$myHeatmap <- renderPlot(myRenderPlot())
 
     output$myPlotlyHeatmap <- renderPlotly({
