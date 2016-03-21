@@ -24,6 +24,7 @@ shinyServer(function(input, output) {
         shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForEncodeMouse")
         shinyjs::hide("widgetForBgeeMouse")
+        shinyjs::hide("widgetForFlybase")
 
         if (input$dataset == "ENCODE RNA-seq (human)") {
             shinyjs::show("widgetForEncodeHuman")
@@ -37,6 +38,8 @@ shinyServer(function(input, output) {
             shinyjs::show("widgetForEncodeMouse")
         } else if (input$dataset == "Bgee RNA-seq (mouse)") {
             shinyjs::show("widgetForBgeeMouse")
+        } else if (input$dataset == "Flybase RNA-seq (drosophila)") {
+            shinyjs::show("widgetForFlybase")
         } else if (input$dataset == "other (soon)") {
             # fill this
         }
@@ -64,6 +67,7 @@ shinyServer(function(input, output) {
             load("data/bgee_mouse_preload.RData")
             load("data/blueprint_rnaseq_preload.RData")
             load("data/roadmap_rnaseq_preload.RData")
+            load("data/flybase_rnaseq_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
             if (input$dataset == "ENCODE RNA-seq (human)") {
                 load("data/encode_rnaseq.RData")
@@ -83,6 +87,9 @@ shinyServer(function(input, output) {
             } else if (input$dataset == "Bgee RNA-seq (mouse)") {
                 load("data/bgee_mouse.RData")
                 dataset <- bgee_mouse
+            } else if (input$dataset == "Flybase RNA-seq (drosophila)") {
+                load("data/flybase_rnaseq.RData")
+                dataset <- flybase_rnaseq
             } else if (input$dataset == "other (soon)") {
                 # fill this
             }
@@ -285,6 +292,21 @@ shinyServer(function(input, output) {
                 dataset$annotation$tissue %in% temp_tissus_bgee_m &
                 dataset$annotation$stage %in% temp_dvp_bgee_m &
                 dataset$annotation$libraryType %in% temp_library_bgee_m
+            )
+        } else if (input$dataset == "Flybase RNA-seq (drosophila)") {
+            if (is.null(input$sample_flybase)) {
+                temp_sample_flybase <- unique(flybase_rnaseq$annotation$name)
+            } else {
+                temp_sample_flybase <- input$sample_flybase
+            }
+            if (is.null(input$library_flybase)) {
+                temp_library_flybase <- unique(flybase_rnaseq$annotation$parentLibrary)
+            } else {
+                temp_library_flybase <- input$library_flybase
+            }
+            keep <- which(
+                dataset$annotation$name %in% temp_sample_flybase &
+                dataset$annotation$parentLibrary %in% temp_library_flybase
             )
         } else { # modify accordingly for new datasets!
 
