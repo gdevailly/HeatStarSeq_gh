@@ -20,8 +20,9 @@ length(unique(fbdata$FBgn)) # 18057, this will be fun
 
 uniqueGenes <- unique(fbdata$FBgn)[order(unique(fbdata$FBgn))]
 
-library(tidyr)
-tidyrMagix <- spread(fbdata, RNASource_name, RPKM_value) # 1 minute ?
+# library(tidyr)
+# tidyrMagix <- spread(fbdata, RNASource_name, RPKM_value) # 1 minute ?
+# not merging very well
 
 dataMatrix <- matrix(0, nrow = length(uniqueGenes), ncol = length(unique(fbdata$RNASource_name)))
 

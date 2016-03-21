@@ -41,7 +41,7 @@
     <a href="#_Where_can_I_find_the_source_code">3.2 Where can I find the source code?</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Can_you_add_this_dataset_on_HeatChIPseq">3.3 Can you add this dataset on HeatChIPseq? One of your dataset does not seemed up to date, can you update it?</a>
+    <a href="#_Can_you_add_this_dataset_on_HeatChIPseq">3.3 Can you add this dataset on HeatChIPseq? One of your datasets does not seem up to date, can you update it?</a>
 </p>
 <p style="padding-left: 3em;">
     <a href="#_Could_you_implement_this_new_feature">3.4 Could you implement this new feature? | I want to report a bug.</a>
@@ -65,22 +65,22 @@
     <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
 </h3>
 <p>
-    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there is 3 datasets available: Transcription Factor (TF)
+    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there are 3 datasets available: Transcription Factor (TF)
 	ChIP-seq from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a> in human (hg19), and
     <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a> TF ChIP-seq for human (hg19) or mouse (mm10).
 </p>
 <p class="text-muted">
-    The dataset will only be loaded when you will have uploaded a peak file, or once you will have focused on a plot panels.
+    The dataset will only be loaded when you will have uploaded a peak file, or once you will have focused on a plot panel.
 </p>
 <h3>
     <a name="_Loading_a_peak_file"></a>2.2 Loading a peak file
 </h3>
 <p>
 	You can now upload a peak file (a list of genomic coordinates). Note that this is not mandatory, and you can jump to section
-    <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accept tab-delimited text file following a bed
+    <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accepts a tab-delimited text file following a bed
     format: first column must be chromosome names (chr1, chr2, chrX, etc.), the second must be region start, and the third region ends. Any additional column
-    will be discarded (peak name, score, strand, etc.). Please, be sure to untick the <strong>My peak file contains a header</strong> option if your file do
-    not contains any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
+    will be discarded (peak name, score, strand, etc.). Please, be sure to untick the <strong>My peak file contains a header</strong> option if your file does
+    not contain any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
     modify the label of your experiment in the plots.
 </p>
 <p class="text-muted">
@@ -89,7 +89,7 @@
     <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @) and we will consider increasing the size limit.
 </p>
 <p>
-    Once the upload is complete, a subtle progress bar will appears on top of the page, and quick description of the on-going steps can be found on the top
+    Once the upload is complete, a subtle progress bar will appear on top of the page, and quick description of the on-going steps can be found on the top
     right of the page. It should take less than a minute for 30.000 regions. The <strong>My peaks</strong> tab should now display a table of your coordinates.
 </p>
 <p class="text-muted">
@@ -99,7 +99,7 @@
 	You can download 
 	<a href="chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed" download>this example file</a>.
 	It is a human ESR1 (ERalpha) ChIP-seq experiment from MCF7 cells, kindly provided by Dr. Str&ouml;mblad.
-	Use a human dataset (for example ENCODE TFBS), and untick the "My peak file contains a header" otpion.
+	Use a human dataset (for example ENCODE TFBS), and untick the "My peak file contains a header" option.
 	It corresponds to the MCF7_ERa_E2_ChIP sample from 
     <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73320")>this GEO dataset</a>
 	supporting <a href="http://www.impactjournals.com/oncotarget/index.php?journal=oncotarget&page=article&op=view&path[]=6081">this study</a>.
@@ -115,7 +115,7 @@
     <strong>experiments</strong> in the selected dataset, the second column contains the <strong>correlation</strong> coefficient between the uploaded
     coordinates and the corresponding experiment in the dataset. The third column contains <strong>scaled correlation</strong> values that we will discuss on
     section <a href="#_Correlation_correction:">2.8</a>. At the bottom of the page, you will find a <strong>Save as tab delimited .txt</strong> download
-    button, allowing you to download a copy of the correlation table as a tab delimited text file. Those file can be imported into many datasheet software
+    button, allowing you to download a copy of the correlation table as a tab delimited text file. Those files can be imported into many datasheet software
     including Microsoft Excel.
 </p>
 <p class="text-muted">
@@ -130,15 +130,15 @@
 </p>
 <p>
     The <strong>static heatmap</strong> tab will display a clustered heatmap representation of the correlation matrix: each row and column represent a single
-    experiment. The colours code for the correlation value, and a colour legend can be found bellow the heatmap: white is a correlation coefficient equal to 0,
-    red equals to 0.5, and black equals to 1. Several options are available on the side bar panel on the left, <strong>3 - Plot customisation</strong>. In the
+    experiment. The colours code for the correlation value, and a colour legend can be found below the heatmap: white is a correlation coefficient equal to 0,
+    red equals to 0.5, and black equals to 1. Several options are available on the side bar panel on the left, <strong>3 - Plot customization</strong>. In the
     order of appearance:
 </p>
 <ul>
     <li>
         The <strong>Highlight my experiment in the heatmap</strong> tick box. When checked, if you uploaded a peak file, the row and line corresponding to your
         experiment will be highlighted: a 0 correlation value will be displayed in yellow, a 0.5 value in bright green, and a 1 correlation value still in
-        black. This can help you localised your experiment in crowded heatmaps.
+        black. This can help you localise your experiment in crowded heatmaps.
     </li>
     <li>
         One or several <strong>subset</strong> options: You can restrict the experiments to be displayed using those fields. They may vary a bit between
@@ -159,8 +159,8 @@
         <a href="#_Correlation_correction:">2.8</a>.
     </li>
     <li>
-		The <strong>Advance clustering options</strong> button will show and hide the <strong>Distance calculation</strong> and<strong>Clusterisation method</strong> options.
-		The default value are fine, but you can select your favourite one anyway. Values are passed to the R <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
+		The <strong>Advance clustering options</strong> button will show and hide the <strong>Distance calculation</strong> and <strong>Clustering method</strong> options.
+		The default values are fine, but you can select your favourite one anyway. Values are passed to the R <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
 		and <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
         <strong>1 - correlations</strong> distance method: instead of using the dist() function on correlation values, we use 1 - correlations as a measure of
         distance between experiments (a correlation of 0.75 will give a distance of 0.25).
@@ -177,22 +177,22 @@
 </p>
 <p>
     Bellow the heatmap, you should see 3 buttons: <strong>Save as png</strong>, <strong>Save as pdf</strong> and <strong>Save as svg</strong>, to export the
-    image in those format.
+    image in those formats.
 </p>
 <h3>
     <a name="_Responsive_heatmap"></a>2.5 Responsive heatmap
 </h3>
 <p>
-    The <strong>responsive heatmap </strong>tab displays an interactive plot provided through the <a href="https://plot.ly/">plot.ly</a> API. It can takes tens
+    The <strong>responsive heatmap </strong>tab displays an interactive plot provided through the <a href="https://plot.ly/">plot.ly</a> API. It can take tens
     of seconds to be displayed on powerful computer running later version of Firefox and Chrome, Safari, Internet explorer
-    or Edge (blame plot.ly). It represent the same version of the <strong>Static heatmap</strong> presented in the previous section, without the side
+    or Edge (blame plot.ly). It represents the same version of the <strong>Static heatmap</strong> presented in the previous section, without the side
     dendrograms (trees). Most of the options are the same as for <strong>Static heatmap</strong>, so please check section <a href="#_Static_heatmap">2.4</a>
     for more information. Additional options are available on the responsive heatmap itself:
 </p>
 <ul>
     <li>
-    Mouse over information: when hovering the mouse over the heatmap, a text box will appears, giving you the name of the experiment in the x-axis, the
-    name of the experiment in the y-axis, and there correlation value (z).
+    Mouse over information: when hovering the mouse over the heatmap, a text box will appear, giving you the name of the experiment in the x-axis, the
+    name of the experiment in the y-axis, and their correlation value (z).
     </li>
 </ul>
 <p class="text-muted">
@@ -201,12 +201,12 @@
 </p>
 <ul>
     <li>
-	You can zoom on the heatmap by drag and dropping the mouse defining a rectangle. To zoom out, double-click on the heatmap or click the
+	You can zoom on the heatmap by dragging and dropping the mouse defining a rectangle. To zoom out, double-click on the heatmap or click the
     <strong>Reset axis</strong> or <strong>Autoscale</strong> buttons on the top left corner of the heatmap.
     </li>
     <li>
-        By selecting the <strong>Pan</strong> button on the top left corner of the heatmap, drag and dropping the mouse will allow you to pan, which can be
-        useful once you zoomed in a specific part of the heatmap.
+        By selecting the <strong>Pan</strong> button on the top left corner of the heatmap, dragging and dropping the mouse will allow you to pan, which can be
+        useful once you have zoomed in a specific part of the heatmap.
     </li>
     <li>
         The <strong>Download plot as a png</strong> button is non-functional (blame plot.ly). Please use the one under the <strong>Static heatmap</strong> or
@@ -246,14 +246,14 @@
 <p>
     Sometimes, the maximum correlation of a user peak file with any experiment in the dataset can be quite low. In some situations, when the user is confident
     that the top hits are relevant, this may be evidence of strong "batch effect" that could reflect artefact of library preparation method, peak calling or
-	ChIP efficiency. Those low correlation value might bias the clustering (due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>).
+	ChIP efficiency. Those low correlation values might bias the clustering (due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>).
 	The user can manually correct this effect using the <strong>Linear scaling</strong> method on the <strong>Uploaded experiment correlation correction</strong> option.
 	The correlation values will be linearly	up-scaled so the maximum correlation value will now be equal to the value of the
     <strong>Maximum expected correlation value for linear scaling correction </strong>slider (default 0.95). The resulting transformed correlation value can be
     obtained from the <strong>scaledCorrelation</strong> column of the <strong>Correlation table</strong>.
 </p>
 <p class="text-muted">
-    The linear scaling of correlation value will not change the ordering of the values, only scaled the value (ie he third most correlated experiment will be
+    The linear scaling of correlation value will not change the ordering of the values, only scale the value (ie he third most correlated experiment will be
     the same with or without scaling).
 </p>
 <div>
@@ -274,7 +274,7 @@
     The source code can be find on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 <h3>
-    <a name="_Can_you_add_this_dataset_on_HeatChIPseq"></a>3.3 Can you add this dataset on HeatChIPseq? One of your dataset does not seemed up to date, can you update it?
+    <a name="_Can_you_add_this_dataset_on_HeatChIPseq"></a>3.3 Can you add this dataset on HeatChIPseq? One of your datasets does not seem up to date, can you update it?
 </h3>
 <p>
     Please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a> (replace at with @) and we will have a look. A well curated dataset can be
@@ -304,7 +304,7 @@
     <strong>HeatChIPseq</strong>
     is a part of <strong>Heat*Seq</strong>, an attempt to make genome-wide comparison of high throughput sequencing experiments easier. It was developed by
 	Guillaume Devailly, Anna Mantsoki and Anagha Joshi at the <a href="http://www.roslin.ed.ac.uk/">Roslin Institute</a>, and funded by the
-	<a href="http://www.bbsrc.ac.uk/">Biotechnology and Biological Sciences Research Council</a>. It use <a href="https://www.r-project.org/">R</a>
+	<a href="http://www.bbsrc.ac.uk/">Biotechnology and Biological Sciences Research Council</a>. It uses <a href="https://www.r-project.org/">R</a>
 	<a href="https://www.rstudio.com/products/shiny/">shiny</a>, <a href="https://plot.ly/">plot.ly</a>, and various <a href="https://cran.r-project.org/">CRAN</a>
 	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a>
 	and <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a>. Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
