@@ -6,10 +6,12 @@ library(magrittr)
 load("data/encode.RData")
 load("data/codex.RData")
 load("data/codex_human_chip.RData")
+load("data/modEncodeD_ChIPseq.RData")
 
 names(encode)
 names(codex)
 names(codex_human_chip)
+names(modEncodeD_ChIPseq)
 
 nullifyDataForFasterPreloading <- function(myList) {
     myList[["dataMatrix"]] <- NULL
@@ -27,10 +29,14 @@ object.size(codex)
 object.size(codex_human_chip)
 codex_human_chip <- nullifyDataForFasterPreloading(codex_human_chip)
 object.size(codex_human_chip)
+object.size(modEncodeD_ChIPseq)
+modEncodeD_ChIPseq <- nullifyDataForFasterPreloading(modEncodeD_ChIPseq)
+object.size(modEncodeD_ChIPseq)
 
 save(encode, file = "data/encode_preload.RData")
 save(codex, file = "data/codex_preload.RData")
 save(codex_human_chip, file = "data/codex_human_chip_preload.RData")
+save(modEncodeD_ChIPseq, file = "data/modEncodeD_ChIPseq_preload.RData")
 
 load("data/encode.RData")
 object.size(encode)

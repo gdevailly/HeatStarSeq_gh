@@ -65,9 +65,10 @@
     <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
 </h3>
 <p>
-    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there are 3 datasets available: Transcription Factor (TF)
-	ChIP-seq from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a> in human (hg19), and
-    <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a> TF ChIP-seq for human (hg19) or mouse (mm10).
+    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there are 4 datasets available: Transcription Factor (TF)
+	ChIP-seq from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a> in human (hg19),
+    <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a> TF ChIP-seq for human (hg19) or mouse (mm10), and 
+	<a href="http://www.modencode.org/">modENCODE</a> TF ChIP-seq for drosophila (r5).
 </p>
 <p class="text-muted">
     The dataset will only be loaded when you will have uploaded a peak file, or once you will have focused on a plot panel.
@@ -78,7 +79,7 @@
 <p>
 	You can now upload a peak file (a list of genomic coordinates). Note that this is not mandatory, and you can jump to section
     <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accepts a tab-delimited text file following a bed
-    format: first column must be chromosome names (chr1, chr2, chrX, etc.), the second must be region start, and the third region ends. Any additional column
+    format: first column must be chromosome names (chr1, chr2, chrX, etc., or for drosophila 2L, 2R, 2LHet, etc.), the second must be region start, and the third region ends. Any additional column
     will be discarded (peak name, score, strand, etc.). Please, be sure to untick the <strong>My peak file contains a header</strong> option if your file does
     not contain any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
     modify the label of your experiment in the plots.
@@ -306,7 +307,7 @@
 	Guillaume Devailly, Anna Mantsoki and Anagha Joshi at the <a href="http://www.roslin.ed.ac.uk/">Roslin Institute</a>, and funded by the
 	<a href="http://www.bbsrc.ac.uk/">Biotechnology and Biological Sciences Research Council</a>. It uses <a href="https://www.r-project.org/">R</a>
 	<a href="https://www.rstudio.com/products/shiny/">shiny</a>, <a href="https://plot.ly/">plot.ly</a>, and various <a href="https://cran.r-project.org/">CRAN</a>
-	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a>
-	and <a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a>. Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
+	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from <a href="http://www.genome.ucsc.edu/ENCODE/dataMatrix/encodeChipMatrixHuman.html">ENCODE</a>, 
+	<a href="http://codex.stemcells.cam.ac.uk/about.php">CODEX</a> and <a href="http://www.modencode.org/">modENCODE</a>. Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 </div>

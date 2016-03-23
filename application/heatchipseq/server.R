@@ -21,12 +21,15 @@ shinyServer(function(input, output) {
         shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForCodexHuman")
         shinyjs::hide("widgetForCodexMouse")
+        shinyjs::hide("widgetForModEncodeD")
         if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             shinyjs::show("widgetForEncodeHuman")
         } else if (input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
             shinyjs::show("widgetForCodexHuman")
         } else if (input$selectedDataset == "CODEX ChIP-seq (mouse, mm10)") {
             shinyjs::show("widgetForCodexMouse")
+        } else if (input$selectedDataset == "modEncode TF ChIP-seq (drosophila, r5)") {
+            shinyjs::show("widgetForModEncodeD")
         } else if (input$selectedDataset == "other (soon)") {
             # fill this
         }
@@ -52,6 +55,7 @@ shinyServer(function(input, output) {
             load("data/encode_preload.RData")
             load("data/codex_preload.RData")
             load("data/codex_human_chip_preload.RData")
+            load("data/modEncodeD_ChIPseq_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
             if(input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
                 load("data/encode.RData")
@@ -62,6 +66,9 @@ shinyServer(function(input, output) {
             } else if(input$selectedDataset == "CODEX ChIP-seq (human, hg19)") {
                 load("data/codex_human_chip.RData")
                 dataset <- codex_human_chip
+            } else if(input$selectedDataset == "modEncode TF ChIP-seq (drosophila, r5)") {
+                load("data/modEncodeD_ChIPseq.RData")
+                dataset <- modEncodeD_ChIPseq
             }
             setProgress(value = 1, detail = "done!")
         })
@@ -221,6 +228,27 @@ shinyServer(function(input, output) {
                     dataset$annotation$tf %in% temp_TF_m
                 )
             }
+        } else if (input$selectedDataset == "modEncode TF ChIP-seq (drosophila, r5)") {
+            if (is.null(input$tf_med)) {
+                temp_tf_med <- unique(modEncodeD_ChIPseq$annotation$antibody)
+            } else {
+                temp_tf_med <- input$tf_med
+            }
+            if (is.null(input$stage_med)) {
+                temp_stage_med <- unique(modEncodeD_ChIPseq$annotation$devStage)
+            } else {
+                temp_stage_med <- input$stage_med
+            }
+            if (is.null(input$strain_med)) {
+                temp_strain_med <- unique(modEncodeD_ChIPseq$annotation$strain)
+            } else {
+                temp_strain_med <- input$strain_med
+            }
+            keep <- which(
+                dataset$annotation$antibody %in% temp_tf_med &
+                dataset$annotation$devStage %in% temp_stage_med &
+                dataset$annotation$strain %in% temp_strain_med
+            )
         }
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements

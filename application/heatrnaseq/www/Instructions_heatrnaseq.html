@@ -65,10 +65,11 @@
     <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
 </h3>
 <p>
-    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there are 5 datasets available: RNA-seq
+    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there are 7 datasets available: RNA-seq
 	from <a href="https://www.encodeproject.org/search/?type=Experiment&assay_title=RNA-seq">ENCODE</a> in human and mouse, from 
-    <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a> in human and mouse, and from 
-	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a> in human.
+    <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a> in human and mouse, from 
+	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a> in human, from <a href="http://www.roadmapepigenomics.org/">Roadmap epigenomics</a> in human,
+	and from <a href="http://flybase.org/">FlyBase</a> in drosophilia.
 </p>
 <p class="text-muted">
     The dataset will only be loaded when you will have uploaded an expression file, or once you will have focused on a plot panel.
@@ -79,7 +80,8 @@
 <p>
 	You can now upload an expression file. Note that this is not mandatory, and you can jump to section
     <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accepts a tab-delimited text file: the first column 
-	must be <a href="http://www.gencodegenes.org/">GENCODE</a> gene names (ENSG00000134046, ENSMUSG00000024513), the second must be the expression value. We
+	must be <a href="http://www.gencodegenes.org/">GENCODE</a> gene names (ENSG00000134046, ENSMUSG00000024513), or <a href="http://flybase.org/">FlyBase</a>
+	for drosophilia (FBgn0000003), the second must be the expression value. We
 	recommend using Transcript per million (TPM) or Fragment per kilobase pes million (FPKM) metrics. Any additional column
     will be discarded. Please, be sure to untick the <strong>My expression file contains a header</strong> option if your file does
     not contain any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
@@ -316,8 +318,10 @@
 	<a href="https://www.rstudio.com/products/shiny/">shiny</a>, <a href="https://plot.ly/">plot.ly</a>, and various <a href="https://cran.r-project.org/">CRAN</a>
 	and <a href="http://www.bioconductor.org/">Bioconductor</a> packages, and datasets from 
 	<a href="https://www.encodeproject.org/search/?type=Experiment&assay_title=RNA-seq">ENCODE</a>, 
-    <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a> and  
-	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a>.
+    <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a>,
+	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a>,
+	<a href="http://www.roadmapepigenomics.org/">Roadmap epigenomics</a> 
+	and <a href="http://flybase.org/">FlyBase</a>.
 	Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
 </div>

@@ -18,7 +18,8 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     selectInput("selectedDataset", label = NULL, choices = c(
                         "ENCODE TFBS ChIP-seq (human, hg19)",
                         "CODEX ChIP-seq (human, hg19)",
-                        "CODEX ChIP-seq (mouse, mm10)"
+                        "CODEX ChIP-seq (mouse, mm10)",
+                        "modEncode TF ChIP-seq (drosophila, r5)"
                     )),
                     h3("2 - Load your data"),
                     p("Upload a bed-like peak file. Tab delimited, first three columns must be chromsome, peak start and peak end.
@@ -73,6 +74,17 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                                       choices = unique(codex$annotation$cellSubtype)[order(unique(codex$annotation$cellSubtype))],
                                                       selected = NULL, multiple = TRUE)
                          )
+                    ),
+                    div(id = "widgetForModEncodeD",
+                        selectInput("tf_med", "Subset for antibody (empty to select all):",
+                                    choices = unique(modEncodeD_ChIPseq$annotation$antibody)[order(unique(modEncodeD_ChIPseq$annotation$antibody))],
+                                    selected = NULL, multiple = TRUE),
+                        selectInput("stage_med", "Subset for developmental stage (empty to select all):",
+                                    choices = unique(modEncodeD_ChIPseq$annotation$devStage)[order(unique(modEncodeD_ChIPseq$annotation$devStage))],
+                                    selected = NULL, multiple = TRUE),
+                        selectInput("strain_med", "Subset for strain (empty to select all):",
+                                    choices = unique(modEncodeD_ChIPseq$annotation$strain)[order(unique(modEncodeD_ChIPseq$annotation$strain))],
+                                    selected = NULL, multiple = TRUE)
                     ),
                     selectInput("correlationCorrection",
                                 label = "Uploaded experiment correlation correction:",
