@@ -29,7 +29,7 @@ shinyUI(
                       dataTableOutput("ChIPseqExempleTable")
                ),
                column(4,
-                      h2("CAGE-seq data", align = "center"),
+                      h2("CAGE data", align = "center"),
                       p(a(
                           actionButton("cageButton", "HeatCAGEseq", class = "btn-warning", style = "font-size:150%"),
                           href = URL_HEATCAGESEQ

@@ -106,5 +106,7 @@ modEncodeD_ChIPseq <- list(
     annotation = metadata
 )
 
+modEncodeD_ChIPseq$annotation$strain[is.na(modEncodeD_ChIPseq$annotation$strain)] <- "unspecify"
+
 save(modEncodeD_ChIPseq, file = "../../../heatchipseq/data/modEncodeD_ChIPseq.RData")
 

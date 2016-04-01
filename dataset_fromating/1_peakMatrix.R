@@ -10,7 +10,6 @@ Sys.time() - a # 5 seconds
 annotation <- read_tsv("data/wgEncodeRegTfbsClusteredInputsV3.tab", col_names = FALSE)
 Sys.time() - a # instant
 
-sapply(list(merged_data, umerged_data, annotation), dim)
 colnames(merged_data) <- c("chr", "start", "end", "experiment")
 head(merged_data)
 colnames(annotation) <- c("peakFile", "name", "TF", "antibody", "cell_line", "treatment", "lab")
