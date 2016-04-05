@@ -79,6 +79,11 @@ shinyServer(function(input, output) {
         } else {
             shinyjs::hide("widgetForLabels")
         }
+        if(input$myPanels == "Static heatmap") {
+            shinyjs::show("div_widgetHMoptions")
+        } else {
+            shinyjs::hide("div_widgetHMoptions")
+        }
     })
 
     # output computations
@@ -425,12 +430,39 @@ shinyServer(function(input, output) {
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
-        heatmap(matData$mat,
-                Rowv = clusterDat$dend,
-                Colv = "Rowv",
+
+        if (input$showDend == "both") {
+            myMat <- matData$mat
+            Rowv <- clusterDat$dend
+            Colv <- "Rowv"
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels else NA
+        } else if (input$showDend == "row") {
+            myMat <- matData$mat[, clusterDat$order]
+            Rowv <- rev(clusterDat$dend)
+            Colv <- NA
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
+        } else if (input$showDend == "column") {
+            myMat <- matData$mat[rev(clusterDat$order), ]
+            Rowv <- NA
+            Colv <- clusterDat$dend
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels[rev(clusterDat$order)] else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels else NA
+        } else if (input$showDend == "none") {
+            myMat <- matData$mat[rev(clusterDat$order), clusterDat$order]
+            Rowv <- NA
+            Colv <- NA
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels[rev(clusterDat$order)] else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
+        }
+
+        heatmap(myMat,
+                Rowv = Rowv,
+                Colv = Colv,
                 scale = "none",
-                labRow = matData$myLabels,
-                labCol = matData$myLabels,
+                labRow = labRow,
+                labCol = labCol,
                 margins = rep(input$margin, 2),
                 cexRow = input$labCex,
                 cexCol = input$labCex,

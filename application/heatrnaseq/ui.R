@@ -145,6 +145,14 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
                     div(id = "widgetForLabels",
                         sliderInput("labCex", label = "Sample name size:", value = 1.2, min = 0.1, max = 3, step = 0.1),
                         sliderInput("margin", label = "Sample name margin:", value = 20, min = 1, max = 50, step = 1)
+                    ),
+                    div(id = "div_widgetHMoptions",
+                        selectInput("showDend", "Show which dendrogram(s)?",
+                                    choices = c("both", "row", "column", "none"),
+                                    selected = "both", multiple = FALSE),
+                        selectInput("showLabels", "Show which labels?",
+                                    choices = c("both", "row", "column", "none"),
+                                    selected = "both", multiple = FALSE)
                     )
                 ),
 
