@@ -25,6 +25,8 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
                       ". It is a mouse RNA-seq experiment from the brain, with header."),
                     checkboxInput("header", strong("My expression file contains a header."), TRUE),
                     fileInput("expressionFile", "Upload your expression file:", accept = "text/tab-separated-values"),
+                    "or",
+                    checkboxInput("useExpleFile", strong("Load the example file"), FALSE),
                     textInput("nameOfExpressionFile", "Name of your experiment", value="my RNA-seq"),
                     h3("3 - Plot customization"),
                     checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),
@@ -159,6 +161,8 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
              includeHTML("www/Instructions_heatrnaseq.html")
     ),
 
-    theme = "bootstrap.css"
+    theme = "bootstrap.css",
+
+    windowTitle = "HeatRNAseq"
 
 )))

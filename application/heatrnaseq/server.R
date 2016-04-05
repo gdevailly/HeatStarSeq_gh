@@ -8,7 +8,7 @@ shinyServer(function(input, output) {
 
     # UI elements activations
     observe({
-        if (is.null(input$expressionFile)) {
+        if (is.null(input$expressionFile) & input$useExpleFile) {
             shinyjs::hide("downloadUserExpressionFile")
             shinyjs::hide("downloadUserCorrelationTable")
         } else {
@@ -99,6 +99,41 @@ shinyServer(function(input, output) {
     })
 
     userExpressionFileAnalysis_1 <- reactive({
+
+        if (input$useExpleFile) {
+            withProgress(value = 1, message = "Loading example: ", detail = "reading file", {
+                userExpressionFile_temp <- read_tsv("www/rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt", col_names = input$header)[, 1:2]
+                colnames(userExpressionFile_temp) <- c("ensembl_id","exp_value")
+                setProgress(value = 1, detail = "intersecting gene names")
+                userExpressionFile_temp_v <- userExpressionFile_temp$exp_value
+                names(userExpressionFile_temp_v) <- userExpressionFile_temp$ensembl_id
+                dataset <- getSelectedDataset()
+                userExpressionFile <- userExpressionFile_temp_v[dataset$geneName]
+                userExpressionFile[is.na(userExpressionFile)] <- 0
+                validate(need(
+                    length(unique(userExpressionFile)) > 1,
+                    "Something went wrong: all genes have the same expression value (probably 0). Cannot calculate correlations.
+                    \nThis is likely because:
+                    \n-the wrong dataset is selected (ie you may have uploaded a mouse expression file, but the selected dataset is for human).
+                    \n-the file formating is not recognized. It should be a two columns, tab delimited text file. First columns must contains the ensembl gene name (ie ENSG00000000003). Second column must contains expression values."
+                ))
+                # correlation calculation
+                setProgress(value = 1, detail = "correlations calculation")
+                userCorrelations <- cor(userExpressionFile, dataset$dataMatrix) %>% as.vector
+                userExpressionFile <- data.frame(
+                    geneName = dataset$geneName,
+                    value = userExpressionFile,
+                    stringsAsFactors = FALSE
+                )
+                setProgress(value = 1, detail = "done!")
+            })
+            return(list(
+                "expression" = userExpressionFile,
+                "correlations" = userCorrelations,
+                "linearNormCorrelations" = NULL # to be fill below
+            ))
+        }
+
         userExpressionFileName <- input$expressionFile
         if (is.null(userExpressionFileName)){
             userExpressionFile <- NULL
@@ -141,7 +176,7 @@ shinyServer(function(input, output) {
     userExpressionFileAnalysis <- reactive({
         userExpressionFileData <- userExpressionFileAnalysis_1()
         userCorrelations <- userExpressionFileData$correlations
-        if (!is.null(input$expressionFile)){
+        if (!is.null(input$expressionFile) | input$useExpleFile) {
             if (input$maxCorrelation != 0) {
                 userExpressionFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
             }
@@ -152,7 +187,7 @@ shinyServer(function(input, output) {
 
     output$tabUserExpressionFile <- renderDataTable({
         validate(
-            need(!is.null(input$expressionFile), "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$expressionFile) | input$useExpleFile, "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
         userExpressionFileAnalysis()$expression
     })
@@ -168,7 +203,7 @@ shinyServer(function(input, output) {
 
     getCorrelationTable <- reactive({
         validate(
-            need(!is.null(input$expressionFile), "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$expressionFile) | input$useExpleFile, "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
             data.frame(
                 "experiment" = getSelectedDataset()$annotation$name,
@@ -356,7 +391,7 @@ shinyServer(function(input, output) {
 
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
-        if (input$highlight & !is.null(input$expressionFile)) {
+        if (input$highlight & (!is.null(input$expressionFile) | input$useExpleFile)) {
             # we increase user cor value by 2 to do the color trick
             matAA$mat[, ncol(matAA$mat)] <- matAA$mat[, ncol(matAA$mat)] + 2
             matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] <- matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] + 2
