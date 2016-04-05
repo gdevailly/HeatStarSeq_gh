@@ -1,11 +1,5 @@
 source("data/server_adresses.R")
-shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
-
-    tabPanel("Instructions",
-             icon("home"),
-             a("Back to main page", href = URL_HEATSTARSEQ),
-             includeHTML("www/Instructions_heatrnaseq.html")
-    ),
+shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ),
 
     tabPanel("Use application",
              sidebarLayout(
@@ -22,26 +16,24 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                         "Bgee RNA-seq (mouse)",
                         "ENCODE RNA-seq (mouse)",
                         "Flybase RNA-seq (drosophila)"
-                    )),
+                    ), selected = "Bgee RNA-seq (mouse)"),
                     h3("2 - Load your data (optional)"),
-                    p("Upload a tab delimited text file of at least two columns. First column must contains ensemble gene id,
-                       second column must contains normalised expression value(ie FPKM or TPM). Maximum size: 10MB."),
+                    p("Upload a tab delimited text file of at least two columns. First column should contain gene id (Ensembl or Flybase),
+                       second column should contain normalised expression value (i.e. FPKM or TPM). Maximum size: 10MB."),
                     p("You can download ",
                       downloadLink("downloadExempleFile", label = " an example file"),
-                      ". It is a mouse RNA-seq experiment from the brain, kindly provided by Dr. Arbeitman.
-                      It corresponds to the NP1071 sample from ",
-                      a("this GEO dataset", href = "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70732"), "."),
+                      ". It is a mouse RNA-seq experiment from the brain, with header."),
                     checkboxInput("header", strong("My expression file contains a header."), TRUE),
                     fileInput("expressionFile", "Upload your expression file:", accept = "text/tab-separated-values"),
                     textInput("nameOfExpressionFile", "Name of your experiment", value="my RNA-seq"),
                     h3("3 - Plot customization"),
-                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), FALSE),
+                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),
                     # we adapt filtering widgets to the various datasets
                     div(id = "widgetForBgeeHuman",
                          selectInput("tissus_bgee_h", "Subset for tissue (empty to select all):",
                                      choices = unique(bgee_human$annotation$tissue)[order(unique(bgee_human$annotation$tissue))],
                                      selected = NULL, multiple = TRUE),
-                         selectInput("dvp_bgee_h", "Subset for devlopemntal stage (empty to select all):",
+                         selectInput("dvp_bgee_h", "Subset for developmental stage (empty to select all):",
                                      choices = unique(bgee_human$annotation$stage)[order(unique(bgee_human$annotation$stage))],
                                      selected = NULL, multiple = TRUE),
                          selectInput("library_bgee_h", "Subset for library type (empty to select all):",
@@ -106,7 +98,7 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                     sliderInput("maxCorrelation",
                                 label = "Maximum expected correlation value for linear scaling correction",
                                 min = 0.1, max = 1, value = 0.95, step = 0.01),
-                    actionButton("advClustOptions", label = "Advance clustering options"),
+                    actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
                                     choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
@@ -154,11 +146,17 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatRNAseq",
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
                                  )
-                        , id = "myPanels"
+                        , id = "myPanels", selected = "Responsive heatmap"
                     )
                 )
 
             )
+    ),
+
+    tabPanel("Instructions",
+             icon("home"),
+             a("Back to main page", href = URL_HEATSTARSEQ),
+             includeHTML("www/Instructions_heatrnaseq.html")
     ),
 
     theme = "bootstrap.css"
