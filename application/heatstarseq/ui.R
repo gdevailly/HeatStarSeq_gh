@@ -2,42 +2,40 @@ library(shiny)
 source("data/server_adresses.R")
 shinyUI(
     navbarPage(
-        "Heat*seq",
+        "",
         tabPanel(
-            "Home",
+            "Heat*seq Home",
             h1("Heat*seq", align = "center"),
-            h3("Correlation heatmaps for hight-througput sequencing experiments", align = "center"),
+            h3("An interactive web tool for high-throughput sequencing experiment comparison with public data", align = "center"),
+            h3(" "),
+            h1(img(src = "heatmap.svg", width = 700), align = "center"),
             fluidRow(
-               column(4,
-                      h2("Gene Expression data", align = "center"),
+               column(2),
+               column(2,
+                      h2("Gene Expression", align = "center"),
                       p(a(
                           actionButton("rnaButton", "HeatRNAseq", class = "btn-success", style = "font-size:150%"),
                           href = URL_HEATRNASEQ
-                      ), align = "center"),
-                      "Format of file  you can upload:",
-                      p("Tab-delimited file of expression values (2 columns)."),
-                      dataTableOutput("RNAseqExempleTable")
+                      ), align = "center")
+
                ),
-               column(4,
-                      h2("ChIP-seq data", align = "center"),
+               column(1),
+               column(2,
+                      h2("ChIP-seq", align = "center"),
                       p(a(
                           actionButton("chipButton", "HeatChIPseq", class = "btn-info", style = "font-size:150%"),
                           href = URL_HEATCHIPSEQ
-                      ), align = "center"),
-                      "Format of file  you can upload:",
-                      p("Tab-delimited bed file of peak coordinates (3 columns)."),
-                      dataTableOutput("ChIPseqExempleTable")
+                      ), align = "center")
                ),
-               column(4,
-                      h2("CAGE data", align = "center"),
+               column(1),
+               column(2,
+                      h2("CAGE", align = "center"),
                       p(a(
                           actionButton("cageButton", "HeatCAGEseq", class = "btn-warning", style = "font-size:150%"),
                           href = URL_HEATCAGESEQ
-                      ), align = "center"),
-                      "Format of file  you can upload:",
-                      p("Tab-delimited bed file of peak coordinates, name, expression value and strand (6 columns)."),
-                      dataTableOutput("CAGEseqExempleTable")
-               )
+                      ), align = "center")
+               ),
+               column(2)
             )
 
         ),
@@ -45,11 +43,11 @@ shinyUI(
         tabPanel(
             "About",
             includeHTML("www/Instructions_heatstarseq.html"),
-            a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
-            a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/")
+            p(a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
+            a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/"), align = "center")
 
         ),
 
-        theme = "bootstrap.css"
+        theme = "bootstrap.css", windowTitle = "Heat*seq"
     )
 )
