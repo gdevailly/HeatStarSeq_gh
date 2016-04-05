@@ -18,18 +18,50 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
                         "Flybase RNA-seq (drosophila)"
                     ), selected = "Bgee RNA-seq (mouse)"),
                     h3("2 - Load your data (optional)"),
-                    p("Upload a tab delimited text file of at least two columns. First column should contain gene id (Ensembl or Flybase),
+                    actionButton("fileFormatInstructions", label = "File formating instructions"),
+                    div(id = "div_fileFormatInstructions",
+                        p("Upload a tab delimited text file of at least two columns. First column should contain gene id (Ensembl or Flybase),
                        second column should contain normalised expression value (i.e. FPKM or TPM). Maximum size: 10MB."),
-                    p("You can download ",
-                      downloadLink("downloadExempleFile", label = " an example file"),
-                      ". It is a mouse RNA-seq experiment from the brain, with header."),
-                    checkboxInput("header", strong("My expression file contains a header."), TRUE),
-                    fileInput("expressionFile", "Upload your expression file:", accept = "text/tab-separated-values"),
-                    "or",
-                    checkboxInput("useExpleFile", strong("Load the example file"), FALSE),
-                    textInput("nameOfExpressionFile", "Name of your experiment", value="my RNA-seq"),
+                        HTML("<p>
+			                First lines of your file should look like this:
+                            <table style=\"width:80%\">
+                            <tr>
+                            <th>geneID</th>
+                            <th>tpm</th>
+                            </tr>
+                            <tr>
+                            <td>ENSG00000134046</td>
+                            <td>120.12</td>
+                            </tr>
+                            <tr>
+                            <td>ENSG00000141644</td>
+                            <td>0</td>
+                            </tr>
+                            <tr>
+                            <td>ENSG00000169057</td>
+                            <td>85.24</td>
+                            </tr>
+                            <tr>
+                            <td>ENSG00000174282</td>
+                            <td>0.54</td>
+                            </tr>
+                            <tr>
+                            <td>ENSG00000187098</td>
+                            <td>42</td>
+                            </tr>
+                            </table>
+                            </p>"),
+                        p("You can download ",
+                          downloadLink("downloadExempleFile", label = " an example file"),
+                          ". It is a mouse RNA-seq experiment from the brain, with header.")
+                    ),
+                    radioButtons("fileToUse", label = NULL, choices = c("Upload your expression file", "Use the example file")),
+                    div(id = "div_fileupload", fileInput("expressionFile", label = "Choose a file:", accept = "text/tab-separated-values")),
+                    div(id = "div_exampleInUse", "The example file is a mouse brain RNA-seq, with a header. Please select only mouse datasets."),
+                    checkboxInput("header", strong("The expression file contains a header."), TRUE),
+                    textInput("nameOfExpressionFile", "Name of your experiment:", value="my RNA-seq"),
                     h3("3 - Plot customization"),
-                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),
+                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap."), TRUE),
                     # we adapt filtering widgets to the various datasets
                     div(id = "widgetForBgeeHuman",
                          selectInput("tissus_bgee_h", "Subset for tissue (empty to select all):",
@@ -97,22 +129,22 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
                                 label = "Uploaded experiment correlation correction:",
                                 choices = list("None", "Linear scaling"),
                                 selected = "None"),
-                    sliderInput("maxCorrelation",
-                                label = "Maximum expected correlation value for linear scaling correction",
-                                min = 0.1, max = 1, value = 0.95, step = 0.01),
+                    div(id = "div_maxCorrelation", sliderInput("maxCorrelation",
+                                label = "Maximum expected correlation value for linear scaling correction:",
+                                min = 0.1, max = 1, value = 0.95, step = 0.01)),
                     actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
                                     choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
                                     selected = 1),
                         selectInput("hclustMethod",
-                                    label = "Clustering method",
+                                    label = "Clustering method:",
                                     choices = list("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1),
-                        sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)
+                        sliderInput("labCex", label = "Sample name size:", value = 1.2, min = 0.1, max = 3, step = 0.1),
+                        sliderInput("margin", label = "Sample name margin:", value = 20, min = 1, max = 50, step = 1)
                     )
                 ),
 

@@ -8,7 +8,35 @@ shinyServer(function(input, output) {
 
     # UI elements activations
     observe({
-        if (is.null(input$expressionFile) & input$useExpleFile) {
+        junkVar <- input$fileFormatInstructions
+        shinyjs::toggle("div_fileFormatInstructions")
+    })
+
+    observe({
+        if(input$fileToUse == "Upload your expression file") {
+            shinyjs::show("div_fileupload")
+            shinyjs::hide("div_exampleInUse")
+        } else {
+            shinyjs::hide("div_fileupload")
+            shinyjs::show("div_exampleInUse")
+        }
+    })
+
+    observe({
+        junkVar <- input$advClustOptions
+        shinyjs::toggle("widgetForClustOptions")
+    })
+
+    observe({
+        if(input$correlationCorrection == "Linear scaling") {
+            shinyjs::show("div_maxCorrelation")
+        } else {
+            shinyjs::hide("div_maxCorrelation")
+        }
+    })
+
+    observe({
+        if (is.null(input$expressionFile) & input$fileToUse != "Use the example file") {
             shinyjs::hide("downloadUserExpressionFile")
             shinyjs::hide("downloadUserCorrelationTable")
         } else {
@@ -53,11 +81,6 @@ shinyServer(function(input, output) {
         }
     })
 
-    observe({
-        junkVar <- input$advClustOptions
-        shinyjs::toggle("widgetForClustOptions")
-    })
-
     # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
@@ -100,7 +123,7 @@ shinyServer(function(input, output) {
 
     userExpressionFileAnalysis_1 <- reactive({
 
-        if (input$useExpleFile) {
+        if (input$fileToUse == "Use the example file") {
             withProgress(value = 1, message = "Loading example: ", detail = "reading file", {
                 userExpressionFile_temp <- read_tsv("www/rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt", col_names = input$header)[, 1:2]
                 colnames(userExpressionFile_temp) <- c("ensembl_id","exp_value")
@@ -176,7 +199,7 @@ shinyServer(function(input, output) {
     userExpressionFileAnalysis <- reactive({
         userExpressionFileData <- userExpressionFileAnalysis_1()
         userCorrelations <- userExpressionFileData$correlations
-        if (!is.null(input$expressionFile) | input$useExpleFile) {
+        if (!is.null(input$expressionFile) | input$fileToUse == "Use the example file") {
             if (input$maxCorrelation != 0) {
                 userExpressionFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
             }
@@ -187,7 +210,7 @@ shinyServer(function(input, output) {
 
     output$tabUserExpressionFile <- renderDataTable({
         validate(
-            need(!is.null(input$expressionFile) | input$useExpleFile, "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$expressionFile) | input$fileToUse == "Use the example file", "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
         userExpressionFileAnalysis()$expression
     })
@@ -203,7 +226,7 @@ shinyServer(function(input, output) {
 
     getCorrelationTable <- reactive({
         validate(
-            need(!is.null(input$expressionFile) | input$useExpleFile, "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$expressionFile) | input$fileToUse == "Use the example file", "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
             data.frame(
                 "experiment" = getSelectedDataset()$annotation$name,
@@ -391,7 +414,7 @@ shinyServer(function(input, output) {
 
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
-        if (input$highlight & (!is.null(input$expressionFile) | input$useExpleFile)) {
+        if (input$highlight & (!is.null(input$expressionFile) | input$fileToUse == "Use the example file")) {
             # we increase user cor value by 2 to do the color trick
             matAA$mat[, ncol(matAA$mat)] <- matAA$mat[, ncol(matAA$mat)] + 2
             matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] <- matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] + 2
