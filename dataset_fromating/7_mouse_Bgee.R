@@ -1,5 +1,5 @@
 # shell script
-# 2015/01/06
+# 2016/01/06
 wget ftp://ftp.bgee.org/current/download/processed_expr_values/rna_seq/Mus_musculus/Mus_musculus_RNA-Seq_read_counts_RPKM.zip
 unzip Mus_musculus_RNA-Seq_read_counts_RPKM.zip
 rm Mus_musculus_RNA-Seq_read_counts_RPKM.zip

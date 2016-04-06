@@ -198,7 +198,9 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
     tabPanel("Instructions",
              icon("home"),
              a("Back to main page", href = URL_HEATSTARSEQ),
-             includeHTML("www/Instructions_heatrnaseq.html")
+             includeHTML("www/Instructions_heatrnaseq.html"),
+             p(a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
+               a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/"), align = "center")
     ),
 
     theme = "bootstrap.css",

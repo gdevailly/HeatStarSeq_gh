@@ -30,7 +30,10 @@
 </p>
 <p style="padding-left: 3em;">
     <a href="#_Correlation_correction">2.8 Correlation correction</a>
-</p style="padding-left: 3em;">
+</p>
+<p style="padding-left: 3em;">
+    <a href="#_About_the_datasets">2.9 About the datasets</a>
+</p>
 <h4 style="padding-left: 1em;">
     <a href="#_FAQ">3 FAQ</a>
 </h4>
@@ -48,6 +51,9 @@
 </p>
 <p style="padding-left: 3em;">
     <a href="#_I_have_uploaded_a_peak_file">3.5 I have uploaded a peak file. How do I remove it?</a>
+</p>
+<p style="padding-left: 3em;">
+    <a href="#_What_happens_to_the_files_I_upload">3.6 What happens to the files I upload?</a>
 </p>
 <h4 style="padding-left: 1em;">
     <a href="#_About">4 About</a>
@@ -140,7 +146,7 @@
 	It is a mouse brain RNA-seq experiment, kindly provided by Dr. Arbeitman.
 	Use a mouse dataset (for example Bgee mouse), and leave the <strong>My expression file contains a header</strong> option ticked.
 	It corresponds to the NP1071 sample from 
-    <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70732")>this GEO dataset</a>
+    <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70732")>GEO dataset GSE70732</a> 
 	supporting <a href="http://www.g3journal.org/content/6/1/221.full">this study</a>.
 	It is quite easy to rebuild. From the bottom of the GEO page, download the <strong>GSE70732_Mouse_all_regions_FPKM_data_all_genes.xlsx.gz</strong> file.
 	Extract the archive, and open the xlsx file into excel. Keep the first column, and delete all expression columns but the last one (named FPKM_NP1071_GTGGCC_R1),
@@ -296,6 +302,71 @@
     The linear scaling of correlation value will not change the ordering of the values, only scale the value (i.e. the third most correlated experiment without scaling
 	will still be third with scaling).
 </p>
+<h3>
+	<a name="_About_the_datasets"></a>2.9 About the datasets
+</h3>
+<p><table style="width:100%">
+ <tr>
+  <th>Dataset</th>
+  <th>Organism</th>
+  <th>Number of experiments</th>
+  <th>download date</th>
+  <th>data from</th>
+ </tr>
+ <tr>
+  <td>Bgee</td>
+  <td>human</td>
+  <td>77</td>
+  <td>2015-06-01</td>
+  <td><a href="ftp://ftp.bgee.org/current/download/processed_expr_values/rna_seq/Homo_sapiens/">Bgee ftp</a></td>
+ </tr>
+ <tr>
+  <td>Bgee</td>
+  <td>mouse</td>
+  <td>109</td>
+  <td>2016-01-06</td>
+  <td><a href="ftp://ftp.bgee.org/current/download/processed_expr_values/rna_seq/Mus_musculus/Mus_musculus_RNA-Seq_read_counts_RPKM.zip">Bgee ftp</a></td>
+ </tr>
+ <tr>
+  <td>Blueprint epigenome</td>
+  <td>human</td>
+  <td>163</td>
+  <td>2016-02-08</td>
+  <td><a href="ftp://ftp.ebi.ac.uk/pub/databases/blueprint/data/homo_sapiens/">EBI ftp</a></td>
+ </tr>
+ <tr>
+  <td>ENCODE</td>
+  <td>human</td>
+  <td>320</td>
+  <td>2015-11-26</td>
+  <td><a href="https://www.encodeproject.org/metadata/type=experiment&assay_term_name=RNA-seq&status=released&assembly=hg19&files.file_type=tsv/metadata.tsv">ENCODE data portail</a></td>
+ </tr>
+ <tr>
+  <td>ENCODE</td>
+  <td>mouse</td>
+  <td>192</td>
+  <td>2016-01-22</td>
+  <td><a href="https://www.encodeproject.org/search/?type=Experiment&amp;assay_term_name=RNA-seq&amp;assembly=mm10&amp;files.file_type=tsv">ENCODE data portail</a></td>
+ </tr>
+ <tr>
+  <td>Roadmap Epigenomics</td>
+  <td>human</td>
+  <td>57</td>
+  <td>2016-03-04</td>
+  <td><a href="http://egg2.wustl.edu/roadmap/data/byDataType/rna/expression/">Roadmap ftp</a></td>
+ </tr>
+ <tr>
+  <td>Flybase</td>
+  <td>drosophila</td>
+  <td>124</td>
+  <td>2016-03-15</td>
+  <td><a href="ftp://ftp.flybase.net/releases/current/precomputed_files/genes/">Flybase ftp</a></td>
+ </tr>
+</table></p>
+<p>
+    If you would like us to add a datasets, or to update an existing one with more recent data, please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a>
+	(replace at with @) and we will have a look. A well curated dataset can be implemented / updated within a working day.
+</p>
 <div>
     <h1>
         <a name="_FAQ"></a>3 FAQ
@@ -334,6 +405,13 @@
     At the moment, there is no option to remove an expression file. You can replace it with any other expression file clicking the <strong>Browse</strong> button again. To
     remove an expression file without uploading a new one, the simplest method is to open a new HeatRNAseq session by going <strong>Back to the main page</strong>.
     Refreshing the HeatRNAseq page may result in a slightly erratic outcome.
+</p>
+<h3>
+    <a name="_What_happens_to_the_files_I_upload"></a> 3.6 What happens to the files I upload?
+</h3>
+<p>
+	Uploaded files are stored in a temporary folder in our server. They are automaticaly deleted once the R session expires (i.e. when you close the window).
+	We do not access to, copy, or re-use those files.
 </p>
 <div>
     <h1>
