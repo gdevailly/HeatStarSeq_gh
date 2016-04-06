@@ -8,7 +8,35 @@ shinyServer(function(input, output) {
 
     # UI elements activations
     observe({
-        if (is.null(input$peakFile)) {
+        junkVar <- input$fileFormatInstructions
+        shinyjs::toggle("div_fileFormatInstructions")
+    })
+
+    observe({
+        if(input$fileToUse == "Upload your peak file") {
+            shinyjs::show("div_fileupload")
+            shinyjs::hide("div_exampleInUse")
+        } else {
+            shinyjs::hide("div_fileupload")
+            shinyjs::show("div_exampleInUse")
+        }
+    })
+
+    observe({
+        junkVar <- input$advClustOptions
+        shinyjs::toggle("widgetForClustOptions")
+    })
+
+    observe({
+        if(input$correlationCorrection == "Linear scaling") {
+            shinyjs::show("div_maxCorrelation")
+        } else {
+            shinyjs::hide("div_maxCorrelation")
+        }
+    })
+
+    observe({
+        if (is.null(input$peakFile) & input$fileToUse != "Use the example file") {
             shinyjs::hide("downloadUserPeaks")
             shinyjs::hide("downloadUserCorrelationTable")
         } else {
@@ -41,11 +69,11 @@ shinyServer(function(input, output) {
         } else {
             shinyjs::hide("widgetForLabels")
         }
-    })
-
-    observe({
-        junkVar <- input$advClustOptions
-        shinyjs::toggle("widgetForClustOptions")
+        if(input$myPanels == "Static heatmap") {
+            shinyjs::show("div_widgetHMoptions")
+        } else {
+            shinyjs::hide("div_widgetHMoptions")
+        }
     })
 
     # output computations
@@ -76,6 +104,32 @@ shinyServer(function(input, output) {
     })
 
     userPeakFileAnalysis_1 <- reactive({
+
+        if (input$fileToUse == "Use the example file") {
+            withProgress(value = 1, message = "User peak file: ", detail = "reading file", {
+                userPeakFile <- read_tsv("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", col_names = input$header)[, 1:3]
+                colnames(userPeakFile) <- c("chr","start","end")
+                setProgress(value = 1, detail = "intersecting peaks")
+                userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
+                dataset <- getSelectedDataset()
+                # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what it is uploading...
+                # Which encode region overlaps?
+                # we ignore peaks presents only in user peak lists for some reasons.
+                suppressWarnings(userOverlap <- overlapsAny(dataset$regionMetaData, userPeakFileGR))
+                # correlation calculation
+                setProgress(value = 1, detail = "correlations calculation")
+                userCorrelations <- cor(userOverlap,
+                                        dataset$dataMatrix
+                ) %>% as.vector
+                setProgress(value = 1, detail = "done!")
+            })
+            return(list(
+                "peaks" = userPeakFile,
+                "correlations" = userCorrelations,
+                "linearNormCorrelations" = NULL # to be fill below
+            ))
+        }
+
         userPeakFileName <- input$peakFile
         if (is.null(userPeakFileName)){
             userPeakFile <- NULL
@@ -109,7 +163,7 @@ shinyServer(function(input, output) {
     userPeakFileAnalysis <- reactive({
         userPeakFileData <- userPeakFileAnalysis_1()
         userCorrelations <- userPeakFileData$correlations
-        if (!is.null(input$peakFile)){
+        if (!is.null(input$peakFile) | input$fileToUse == "Use the example file"){
             if (input$maxCorrelation != 0) {
                 userPeakFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
             }
@@ -120,7 +174,7 @@ shinyServer(function(input, output) {
 
     output$tabUserPeaks <- renderDataTable({
         validate(
-            need(!is.null(input$peakFile), "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$peakFile) | input$fileToUse == "Use the example file", "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
         )
         userPeakFileAnalysis()$peaks
     })
@@ -133,14 +187,22 @@ shinyServer(function(input, output) {
 
     getCorrelationTable <- reactive({
         validate(
-            need(!is.null(input$peakFile), "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$peakFile) | input$fileToUse == "Use the example file", "Upload an peak file, or click on a 'heatmap' tab to explore the dataset.")
         )
-            data.frame(
+        if(input$correlationCorrection == "Linear scaling") {
+            return(data.frame(
                 "experiment" = getSelectedDataset()$annotation$name,
                 "correlation" = userPeakFileAnalysis()$correlations,
                 "scaledCorrelation" = userPeakFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
-            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE),]
+            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE), ])
+        } else {
+            return(data.frame(
+                "experiment" = getSelectedDataset()$annotation$name,
+                "correlation" = userPeakFileAnalysis()$correlations,
+                stringsAsFactors = FALSE
+            )[order(userPeakFileAnalysis()$correlations, decreasing = TRUE), ])
+        }
     })
 
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
@@ -156,7 +218,6 @@ shinyServer(function(input, output) {
         workingMatrix <- dataset$correlationMatrix
         keep<- 1:nrow(workingMatrix)
         # filtering is dataset-depedent...
-
         if (input$selectedDataset == "ENCODE TFBS ChIP-seq (human, hg19)") {
             if (is.null(input$cells)) {
                 temp_cells <- unique(encode$annotation$cellLine)
@@ -294,7 +355,7 @@ shinyServer(function(input, output) {
 
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
-        if (input$highlight & !is.null(input$peakFile)) {
+        if (input$highlight & (!is.null(input$peakFile) | input$fileToUse == "Use the example file")) {
             # we increase user cor value by 2 to do the color trick
             matAA$mat[, ncol(matAA$mat)] <- matAA$mat[, ncol(matAA$mat)] + 2
             matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] <- matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] + 2
@@ -305,12 +366,39 @@ shinyServer(function(input, output) {
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
-        heatmap(matData$mat,
-                Rowv = clusterDat$dend,
-                Colv = "Rowv",
+
+        if (input$showDend == "both") {
+            myMat <- matData$mat
+            Rowv <- clusterDat$dend
+            Colv <- "Rowv"
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels else NA
+        } else if (input$showDend == "row") {
+            myMat <- matData$mat[, clusterDat$order]
+            Rowv <- rev(clusterDat$dend)
+            Colv <- NA
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
+        } else if (input$showDend == "column") {
+            myMat <- matData$mat[rev(clusterDat$order), ]
+            Rowv <- NA
+            Colv <- clusterDat$dend
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels[rev(clusterDat$order)] else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels else NA
+        } else if (input$showDend == "none") {
+            myMat <- matData$mat[rev(clusterDat$order), clusterDat$order]
+            Rowv <- NA
+            Colv <- NA
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels[rev(clusterDat$order)] else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
+        }
+
+        heatmap(myMat,
+                Rowv = Rowv,
+                Colv = Colv,
                 scale = "none",
-                labRow = matData$myLabels,
-                labCol = matData$myLabels,
+                labRow = labRow,
+                labCol = labCol,
                 margins = rep(input$margin, 2),
                 cexRow = input$labCex,
                 cexCol = input$labCex,

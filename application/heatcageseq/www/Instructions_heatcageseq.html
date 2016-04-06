@@ -68,11 +68,12 @@
     <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
 </h3>
 <p>
-    The first thing you must do is to <strong>select a dataset</strong> to work with. At present, there are 2 datasets available: CAGE 
+    The first thing you need to do is to <strong>select a dataset</strong> to work with. At present, there are 2 datasets available: CAGE 
 	experiments from <a href="http://fantom.gsc.riken.jp/">FANTOM5</a> in human (hg19) and mouse (mm9).
 </p>
 <p class="text-muted">
-    The dataset will only be loaded when you will have uploaded a bed file, or once you will have focused on a plot panel.
+    The dataset will only be loaded when you will have uploaded a bed file, or after you have chosen one of the following tabs:
+	<strong>Static heatmap</strong>, <strong>Responsive heatmap</strong>, <strong>Tree</strong> or <strong>Samples metadata</strong>.
 </p>
 <h3>
     <a name="_Loading_a_CAGE_result_bed_file"></a>2.2 Loading a CAGE result bed file
@@ -80,12 +81,16 @@
 <p>
 	You can now upload a CAGE result bed file. Note that this is not mandatory, and you can jump to section
     <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accepts a tab-delimited text file following a bed
-    format, and requires at least 6 columns: first column must be chromosome names (chr1, chr2, chrX, etc.), the second must be region start, the third region ends,
-	the fourth region name (not used, but must be present), the fifth must be a score reflectiong CAGE expression value, such as RPM values or tag count, and the sixth
-	must contains strand information. Any additional column
-    will be discarded. Please, be sure to untick the <strong>My bed file contains a header</strong> option if your file does
-    not contain any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field, it will
-    modify the label of your experiment in the plots.
+    format, and requires at least 6 columns: first column should be chromosome name (chr1, chr2, chrX, etc.), the second region start, the third region end,
+	the fourth region name (not used, but required), the fifth a score reflecting CAGE expression value, such as RPM values or tag count, and the sixth 
+	strand information. Any additional column 
+    will be discarded. Please, make sure to untick the <strong>My bed file contains a header</strong> option if your file does
+    not contain any header, as the first line of the file would be discarded. You can also fill the <strong>Name of your experiment</strong> field which will
+    modify the label of your experiment.
+</p>
+<p class="text-muted">
+    HeatCAGEseq computes Pearson correlation coefficient between experiment score column, so the unit of expression measure has little effect
+	(any linear transformation of expression values will return the same correlation coefficient).
 </p>
 <p class="text-muted">
     The maximum size you can upload is 10 Mb. If your bed file is larger than that, try keeping only the first six columns of it to reduce file size. If
@@ -100,7 +105,57 @@
     Currently, the easiest way to unload a bed file without uploading a new one is to come back to the main page and open a new HeatCAGEseq window.
 </p>
 <p>
-
+	First lines of your file should look like this:
+	<table style="width:100%">
+	  <tr>
+		<th>chr</th>
+		<th>start</th>
+		<th>end</th>
+		<th>name</th>
+		<th>rpm</th>
+		<th>strand</th>
+	  </tr>
+	  <tr>
+		<th>chr2</th>
+		<th>25486325</th>
+		<th>25486487</th>
+		<th>CAGEpeak_1</th>
+		<th>458.12</th>
+		<th>+</th>
+	  </tr>
+	  <tr>
+		<th>chr6</th>
+		<th>5896321</th>
+		<th>5896380</th>
+		<th>CAGEpeak_2</th>
+		<th>25.03</th>
+		<th>+</th>
+	  </tr>
+	  <tr>
+		<th>chr6</th>
+		<th>223541</th>
+		<th>223602</th>
+		<th>CAGEpeak_3</th>
+		<th>1.23</th>
+		<th>-</th>
+	  </tr>
+	  <tr>
+		<th>chr17</th>
+		<th>5012035</th>
+		<th>5012100</th>
+		<th>CAGEpeak_4</th>
+		<th>45.3</th>
+		<th>+</th>
+	  </tr>
+	  <tr>
+		<th>chr21</th>
+		<th>960032</th>
+		<th>960098</th>
+		<th>CAGEpeak_5</th>
+		<th>8.70/th>
+		<th>-</th>
+	  </tr>
+	</table> 
 </p>
 <h3>
     <a name="_Looking_at_the_Correlation_table"></a>2.3 Looking at the Correlation table

@@ -233,12 +233,20 @@ shinyServer(function(input, output) {
         validate(
             need(!is.null(input$expressionFile) | input$fileToUse == "Use the example file", "Upload an expression file, or click on a 'heatmap' tab to explore the dataset.")
         )
-            data.frame(
+        if(input$correlationCorrection == "Linear scaling") {
+            return(data.frame(
                 "experiment" = getSelectedDataset()$annotation$name,
                 "correlation" = userExpressionFileAnalysis()$correlations,
                 "scaledCorrelation" = userExpressionFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
-            )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ]
+            )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ])
+        } else {
+            return(data.frame(
+                "experiment" = getSelectedDataset()$annotation$name,
+                "correlation" = userExpressionFileAnalysis()$correlations,
+                stringsAsFactors = FALSE
+            )[order(userExpressionFileAnalysis()$correlations, decreasing = TRUE), ])
+        }
     })
 
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())

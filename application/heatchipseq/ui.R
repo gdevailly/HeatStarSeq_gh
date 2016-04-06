@@ -1,12 +1,5 @@
 source("data/server_adresses.R")
-
-shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
-
-    tabPanel("Instructions",
-             icon("home"),
-             a("Back to main page", href = URL_HEATSTARSEQ),
-             includeHTML("www/Instructions_heatchipseq.html")
-    ),
+shinyUI(tagList(useShinyjs(), navbarPage(a("HeatChIPseq", href = URL_HEATSTARSEQ),
 
     tabPanel("Use application",
              sidebarLayout(
@@ -20,20 +13,59 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                         "CODEX ChIP-seq (human, hg19)",
                         "CODEX ChIP-seq (mouse, mm10)",
                         "modEncode TF ChIP-seq (drosophila, r5)"
-                    )),
-                    h3("2 - Load your data"),
-                    p("Upload a bed-like peak file. Tab delimited, first three columns must be chromsome, peak start and peak end.
-                      Maximum size: 10MB. Please, use the same reference genome version than the selected dataset."),
-                    p("You can download ",
-                    downloadLink("downloadExempleFile", label = " an example file"),
-                      ". It is a human ESR1 (ERalpha) ChIP-seq experiment in MCF7 cells, kindly provided by Dr. Stromblad.
-                      It corresponds to the MCF7_ERa_E2_ChIP sample from ",
-                      a("this GEO dataset", href = "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73320"), "."),
-                    checkboxInput("header", "My peak file contains a header.", TRUE),
-                    fileInput("peakFile", strong("Upload your peak file:"), accept = "text/tab-separated-values"),
+                    ), selected = "ENCODE TFBS ChIP-seq (human, hg19)"),
+                    h3("2 - Load your data (optional)"),
+                    actionButton("fileFormatInstructions", label = "File formating instructions"),
+                    div(id = "div_fileFormatInstructions",
+                        p("Upload a bed-like peak file. Tab delimited, first three columns should be chromsome, peak start and peak end.
+                          Maximum size: 10MB. Please, use the same reference genome version than the selected dataset."),
+                        HTML("<p>
+	                         First lines of your file should look like this:
+                             <table style=\"width:50%\">
+                             <tr>
+                             <th>chr</th>
+                             <th>start</th>
+                             <th>end</th>
+                             </tr>
+                             <tr>
+                             <td>chr1</td>
+                             <td>125423</td>
+                             <td>125891</td>
+                             </tr>
+                             <tr>
+                             <td>chr1</td>
+                             <td>8545032</td>
+                             <td>8546254</td>
+                             </tr>
+                             <tr>
+                             <td>chr4</td>
+                             <td>4523698</td>
+                             <td>4524785</td>
+                             </tr>
+                             <tr>
+                             <td>chr12</td>
+                             <td>854120</td>
+                             <td>854870</td>
+                             </tr>
+                             <tr>
+                             <td>chrX</td>
+                             <td>2458750</td>
+                             <td>2459872</td>
+                             </tr>
+                             </table>
+                             </p>
+                             "),
+                        p("You can download ",
+                        downloadLink("downloadExempleFile", label = " an example file"),
+                          ". It is a human ESR1 (ERalpha) ChIP-seq experiment in MCF7 cells, withou header.")
+                    ),
+                    radioButtons("fileToUse", label = NULL, choices = c("Upload your peak file", "Use the example file")),
+                    div(id = "div_fileupload", fileInput("peakFile", strong("Choose a file:"), accept = "text/tab-separated-values")),
+                    div(id = "div_exampleInUse", "The example file is a human ESR1 (ERalpha) ChIP-seq in MCF7 cells. Please select only human datasets."),
+                    checkboxInput("header", "My peak file contains a header.", FALSE),
                     textInput("nameOfPeakFile", "Name of your experiment", value="my ChIP experiment"),
                     h3("3 - Plot customization"),
-                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), FALSE),
+                    checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),
                     # we adapt filtering widgets to the various datasets
                     div(id = "widgetForEncodeHuman",
                         selectInput("TF", "Subset for TF(s) (empty to select all):",
@@ -90,10 +122,10 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                 label = "Uploaded experiment correlation correction:",
                                 choices = list("None", "Linear scaling"),
                                 selected = "None"),
-                    sliderInput("maxCorrelation",
+                    div(id = "div_maxCorrelation", sliderInput("maxCorrelation",
                                 label = "Maximum expected correlation value for linear scaling correction",
-                                min = 0.1, max = 1, value = 0.95, step = 0.01),
-                    actionButton("advClustOptions", label = "Advance clustering options"),
+                                min = 0.1, max = 1, value = 0.95, step = 0.01)),
+                    actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
                                     choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
@@ -106,6 +138,14 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                     div(id = "widgetForLabels",
                         sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1),
                         sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)
+                    ),
+                    div(id = "div_widgetHMoptions",
+                        selectInput("showDend", "Show which dendrogram(s)?",
+                                    choices = c("both", "row", "column", "none"),
+                                    selected = "both", multiple = FALSE),
+                        selectInput("showLabels", "Show which labels?",
+                                    choices = c("both", "row", "column", "none"),
+                                    selected = "both", multiple = FALSE)
                     )
                 ),
 
@@ -141,14 +181,23 @@ shinyUI(tagList(useShinyjs(), navbarPage("HeatChIPseq",
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
                         )
-                        , id = "myPanels"
+                        , id = "myPanels", selected = "Static heatmap"
                     )
                 )
 
             )
     ),
 
-    theme = "bootstrap.css"
+    tabPanel("Instructions",
+             icon("home"),
+             a("Back to main page", href = URL_HEATSTARSEQ),
+             includeHTML("www/Instructions_heatchipseq.html"),
+             p(a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
+               a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/"), align = "center")
+    ),
+
+    theme = "bootstrap.css",
+
+    windowTitle = "HeatChIPseq"
 
 )))
-
