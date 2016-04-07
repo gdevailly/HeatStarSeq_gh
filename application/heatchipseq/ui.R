@@ -17,8 +17,8 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatChIPseq", href = URL_HEATSTARSEQ
                     h3("2 - Load your data (optional)"),
                     actionButton("fileFormatInstructions", label = "File formating instructions"),
                     div(id = "div_fileFormatInstructions",
-                        p("Upload a bed-like peak file. Tab delimited, first three columns should be chromsome, peak start and peak end.
-                          Maximum size: 10MB. Please, use the same reference genome version than the selected dataset."),
+                        p("Upload a bed-like peak file. Tab delimited, first three columns should be chromosome, peak start and peak end.
+                          Maximum size: 10MB. Please, use the same reference genome version as the selected dataset."),
                         HTML("<p>
 	                         First lines of your file should look like this:
                              <table style=\"width:50%\">
