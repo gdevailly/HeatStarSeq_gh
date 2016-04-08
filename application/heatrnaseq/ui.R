@@ -53,7 +53,7 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatRNAseq", href = URL_HEATSTARSEQ)
                             </p>"),
                         p("You can download ",
                           downloadLink("downloadExempleFile", label = " an example file"),
-                          ". It is a mouse RNA-seq experiment from the brain, with header.")
+                          ". It is a mouse RNA-seq experiment from the brain, with a header.")
                     ),
                     radioButtons("fileToUse", label = NULL, choices = c("Upload your expression file", "Use the example file")),
                     div(id = "div_fileupload", fileInput("expressionFile", label = "Choose a file:", accept = "text/tab-separated-values")),

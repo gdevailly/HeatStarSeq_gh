@@ -8,7 +8,35 @@ shinyServer(function(input, output) {
 
     # UI elements activations
     observe({
-        if (is.null(input$peakFile)) {
+        junkVar <- input$fileFormatInstructions
+        shinyjs::toggle("div_fileFormatInstructions")
+    })
+
+    observe({
+        if(input$fileToUse == "Upload your result file") {
+            shinyjs::show("div_fileupload")
+            shinyjs::hide("div_exampleInUse")
+        } else {
+            shinyjs::hide("div_fileupload")
+            shinyjs::show("div_exampleInUse")
+        }
+    })
+
+    observe({
+        junkVar <- input$advClustOptions
+        shinyjs::toggle("widgetForClustOptions")
+    })
+
+    observe({
+        if(input$correlationCorrection == "Linear scaling") {
+            shinyjs::show("div_maxCorrelation")
+        } else {
+            shinyjs::hide("div_maxCorrelation")
+        }
+    })
+
+    observe({
+        if (is.null(input$peakFile) & input$fileToUse != "Use the example file") {
             shinyjs::hide("downloadUserCageFile")
             shinyjs::hide("downloadUserCorrelationTable")
         } else {
@@ -35,11 +63,11 @@ shinyServer(function(input, output) {
         } else {
             shinyjs::hide("widgetForLabels")
         }
-    })
-
-    observe({
-        junkVar <- input$advClustOptions
-        shinyjs::toggle("widgetForClustOptions")
+        if(input$myPanels == "Static heatmap") {
+            shinyjs::show("div_widgetHMoptions")
+        } else {
+            shinyjs::hide("div_widgetHMoptions")
+        }
     })
 
     # output computations
@@ -62,6 +90,34 @@ shinyServer(function(input, output) {
     })
 
     userCageFileAnalysis_1 <- reactive({
+
+        if (input$fileToUse == "Use the example file") {
+            withProgress(value = 1, message = "Usercage file: ", detail = "reading file", {
+                userCageFile <- read_tsv("userCageFileName$datapath", col_names = input$header)[, 1:6]
+                setProgress(value = 1, detail = "intersecting CAGE regions")
+                colnames(userCageFile) <- c("chr", "start", "end", "name", "score", "strand")
+                userCageFileGR <- with(userCageFile, GRanges(chr, IRanges(start, end), strand = strand, score = score))
+                dataset <- getSelectedDataset()
+                # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what he/her is uploading...
+                # Which region overlaps?
+                # we ignore peaks presents only in user peak lists.
+                suppressWarnings(userOverlap <- findOverlaps(dataset$regionMetaData, userCageFileGR, select = "arbitrary"))
+                userCuratedValues <- numeric(nrow(dataset$dataMatrix))
+                userCuratedValues[!is.na(userOverlap)] <- userCageFile[userOverlap[!is.na(userOverlap)], "score"]
+                # correlation calculation
+                setProgress(value = 1, detail = "correlations calculation")
+                userCorrelations <- cor(userCuratedValues,
+                                        dataset$dataMatrix
+                ) %>% as.vector
+                setProgress(value = 1, detail = "done!")
+            })
+            return(list(
+                "peaks" = userCageFile,
+                "correlations" = userCorrelations,
+                "linearNormCorrelations" = NULL # to be fill below
+            ))
+        }
+
         userCageFileName <- input$cageFile
         if (is.null(userCageFileName)){
             userCageFile <- NULL
@@ -97,7 +153,7 @@ shinyServer(function(input, output) {
     userCageFileAnalysis <- reactive({
         userCageFileData <- userCageFileAnalysis_1()
         userCorrelations <- userCageFileData$correlations
-        if (!is.null(input$cageFile)){
+        if (!is.null(input$cageFile)  | input$fileToUse == "Use the example file"){
             if (input$maxCorrelation != 0) {
                 userCageFileData$linearNormCorrelations <- userCorrelations * input$maxCorrelation / max(userCorrelations)
             }
@@ -107,7 +163,7 @@ shinyServer(function(input, output) {
 
     output$tabUserCageFile <- renderDataTable({
         validate(
-            need(!is.null(input$cageFile), "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$cageFile) | input$fileToUse == "Use the example file", "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
         )
         userCageFileAnalysis()$peaks
     })
@@ -120,14 +176,22 @@ shinyServer(function(input, output) {
 
     getCorrelationTable <- reactive({
         validate(
-            need(!is.null(input$cageFile), "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
+            need(!is.null(input$cageFile) | input$fileToUse == "Use the example file", "Upload an bed file, or click on a 'heatmap' tab to explore the dataset.")
         )
-            data.frame(
+        if(input$correlationCorrection == "Linear scaling") {
+            return(data.frame(
                 "experiment" = getSelectedDataset()$annotation$name,
                 "correlation" = userCageFileAnalysis()$correlations,
                 "scaledCorrelation" = userCageFileAnalysis()$linearNormCorrelations,
                 stringsAsFactors = FALSE
-            )[order(userCageFileAnalysis()$correlations, decreasing = TRUE),]
+            )[order(userCageFileAnalysis()$correlations, decreasing = TRUE),])
+        } else {
+            return(data.frame(
+                "experiment" = getSelectedDataset()$annotation$name,
+                "correlation" = userCageFileAnalysis()$correlations,
+                stringsAsFactors = FALSE
+            )[order(userCageFileAnalysis()$correlations, decreasing = TRUE),])
+        }
     })
 
     output$tabUserCorrelationTable <- renderDataTable(getCorrelationTable())
@@ -215,7 +279,7 @@ shinyServer(function(input, output) {
 
     matAfterHighlight <- reactive({
         matAA <- subsetMatrix()
-        if (input$highlight & !is.null(input$cageFile)) {
+        if (input$highlight & (!is.null(input$cageFile) | input$fileToUse == "Use the example file")) {
             # we increase user cor value by 2 to do the color trick
             matAA$mat[, ncol(matAA$mat)] <- matAA$mat[, ncol(matAA$mat)] + 2
             matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] <- matAA$mat[nrow(matAA$mat), 1:(ncol(matAA$mat) - 1)] + 2
@@ -226,6 +290,33 @@ shinyServer(function(input, output) {
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
+
+        if (input$showDend == "both") {
+            myMat <- matData$mat
+            Rowv <- clusterDat$dend
+            Colv <- "Rowv"
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels else NA
+        } else if (input$showDend == "row") {
+            myMat <- matData$mat[, clusterDat$order]
+            Rowv <- rev(clusterDat$dend)
+            Colv <- NA
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
+        } else if (input$showDend == "column") {
+            myMat <- matData$mat[rev(clusterDat$order), ]
+            Rowv <- NA
+            Colv <- clusterDat$dend
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels[rev(clusterDat$order)] else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels else NA
+        } else if (input$showDend == "none") {
+            myMat <- matData$mat[rev(clusterDat$order), clusterDat$order]
+            Rowv <- NA
+            Colv <- NA
+            labRow <- if (input$showLabels %in% c("both", "row")) matData$myLabels[rev(clusterDat$order)] else NA
+            labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
+        }
+
         heatmap(matData$mat,
                 Rowv = clusterDat$dend,
                 Colv = "Rowv",

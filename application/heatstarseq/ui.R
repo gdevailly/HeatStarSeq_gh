@@ -8,11 +8,10 @@ shinyUI(
             h1("Heat*seq", align = "center"),
             h3("An interactive web tool for high-throughput sequencing experiment comparison with public data", align = "center"),
             h3(" "),
-            h1(img(src = "heatmap.svg", width = 700), align = "center"),
             fluidRow(
                column(2),
                column(2,
-                      h2("Gene Expression", align = "center"),
+                      h2("RNA-seq", align = "center"),
                       p(a(
                           actionButton("rnaButton", "HeatRNAseq", class = "btn-success", style = "font-size:150%"),
                           href = URL_HEATRNASEQ
@@ -36,7 +35,9 @@ shinyUI(
                       ), align = "center")
                ),
                column(2)
-            )
+            ),
+            h1(img(src = "heatmap.svg", width = 700), align = "center")
+
 
         ),
 

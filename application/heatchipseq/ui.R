@@ -1,11 +1,11 @@
 source("data/server_adresses.R")
-shinyUI(tagList(useShinyjs(), navbarPage(a("HeatChIPseq", href = URL_HEATSTARSEQ),
+shinyUI(tagList(useShinyjs(), navbarPage(a("HeatStarseq", href = URL_HEATSTARSEQ),
 
     tabPanel("Use application",
              sidebarLayout(
 
                 sidebarPanel(
-                    icon("home"),
+                    # icon("home"),
                     a("Back to main page", href = URL_HEATSTARSEQ),
                     h3("1 - Select a dataset"),
                     selectInput("selectedDataset", label = NULL, choices = c(
@@ -57,7 +57,7 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatChIPseq", href = URL_HEATSTARSEQ
                              "),
                         p("You can download ",
                         downloadLink("downloadExempleFile", label = " an example file"),
-                          ". It is a human ESR1 (ERalpha) ChIP-seq experiment in MCF7 cells, withou header.")
+                          ". It is a human ESR1 (ERalpha) ChIP-seq experiment in MCF7 cells, without a header.")
                     ),
                     radioButtons("fileToUse", label = NULL, choices = c("Upload your peak file", "Use the example file")),
                     div(id = "div_fileupload", fileInput("peakFile", strong("Choose a file:"), accept = "text/tab-separated-values")),
@@ -136,7 +136,7 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatChIPseq", href = URL_HEATSTARSEQ
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        sliderInput("labCex", label = "Sample name size", value = 1.2, min = 0.1, max = 3, step = 0.1),
+                        sliderInput("labCex", label = "Sample name size", value = 0.1, min = 0.1, max = 3, step = 0.1),
                         sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)
                     ),
                     div(id = "div_widgetHMoptions",
