@@ -1,12 +1,11 @@
 source("data/server_adresses.R")
-shinyUI(tagList(useShinyjs(), navbarPage(a("HeatStarseq", href = URL_HEATSTARSEQ),
+shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
 
     tabPanel("Use application",
              sidebarLayout(
 
                 sidebarPanel(
-                    # icon("home"),
-                    a("Back to main page", href = URL_HEATSTARSEQ),
+                    h2("HeatChIPseq"),
                     h3("1 - Select a dataset"),
                     selectInput("selectedDataset", label = NULL, choices = c(
                         "ENCODE TFBS ChIP-seq (human, hg19)",
@@ -189,8 +188,6 @@ shinyUI(tagList(useShinyjs(), navbarPage(a("HeatStarseq", href = URL_HEATSTARSEQ
     ),
 
     tabPanel("Instructions",
-             icon("home"),
-             a("Back to main page", href = URL_HEATSTARSEQ),
              includeHTML("www/Instructions_heatchipseq.html"),
              p(a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
                a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/"), align = "center")
