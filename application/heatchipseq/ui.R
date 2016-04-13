@@ -135,9 +135,13 @@ shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href =
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        sliderInput("labCex", label = "Sample name size", value = 0.1, min = 0.1, max = 3, step = 0.1),
-                        sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)
+                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manualy")),
+                        div(id = "widgetForLabelsManual",
+                            sliderInput("labCex", label = "Sample name size", value = 0.1, min = 0.1, max = 3, step = 0.1),
+                            sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)
+                        )
                     ),
+
                     div(id = "div_widgetHMoptions",
                         selectInput("showDend", "Show which dendrogram(s)?",
                                     choices = c("both", "row", "column", "none"),
@@ -188,6 +192,7 @@ shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href =
     ),
 
     tabPanel("Instructions",
+             h1("HeatChIPseq", align = "center"),
              includeHTML("www/Instructions_heatchipseq.html"),
              p(a(img(src = "The_Roslin_Institute_logo.gif"), href = "http://www.roslin.ed.ac.uk/"),
                a(img(src = "BBSRC_logo.gif"), href = "http://www.bbsrc.ac.uk/"), align = "center")

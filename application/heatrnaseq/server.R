@@ -4,7 +4,7 @@ library(cba)
 
 options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
 
     # UI elements activations
     observe({
@@ -83,6 +83,14 @@ shinyServer(function(input, output) {
             shinyjs::show("div_widgetHMoptions")
         } else {
             shinyjs::hide("div_widgetHMoptions")
+        }
+    })
+
+    observe({
+        if(input$labelOption == "Automatic") {
+            shinyjs::hide("widgetForLabelsManual")
+        } else {
+            shinyjs::show("widgetForLabelsManual")
         }
     })
 
@@ -439,6 +447,18 @@ shinyServer(function(input, output) {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
 
+        nSample <- length(matData$myLabels)
+
+        newLabSize <- round((6/nSample^0.6)*10)/10
+        if(newLabSize > 3) newLabSize <- 3
+        if(newLabSize < 0.1) newLabSize <- 0.1
+        if (input$labelOption == "Automatic") updateSliderInput(session, "labCex", label = NULL, value = newLabSize, min = NULL, max = NULL, step = NULL)
+
+        newMargin <- round((66/nSample^0.25)*10)/10
+        if(newMargin > 50) newMargin <- 50
+        if(newMargin < 1) newMargin <- 1
+        if (input$labelOption == "Automatic") updateSliderInput(session, "margin", label = NULL, value = newMargin, min = NULL, max = NULL, step = NULL)
+
         if (input$showDend == "both") {
             myMat <- matData$mat
             Rowv <- clusterDat$dend
@@ -471,9 +491,9 @@ shinyServer(function(input, output) {
                 scale = "none",
                 labRow = labRow,
                 labCol = labCol,
-                margins = rep(input$margin, 2),
-                cexRow = input$labCex,
-                cexCol = input$labCex,
+                margins = if(input$labelOption == "Automatic") rep(newMargin, 2) else  rep(input$margin, 2),
+                cexRow = if(input$labelOption == "Automatic") newLabSize else input$labCex,
+                cexCol = if(input$labelOption == "Automatic") newLabSize else input$labCex,
                 breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
                 col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255),
                 useRaster = TRUE
@@ -551,9 +571,23 @@ shinyServer(function(input, output) {
     })
 
     myRenderTreePlot <- function() {
+        matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
+
+        nSample <- length(matData$myLabels)
+
+        newLabSize <- round((6/nSample^0.6)*10)/10
+        if(newLabSize > 1.4) newLabSize <- 1.4
+        if(newLabSize < 0.1) newLabSize <- 0.1
+        if (input$labelOption == "Automatic") updateSliderInput(session, "labCex", label = NULL, value = newLabSize, min = NULL, max = NULL, step = NULL)
+
+        newMargin <- round((66/nSample^0.25)*10)/10
+        if(newMargin > 20) newMargin <- 20
+        if(newMargin < 1) newMargin <- 1
+        if (input$labelOption == "Automatic") updateSliderInput(session, "margin", label = NULL, value = newMargin, min = NULL, max = NULL, step = NULL)
+
         oldPar <- list(mar = par()$mar, cex = par()$cex)
-        par(mar = c(5, 4, 4, input$margin), cex = input$labCex)
+        par(mar = c(5, 4, 4, if (input$labelOption == "Automatic") newMargin else input$margin), cex = if (input$labelOption == "Automatic") newLabSize else input$labCex)
         plot(
             clusterDat$dend,
             horiz = TRUE
