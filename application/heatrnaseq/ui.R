@@ -12,6 +12,7 @@ shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href =
                         "Blueprint RNA-seq (human)",
                         "Roadmap Epigenomics RNA-seq (human)",
                         "GTEX summary (human)",
+                        "GTEX - all samples (human)",
                         "ENCODE RNA-seq (human)",
                         "Bgee RNA-seq (mouse)",
                         "ENCODE RNA-seq (mouse)",
@@ -90,6 +91,11 @@ shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href =
                     div(id = "widgetForGtexSmall",
                         selectInput("celltype_gtex_small_h", "Tissue (empty to select all):",
                                     choices = unique(gtex_small$annotation$name)[order(unique(gtex_small$annotation$name))],
+                                    selected = NULL, multiple = TRUE)
+                    ),
+                    div(id = "widgetForGtexLarge",
+                        selectInput("celltype_gtex_large_h", "Tissue (empty to select all):",
+                                    choices = unique(gtex_large$annotation$SMTSD)[order(unique(gtex_large$annotation$SMTSD))],
                                     selected = NULL, multiple = TRUE)
                     ),
                     div(id = "widgetForEncodeHuman",

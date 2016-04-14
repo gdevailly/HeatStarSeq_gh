@@ -62,5 +62,7 @@ gtex_small <- list(
     annotation = as.data.frame(myMetadata)
 )
 
+gtex_small$annotation$name <- as.character(gtex_small$annotation$name)
+
 save(gtex_small, file = "../../heatrnaseq/data/gtex_small.RData")
 

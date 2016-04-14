@@ -50,6 +50,7 @@ shinyServer(function(input, output, session) {
         shinyjs::hide("widgetForBlueprintHuman")
         shinyjs::hide("widgetForRoadmapHuman")
         shinyjs::hide("widgetForGtexSmall")
+        shinyjs::hide("widgetForGtexLarge")
         shinyjs::hide("widgetForEncodeHuman")
         shinyjs::hide("widgetForEncodeMouse")
         shinyjs::hide("widgetForBgeeMouse")
@@ -65,6 +66,8 @@ shinyServer(function(input, output, session) {
             shinyjs::show("widgetForRoadmapHuman")
         } else if (input$dataset == "GTEX summary (human)") {
             shinyjs::show("widgetForGtexSmall")
+        } else if (input$dataset == "GTEX - all samples (human)") {
+            shinyjs::show("widgetForGtexLarge")
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             shinyjs::show("widgetForEncodeMouse")
         } else if (input$dataset == "Bgee RNA-seq (mouse)") {
@@ -107,6 +110,7 @@ shinyServer(function(input, output, session) {
             load("data/blueprint_rnaseq_preload.RData")
             load("data/roadmap_rnaseq_preload.RData")
             load("data/gtex_small_preload.RData")
+            load("data/gtex_large_preload.RData")
             load("data/flybase_rnaseq_preload.RData")
             setProgress(value = 1, detail = "loading new dataset")
             if (input$dataset == "ENCODE RNA-seq (human)") {
@@ -124,6 +128,9 @@ shinyServer(function(input, output, session) {
             } else if (input$dataset == "GTEX summary (human)") {
                 load("data/gtex_small.RData")
                 dataset <- gtex_small
+            } else if (input$dataset == "GTEX - all samples (human)") {
+                load("data/gtex_large.RData")
+                dataset <- gtex_large
             } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
                 load("data/encode_mouse_rnaseq.RData")
                 dataset <- encode_mouse_rnaseq
@@ -351,6 +358,15 @@ shinyServer(function(input, output, session) {
             }
             keep <- which(
                 dataset$annotation$name %in% temp_celltype_gtex_small_h
+            )
+        } else if (input$dataset == "GTEX - all samples (human)") {
+            if (is.null(input$celltype_gtex_large_h)) {
+                temp_celltype_gtex_large_h <- unique(gtex_large$annotation$SMTSD)
+            } else {
+                temp_celltype_gtex_large_h <- input$celltype_gtex_large_h
+            }
+            keep <- which(
+                dataset$annotation$SMTSD %in% temp_celltype_gtex_large_h
             )
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             if (is.null(input$cells_encode_m)) {

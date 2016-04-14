@@ -67,8 +67,14 @@ gtex_large <- list(
     correlationMatrix = corMatrix,
     annotation = as.data.frame(metadata)
 )
+gtex_large$annotation$name <- as.character(gtex_large$annotation$name)
+gtex_large$annotation$SAMPID <- as.character(gtex_large$annotation$SAMPID)
+gtex_large$annotation$SMTS <- as.character(gtex_large$annotation$SMTS)
+gtex_large$annotation$SMTSD <- as.character(gtex_large$annotation$SMTSD)
+gtex_large$annotation$SMNABTCHT <- as.character(gtex_large$annotation$SMNABTCHT)
+gtex_large$annotation$url <- as.character(gtex_large$annotation$url)
 
-# save(gtex_large, file = "gtex_large.RData")
+save(gtex_large, file = "gtex_large.RData")
 
 
 
