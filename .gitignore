@@ -21,6 +21,8 @@ vignettes/*.pdf
 # heavy file
 application/heatcageseq/data/fantom5_human_cage.RData
 
+# google analytics
+application/heatstarseq/www/google_analytics.js
 
 # =========================
 # Operating System Files

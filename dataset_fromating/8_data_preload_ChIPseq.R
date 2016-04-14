@@ -45,7 +45,6 @@ object.size(encode)
 
 ### RNA seq -----------
 setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/heatrnaseq/")
-library(GenomicRanges)
 library(magrittr)
 
 load("data/encode_rnaseq.RData")
@@ -55,6 +54,8 @@ load("data/encode_mouse_rnaseq.RData")
 load("data/blueprint_rnaseq.RData")
 load("data/roadmap_rnaseq.RData")
 load("data/flybase_rnaseq.RData")
+load("data/gtex_small.RData")
+load("data/gtex_large.RData")
 
 names(encode_rnaseq)
 names(bgee_human)
@@ -63,6 +64,9 @@ names(encode_mouse_rnaseq)
 names(blueprint_rnaseq)
 names(roadmap_rnaseq)
 names(flybase_rnaseq)
+names(gtex_small)
+names(gtex_large)
+
 
 nullifyDataForFasterPreloading <- function(myList) {
     myList[["dataMatrix"]] <- NULL
@@ -92,6 +96,12 @@ object.size(roadmap_rnaseq)
 object.size(flybase_rnaseq)
 flybase_rnaseq <- nullifyDataForFasterPreloading(flybase_rnaseq)
 object.size(flybase_rnaseq)
+object.size(gtex_small)
+gtex_small <- nullifyDataForFasterPreloading(gtex_small)
+object.size(gtex_small)
+object.size(gtex_large)
+gtex_large <- nullifyDataForFasterPreloading(gtex_large)
+object.size(gtex_large)
 
 save(encode_rnaseq, file = "data/encode_rnaseq_preload.RData")
 save(bgee_human, file = "data/bgee_human_preload.RData")
@@ -100,6 +110,8 @@ save(encode_mouse_rnaseq, file = "data/encode_mouse_rnaseq_preload.RData")
 save(blueprint_rnaseq, file = "data/blueprint_rnaseq_preload.RData")
 save(roadmap_rnaseq, file = "data/roadmap_rnaseq_preload.RData")
 save(flybase_rnaseq, file = "data/flybase_rnaseq_preload.RData")
+save(gtex_small, file = "data/gtex_small_preload.RData")
+save(gtex_large, file = "data/gtex_large_preload.RData")
 
 # CAGE seq
 setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/heatcageseq/")
