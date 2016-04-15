@@ -108,6 +108,13 @@ shinyServer(function(input, output, session) {
             }
             setProgress(value = 1, detail = "done!")
         })
+        isolate(
+            if (input$fileToUse == "Use the example file") {
+                if (!input$selectedDataset %in% c("ENCODE TFBS ChIP-seq (human, hg19)", "CODEX ChIP-seq (human, hg19)")) {
+                    updateRadioButtons(session = session, "fileToUse", label = NULL, choices = NULL, selected = "Upload your peak file")
+                }
+            }
+        )
         return(dataset)
     })
 
@@ -120,6 +127,11 @@ shinyServer(function(input, output, session) {
                 setProgress(value = 1, detail = "intersecting peaks")
                 userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
                 dataset <- getSelectedDataset()
+                validate(need(
+                    input$selectedDataset %in% c("ENCODE TFBS ChIP-seq (human, hg19)", "CODEX ChIP-seq (human, hg19)"),
+                    "Something is wrong, sorry. :(
+                    \nThe example file is a human ChIP-seq experiment. You should choose a human dataset, I am sure it will work better."
+                ))
                 # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what it is uploading...
                 # Which encode region overlaps?
                 # we ignore peaks presents only in user peak lists for some reasons.

@@ -125,10 +125,10 @@ shinyServer(function(input, output, session) {
             } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
                 load("data/roadmap_rnaseq.RData")
                 dataset <- roadmap_rnaseq
-            } else if (input$dataset == "GTEx summary (human)") {
+            } else if (input$dataset == "GETx summary (human)") {
                 load("data/gtex_small.RData")
                 dataset <- gtex_small
-            } else if (input$dataset == "GTEx - all samples (human)") {
+            } else if (input$dataset == "GETx - all samples (human)") {
                 load("data/gtex_large.RData")
                 dataset <- gtex_large
             } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
@@ -145,6 +145,13 @@ shinyServer(function(input, output, session) {
             }
             setProgress(value = 1, detail = "done!")
         })
+        isolate(
+            if (input$fileToUse == "Use the example file") {
+                if (!input$dataset %in% c("Bgee RNA-seq (mouse)", "ENCODE RNA-seq (mouse)")) {
+                    updateRadioButtons(session = session, "fileToUse", label = NULL, choices = NULL, selected = "Upload your expression file")
+                }
+            }
+        )
         return(dataset)
     })
 
@@ -162,10 +169,8 @@ shinyServer(function(input, output, session) {
                 userExpressionFile[is.na(userExpressionFile)] <- 0
                 validate(need(
                     length(unique(userExpressionFile)) > 1,
-                    "Something went wrong: all genes have the same expression value (probably 0). Cannot calculate correlations.
-                    \nThis is likely because:
-                    \n-the wrong dataset is selected (ie you may have uploaded a mouse expression file, but the selected dataset is for human).
-                    \n-the file formatting is not recognized. It should be a two columns, tab delimited text file. First columns should contain the ensembl gene name id (ie ENSG00000000003) or Flybase id (FBgn0000003). Second column should contains expression values."
+                    "Something is wrong, sorry. :(
+                    \nThe example file is a mouse RNA-seq experiment. You should choose a mouse dataset, I am sure it will work better."
                 ))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
