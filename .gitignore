@@ -23,6 +23,9 @@ application/heatcageseq/data/fantom5_human_cage.RData
 
 # google analytics
 application/heatstarseq/www/google_analytics.js
+application/heatrnaseq/www/google_analytics.js
+application/heatchipseq/www/google_analytics.js
+application/heatcageseq/www/google_analytics.js
 
 # =========================
 # Operating System Files

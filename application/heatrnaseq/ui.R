@@ -1,5 +1,5 @@
 source("data/server_adresses.R")
-shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
+shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
 
     tabPanel("Use application",
              sidebarLayout(
@@ -202,7 +202,7 @@ shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href =
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
                                  )
-                        , id = "myPanels", selected = "Responsive heatmap"
+                        , id = "myPanels", selected = "Static heatmap"
                     )
                 )
 

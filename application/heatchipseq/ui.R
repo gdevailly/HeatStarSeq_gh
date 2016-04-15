@@ -1,5 +1,5 @@
 source("data/server_adresses.R")
-shinyUI(tagList(useShinyjs(), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
+shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
 
     tabPanel("Use application",
              sidebarLayout(
