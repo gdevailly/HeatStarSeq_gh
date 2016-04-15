@@ -102,7 +102,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                     actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
-                                    choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
+                                    choices = list("euclidean", "1 - Pearson correlation coefficient", "maximum", "manhattan", "canberra"),
                                     selected = 1),
                         selectInput("hclustMethod",
                                     label = "Clustering method",
@@ -110,7 +110,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manualy")),
+                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manually")),
                         div(id = "widgetForLabelsManual",
                             sliderInput("labCex", label = "Sample name size:", value = 1.2, min = 0.1, max = 3, step = 0.1),
                             sliderInput("margin", label = "Sample name margin:", value = 20, min = 1, max = 50, step = 1)

@@ -143,7 +143,7 @@
 <p>
 	You can download 
 	<a href="chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed" download>this example file</a>.
-	It is a human ESR1 (ERalpha) ChIP-seq experiment from MCF7 cells, kindly provided by Dr. Str&ouml;mblad.
+	It is a ESR1 (ERalpha) ChIP-seq experiment from MCF7 cells, kindly provided by Dr. Str&ouml;mblad.
 	Use a human dataset (for example ENCODE TFBS), and untick the "My peak file contains a header" option.
 	It corresponds to the MCF7_ERa_E2_ChIP sample from 
     <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73320")>GEO dataset GSE73320</a>
@@ -206,7 +206,7 @@
 		The <strong>Advanced clustering options</strong> button will reveal the <strong>Distance calculation</strong> and <strong>Clustering method</strong> options.
 		The selected values are passed to the R <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
 		and <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
-        <strong>1 - correlations</strong> distance method: instead of using the dist() function on correlation values, it uses 1 - correlations as a measure of
+        <strong>1 - Pearson correlation coefficient</strong> distance method: instead of using the dist() function on correlation values, it uses 1 - correlations as a measure of
         distance between experiments (a correlation of 0.75 will give a distance of 0.25).
     </li>
     <li>
@@ -341,7 +341,7 @@
  </tr>
 </table></p>
 <p>
-    If you would like us to add a datasets, or to update an existing one with more recent data, please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a>
+    If you would like us to add a dataset, or to update an existing one, please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a>
 	(replace at with @). A well curated dataset can be implemented / updated within a working day.
 </p>
 <div>

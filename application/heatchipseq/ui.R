@@ -59,9 +59,11 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                           ". It is a human ESR1 (ERalpha) ChIP-seq experiment in MCF7 cells, without a header.")
                     ),
                     radioButtons("fileToUse", label = NULL, choices = c("Upload your peak file", "Use the example file")),
-                    div(id = "div_fileupload", fileInput("peakFile", strong("Choose a file:"), accept = "text/tab-separated-values")),
-                    div(id = "div_exampleInUse", "The example file is a human ESR1 (ERalpha) ChIP-seq in MCF7 cells. Please select only human datasets."),
-                    checkboxInput("header", "My peak file contains a header.", FALSE),
+                    div(id = "div_fileupload",
+                        fileInput("peakFile", strong("Choose a file:"), accept = "text/tab-separated-values"),
+                        checkboxInput("header", "My peak file contains a header.", FALSE)
+                    ),
+                    div(id = "div_exampleInUse", "The example file is a ESR1 (ERalpha) ChIP-seq in MCF7 cells. Please select only human datasets."),
                     textInput("nameOfPeakFile", "Name of your experiment", value="my ChIP experiment"),
                     h3("3 - Plot customization"),
                     checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),
@@ -127,7 +129,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                     actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
-                                    choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
+                                    choices = list("euclidean", "1 - Pearson correlation coefficient", "maximum", "manhattan", "canberra"),
                                     selected = 1),
                         selectInput("hclustMethod",
                                     label = "Clustering method",
@@ -135,7 +137,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manualy")),
+                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manually")),
                         div(id = "widgetForLabelsManual",
                             sliderInput("labCex", label = "Sample name size", value = 0.1, min = 0.1, max = 3, step = 0.1),
                             sliderInput("margin", label = "Sample name margin", value = 20, min = 1, max = 50, step = 1)

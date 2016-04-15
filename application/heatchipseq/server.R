@@ -115,7 +115,7 @@ shinyServer(function(input, output, session) {
 
         if (input$fileToUse == "Use the example file") {
             withProgress(value = 1, message = "User peak file: ", detail = "reading file", {
-                userPeakFile <- read_tsv("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", col_names = input$header)[, 1:3]
+                userPeakFile <- read_tsv("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", col_names = FALSE)[, 1:3]
                 colnames(userPeakFile) <- c("chr","start","end")
                 setProgress(value = 1, detail = "intersecting peaks")
                 userPeakFileGR <- with(userPeakFile, GRanges(chr, IRanges(start, end)))
@@ -322,7 +322,10 @@ shinyServer(function(input, output, session) {
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
         validate(
-            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please selecet more experiments.")
+            need(length(keep) >= 3, "Fewer than 3 experiments match your criteria. Please select more experiments.")
+        )
+        validate(
+            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select less experiments.")
         )
         if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]
@@ -347,7 +350,7 @@ shinyServer(function(input, output, session) {
             myData <- subsetMatrix()
             myMat <- myData$mat
             colnames(myMat) <- rownames(myMat) <- myData$myLabels
-            if (input$distOption == "1 - correlations") {
+            if (input$distOption == "1 - Pearson correlation coefficient") {
                 d <- as.dist(1 - myMat)
             } else {
                 d <- dist(myMat, method = input$distOption)

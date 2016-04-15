@@ -246,7 +246,10 @@ shinyServer(function(input, output, session) {
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
         validate(
-            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please selecet more experiments.")
+            need(length(keep) >= 3, "Fewer than 3 experiments match your criteria. Please select more experiments.")
+        )
+        validate(
+            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select less experiments.")
         )
         if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]
@@ -270,7 +273,7 @@ shinyServer(function(input, output, session) {
             myData <- subsetMatrix()
             myMat <- myData$mat
             colnames(myMat) <- rownames(myMat) <- myData$myLabels
-            if (input$distOption == "1 - correlations") {
+            if (input$distOption == "1 - Pearson correlation coefficient") {
                 d <- as.dist(1 - myMat)
             } else {
                 d <- dist(myMat, method = input$distOption)

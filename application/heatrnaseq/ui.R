@@ -148,7 +148,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                     actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
-                                    choices = list("euclidean", "1 - correlations", "maximum", "manhattan", "canberra"),
+                                    choices = list("euclidean", "1 - Pearson correlation coefficient", "maximum", "manhattan", "canberra"),
                                     selected = 1),
                         selectInput("hclustMethod",
                                     label = "Clustering method:",
