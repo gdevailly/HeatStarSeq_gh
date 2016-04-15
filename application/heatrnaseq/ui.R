@@ -11,8 +11,8 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         "Bgee RNA-seq (human)",
                         "Blueprint RNA-seq (human)",
                         "Roadmap Epigenomics RNA-seq (human)",
-                        "GTEX summary (human)",
-                        "GTEX - all samples (human)",
+                        "GETx summary (human)",
+                        "GETx - all samples (human)",
                         "ENCODE RNA-seq (human)",
                         "Bgee RNA-seq (mouse)",
                         "ENCODE RNA-seq (mouse)",
@@ -57,9 +57,11 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                           ". It is a mouse RNA-seq experiment from the brain, with a header.")
                     ),
                     radioButtons("fileToUse", label = NULL, choices = c("Upload your expression file", "Use the example file")),
-                    div(id = "div_fileupload", fileInput("expressionFile", label = "Choose a file:", accept = "text/tab-separated-values")),
-                    div(id = "div_exampleInUse", "The example file is a mouse brain RNA-seq, with a header. Please select only mouse datasets."),
-                    checkboxInput("header", strong("The expression file contains a header."), TRUE),
+                    div(id = "div_fileupload",
+                        fileInput("expressionFile", label = "Choose a file:", accept = "text/tab-separated-values"),
+                        checkboxInput("header", strong("The expression file contains a header."), TRUE)
+                    ),
+                    div(id = "div_exampleInUse", "The example file is a mouse RNA-seq from the brain. Please select only mouse datasets."),
                     textInput("nameOfExpressionFile", "Name of your experiment:", value="my RNA-seq"),
                     h3("3 - Plot customization"),
                     checkboxInput("highlight", strong("Highlight my experiment in the heatmap."), TRUE),
@@ -121,7 +123,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                      selectInput("tissus_bgee_m", "Subset for tissue (empty to select all):",
                                                  choices = unique(bgee_mouse$annotation$tissue)[order(unique(bgee_mouse$annotation$tissue))],
                                                  selected = NULL, multiple = TRUE),
-                                     selectInput("dvp_bgee_m", "Subset for devlopemntal stage (empty to select all):",
+                                     selectInput("dvp_bgee_m", "Subset for developmental stage (empty to select all):",
                                                  choices = unique(bgee_mouse$annotation$stage)[order(unique(bgee_mouse$annotation$stage))],
                                                  selected = NULL, multiple = TRUE),
                                      selectInput("library_bgee_m", "Subset for library type (empty to select all):",
@@ -154,7 +156,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                     selected = "complete")
                     ),
                     div(id = "widgetForLabels",
-                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manualy")),
+                        radioButtons("labelOption", label = "Label size:", choices = list("Automatic", "Adjust manually")),
                         div(id = "widgetForLabelsManual",
                             sliderInput("labCex", label = "Sample name size:", value = 1.2, min = 0.1, max = 3, step = 0.1),
                             sliderInput("margin", label = "Sample name margin:", value = 20, min = 1, max = 50, step = 1)

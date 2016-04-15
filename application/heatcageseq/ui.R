@@ -83,7 +83,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         selectInput("f5h_cells", "Subset for cell type(s) (empty to select all):",
                                     choices = unique(fantom5_human_cage$annotation$tissue)[order(unique(fantom5_human_cage$annotation$tissue))],
                                     selected = NULL, multiple = TRUE),
-                        selectInput("f5h_isCellLine", "Cell lines or not? (empty to select all)",
+                        selectInput("f5h_isCellLine", "Cell type:",
                                     choices = c("all", "only cell line", "only non cell line"),
                                     selected = NULL, multiple = FALSE)
                     ),

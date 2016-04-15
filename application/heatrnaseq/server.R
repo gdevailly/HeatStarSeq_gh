@@ -64,9 +64,9 @@ shinyServer(function(input, output, session) {
             shinyjs::show("widgetForBlueprintHuman")
         } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
             shinyjs::show("widgetForRoadmapHuman")
-        } else if (input$dataset == "GTEX summary (human)") {
+        } else if (input$dataset == "GTEx summary (human)") {
             shinyjs::show("widgetForGtexSmall")
-        } else if (input$dataset == "GTEX - all samples (human)") {
+        } else if (input$dataset == "GTEx - all samples (human)") {
             shinyjs::show("widgetForGtexLarge")
         } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
             shinyjs::show("widgetForEncodeMouse")
@@ -125,10 +125,10 @@ shinyServer(function(input, output, session) {
             } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
                 load("data/roadmap_rnaseq.RData")
                 dataset <- roadmap_rnaseq
-            } else if (input$dataset == "GTEX summary (human)") {
+            } else if (input$dataset == "GTEx summary (human)") {
                 load("data/gtex_small.RData")
                 dataset <- gtex_small
-            } else if (input$dataset == "GTEX - all samples (human)") {
+            } else if (input$dataset == "GTEx - all samples (human)") {
                 load("data/gtex_large.RData")
                 dataset <- gtex_large
             } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
@@ -152,7 +152,7 @@ shinyServer(function(input, output, session) {
 
         if (input$fileToUse == "Use the example file") {
             withProgress(value = 1, message = "Loading example: ", detail = "reading file", {
-                userExpressionFile_temp <- read_tsv("www/rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt", col_names = input$header)[, 1:2]
+                userExpressionFile_temp <- read_tsv("www/rnaseq_mouse_GSE70732_NP1071_FPKM_all_genes_with_header.txt", col_names = TRUE)[, 1:2]
                 colnames(userExpressionFile_temp) <- c("ensembl_id","exp_value")
                 setProgress(value = 1, detail = "intersecting gene names")
                 userExpressionFile_temp_v <- userExpressionFile_temp$exp_value
@@ -165,7 +165,7 @@ shinyServer(function(input, output, session) {
                     "Something went wrong: all genes have the same expression value (probably 0). Cannot calculate correlations.
                     \nThis is likely because:
                     \n-the wrong dataset is selected (ie you may have uploaded a mouse expression file, but the selected dataset is for human).
-                    \n-the file formating is not recognized. It should be a two columns, tab delimited text file. First columns must contains the ensembl gene name (ie ENSG00000000003). Second column must contains expression values."
+                    \n-the file formatting is not recognized. It should be a two columns, tab delimited text file. First columns should contain the ensembl gene name id (ie ENSG00000000003) or Flybase id (FBgn0000003). Second column should contains expression values."
                 ))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
@@ -203,7 +203,7 @@ shinyServer(function(input, output, session) {
                     "Something went wrong: all genes have the same expression value (probably 0). Cannot calculate correlations.
                     \nThis is likely because:
                     \n-the wrong dataset is selected (ie you may have uploaded a mouse expression file, but the selected dataset is for human).
-                    \n-the file formating is not recognized. It should be a two columns, tab delimited text file. First columns must contains the ensembl gene name (ie ENSG00000000003). Second column must contains expression values."
+                    \n-the file formatting is not recognized. It should be a two columns, tab delimited text file. First columns should contain the ensembl gene name id (ie ENSG00000000003) or Flybase id (FBgn0000003). Second column should contains expression values."
                 ))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
@@ -350,7 +350,7 @@ shinyServer(function(input, output, session) {
             keep <- which(
                 dataset$annotation$name %in% temp_celltype_roadmap_h
             )
-        } else if (input$dataset == "GTEX summary (human)") {
+        } else if (input$dataset == "GTEx summary (human)") {
             if (is.null(input$celltype_gtex_small_h)) {
                 temp_celltype_gtex_small_h <- unique(gtex_small$annotation$name)
             } else {
@@ -359,7 +359,7 @@ shinyServer(function(input, output, session) {
             keep <- which(
                 dataset$annotation$name %in% temp_celltype_gtex_small_h
             )
-        } else if (input$dataset == "GTEX - all samples (human)") {
+        } else if (input$dataset == "GTEx - all samples (human)") {
             if (is.null(input$celltype_gtex_large_h)) {
                 temp_celltype_gtex_large_h <- unique(gtex_large$annotation$SMTSD)
             } else {
@@ -425,10 +425,10 @@ shinyServer(function(input, output, session) {
 
         myLabels <- dataset$annotation$name
         validate(
-            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please selecet more experiments.")
+            need(length(keep) >= 3, "Fewer than 3 experiments match your criteria. Please select more experiments.")
         )
         validate(
-            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please selecet less experiments.")
+            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select less experiments.")
         )
         if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]

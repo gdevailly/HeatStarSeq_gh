@@ -72,14 +72,15 @@
     <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
 </h3>
 <p>
-    The first step is to <strong>select a dataset</strong> to work with. At the moment, there are 7 datasets available: RNA-seq
+    The first step is to <strong>select a dataset</strong> to work with. At the moment, there are 9 datasets available: RNA-seq
 	from <a href="https://www.encodeproject.org/search/?type=Experiment&assay_title=RNA-seq">ENCODE</a> in human and mouse, from 
     <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a> in human and mouse, from 
 	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a> in human, from <a href="http://www.roadmapepigenomics.org/">Roadmap epigenomics</a> in human,
+	from <a href="http://gtexportal.org/home/">GTEx</a> in human (available as either a summary dataset or a complete dataset),
 	and from <a href="http://flybase.org/">FlyBase</a> in drosophilia.
 </p>
 <h3>
-    <a name="_Loading_a_expression_file"></a>2.2 Loading an expression file
+    <a name="_Loading_an_expression_file"></a>2.2 Loading an expression file
 </h3>
 <p>
 	You can now upload an expression file. Note that this is not mandatory, and you can jump to section
@@ -351,18 +352,18 @@
   <td><a href="http://egg2.wustl.edu/roadmap/data/byDataType/rna/expression/">Roadmap ftp</a></td>
  </tr>
  <tr>
-  <td>GTEX (summary)</td>
+  <td>GTEx (summary)</td>
   <td>human</td>
   <td>53</td>
   <td>2016-04-13</td>
-  <td><a href="http://gtexportal.org/home/datasets">GTEX website</a></td>
+  <td><a href="http://gtexportal.org/home/datasets">GTEx website</a></td>
  </tr>
  <tr>
-  <td>GTEX (all samples)</td>
+  <td>GTEx (all samples)</td>
   <td>human</td>
   <td>8555</td>
   <td>2016-04-13</td>
-  <td><a href="http://gtexportal.org/home/datasets">GTEX website</a></td>
+  <td><a href="http://gtexportal.org/home/datasets">GTEx website</a></td>
  </tr>
  <tr>
   <td>Flybase</td>
@@ -373,13 +374,13 @@
  </tr>
 </table></p>
 <p>
-    If you would like us to add a datasets, or to update an existing one with more recent data, please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a>
+    If you would like us to add a dataset, or to update an existing one, please <a href="mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk">contact us</a>
 	(replace at with @). A well curated dataset can be implemented / updated within a working day.
 </p>
 <p class="text-muted">
-    <strong>GTEX (summary)</strong> was build taking median gene expression values for all sample from a same tissue.
-	<strong>GTEX (all samples)</strong> contains too many samples to be displayed as an heatmap here, but subset of experiments can be displayed.
-	You can still correlate any expression file with the entire GTEX dataset in less than 5 minutes by selecting the <strong>Correlation table</strong> tab.
+    <strong>GTEx (summary)</strong> was built taking median gene expression values for all samples from the same tissue.
+	<strong>GTEx (all samples)</strong> contains too many samples to be displayed as a heatmap here, but subsets of experiments can be displayed.
+	You can still calculate the correlation of any expression file with the entire GTEx dataset in less than 5 minutes by selecting the <strong>Correlation table</strong> tab.
 </p>
 <div>
     <h1>
@@ -441,7 +442,7 @@
 	<a href="https://www.encodeproject.org/search/?type=Experiment&assay_title=RNA-seq">ENCODE</a>, 
     <a href="http://bgee.org/?page=download&action=proc_values">Bgee</a>,
 	<a href="http://www.blueprint-epigenome.eu/">BLUEPRINT</a>,
-	<a href="http://www.roadmapepigenomics.org/">Roadmap epigenomics</a> 
+	<a href="http://www.roadmapepigenomics.org/">Roadmap epigenomics</a>, <a href="http://gtexportal.org/home/">GTEx</a>,
 	and <a href="http://flybase.org/">FlyBase</a>.
 	Sources are available on <a href="https://github.com/gdevailly/HeatStarSeq_gh">GitHub</a>.
 </p>
