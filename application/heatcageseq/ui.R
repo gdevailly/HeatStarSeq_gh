@@ -80,15 +80,15 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                     checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),
                     # we adapt filtering widgets to the various datasets
                     div(id = "widgetForFantom5Human",
-                        selectInput("f5h_cells", "Subset for cell type(s) (empty to select all):",
+                        selectInput("f5h_cells", "Cell type(s) (empty to select all):",
                                     choices = unique(fantom5_human_cage$annotation$tissue)[order(unique(fantom5_human_cage$annotation$tissue))],
                                     selected = NULL, multiple = TRUE),
-                        selectInput("f5h_isCellLine", "Cell type:",
+                        selectInput("f5h_isCellLine", "Sample origin:",
                                     choices = c("all", "only cell line", "only non cell line"),
                                     selected = NULL, multiple = FALSE)
                     ),
                     div(id = "widgetForFantom5Mouse",
-                        selectInput("f5m_cells", "Subset for cell type(s) (empty to select all):",
+                        selectInput("f5m_cells", "Cell type(s) (empty to select all):",
                                     choices = unique(fantom5_mouse_cage$annotation$tissue)[order(unique(fantom5_mouse_cage$annotation$tissue))],
                                     selected = NULL, multiple = TRUE)
                     ),
@@ -102,7 +102,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                     actionButton("advClustOptions", label = "Advanced clustering options"),
                     div(id = "widgetForClustOptions",
                         selectInput("distOption", label = "Distance calculation:",
-                                    choices = list("euclidean", "1 - Pearson correlation coefficient", "maximum", "manhattan", "canberra"),
+                                    choices = list("euclidean", "1 - Pearson's correlation coefficient", "maximum", "manhattan", "canberra"),
                                     selected = 1),
                         selectInput("hclustMethod",
                                     label = "Clustering method",
@@ -116,10 +116,10 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                             sliderInput("margin", label = "Sample name margin:", value = 20, min = 1, max = 50, step = 1)
                         )                    ),
                     div(id = "div_widgetHMoptions",
-                        selectInput("showDend", "Show which dendrogram(s)?",
+                        selectInput("showDend", "Show dendrogram(s)?",
                                     choices = c("both", "row", "column", "none"),
                                     selected = "both", multiple = FALSE),
-                        selectInput("showLabels", "Show which labels?",
+                        selectInput("showLabels", "Show labels?",
                                     choices = c("both", "row", "column", "none"),
                                     selected = "both", multiple = FALSE)
                     )

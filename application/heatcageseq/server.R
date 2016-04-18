@@ -246,10 +246,10 @@ shinyServer(function(input, output, session) {
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
         validate(
-            need(length(keep) >= 3, "Fewer than 3 experiments match your criteria. Please select more experiments.")
+            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please select more experiments.")
         )
         validate(
-            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select less experiments.")
+            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select fewer experiments.")
         )
         if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]

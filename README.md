@@ -21,21 +21,21 @@ Contact: [@G_Devailly](https://twitter.com/G_Devailly) / guillaume.devailly _at_
 - [ChIP-seq data](https://github.com/gdevailly/HeatStarSeq_gh#chip-seq-data)
 
 ## About  this repository
-The `application` folder contains subfolder, each of which contains a [Shiny Application](http://shiny.rstudio.com/). The `dataset_formatting` folder contains R scripts documenting the prosess of pre-formatting datasets, and exploratory work on the application.
+The `application` folder contains subfolders, each of which contains a [Shiny Application](http://shiny.rstudio.com/). The `dataset_formatting` folder contains R scripts documenting the process of pre-formatting datasets, and experimental work on the application.
 
 ## How to use Heat\*Seq
 
 ### The public server
-Heat\*Seq is available for now [at this address](http://www.heatstarseq.roslin.ed.ac.uk/).
-**The Application is still in early development.**
+Heat\*Seq is available [at this address](http://www.heatstarseq.roslin.ed.ac.uk/).
 
 ### Running Heat\*Seq locally
-Download the Github folder (for example, from [here](https://github.com/gdevailly/HeatStarSeq_gh/archive/master.zip)). Extract the  .zip archive. You will need R (at least 3.2), and need to install several R packages from CRAN and Bioconductor (package list to come soon). Launch R, and go to one of the two following directories `application/heatrnaseq/` or `application/heatchipseq/`, using for example the `setwd()` R command. Finally, execute the following:
+Download the Github folder (for example, from [here](https://github.com/gdevailly/HeatStarSeq_gh/archive/master.zip)). Extract the .zip archive. You will need R (version 3.2 or later), and need to install several R packages from CRAN (shiny, shinyjs, plotly, magrittr, readr, svglite, cba) and Bioconductor (GenomicRanges). Two datasets are to heavy to be included in GitHub. Please download [the FANTOM5 human CAGE dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTYXhwZnptQWlyeDA/view?usp=sharing) and the [GTEx full dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTaXZPUHdVSVJ0dXc/view?usp=sharing) and place the file into the `application/heatcageseq/data/` and `application/heatrnaseq/data/` folders respectively.
+Launch R, and go to one of the three following directories `application/heatrnaseq/`, `application/heatchipseq/` or `application/heatcageseq/`, using for example the `setwd()` R command. Finally, execute the following:
 ```R
 library(shiny)
 runApp()
 ```
-Some datasets are heavy, so you may need more than 3 Gb of available memory.
+Some datasets are heavy, so you may need more than 3 Gb of free memory.
 ### Creating your Heat\*Seq server
 Heat\*Seq is a [Shiny application](http://shiny.rstudio.com/), so you will need a **Shiny server**.
 You can install the [Open source edition of Shiny server](https://github.com/rstudio/shiny-server) on any compatible web-server, or use [shinyapps.io](http://www.shinyapps.io/).
@@ -47,8 +47,8 @@ URL_HEATRNASEQ <- "http://www.chipcompare.roslin.ed.ac.uk/heatrnaseq"
 URL_HEATCHIPSEQ <- "http://www.chipcompare.roslin.ed.ac.uk/heatchipseq"
 ```
 and copy it in the `data` folder of **each** application.
-
-If you created a mirror of Heat\*Seq, I will be very pleased if you contact me so that I can advertise it.
+Several R packages are required, from CRAN (shiny, shinyjs, plotly, magrittr, readr, svglite, cba) and Bioconductor (GenomicRanges). Two datasets are to heavy to be included in GitHub. Please download [the FANTOM5 human CAGE dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTYXhwZnptQWlyeDA/view?usp=sharing) and the [GTEx full dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTaXZPUHdVSVJ0dXc/view?usp=sharing) and place the file into the `application/heatcageseq/data/` and `application/heatrnaseq/data/` folders respectively.
+If you whish to create a mirror of Heat\*Seq, please feel free to [contact me](mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk") (replace at with @).
 
 ## How to add new datasets
 
@@ -57,13 +57,13 @@ If you created a mirror of Heat\*Seq, I will be very pleased if you contact me s
 **1) Formatting the dataset**
 
 One needs to create an R list object, hereafter named `newDataset`, which contains the following elements (the element name matters, not the order of them in the list):
-- `newDataset$dataMatrix`, a numeric matrix of one row per [GENCODE gene](http://www.gencodegenes.org/) and one column per sample. Each value should be a measure of gene expression (usually FPKM or TPM) for that gene in that sample. I would strongly advise to remove genes with no expression in the dataset `which(rowSums(newDataset$dataMatrix) != 0)`, to not name the rows and columns, and to replace all NAs by 0s.
+- `newDataset$dataMatrix`, a numeric matrix of one row per [GENCODE gene](http://www.gencodegenes.org/) and one column per sample. Each value should be a measure of gene expression (usually FPKM or TPM) for that gene in that sample. I would strongly advise to remove genes with no expression in the dataset `which(rowSums(newDataset$dataMatrix) != 0)` and to replace all NAs by 0s. Please do not name the rows and columns,
 - `newDataset$geneName`, a character vector of as many elements as there are in the rows of dataMatrix, containing the [GENCODE gene](http://www.gencodegenes.org/) name of each gene, in the same order as in the dataMatrix. Use GENCODE name without the number of transcripts (ENSG00000134046 and not ENSG00000134046.5).
 - `newDataset$correlationMatrix`, the output of `cor(newDataset$dataMatrix)`:
 ```R
 newDataset$correlationMatrix <- cor(newDataset$dataMatrix)
 ```
-- `newDataset$annotation`, a data.frame (with string as character, not factor) of one line per experiment in the dataset. The number of lines of the annotation table must be equal to the number of columns of the dataMatrix, and be in the same order. The annotation table MUST contain a `name` column containing UNIQUE character strings describing the experiment. It is strongly advised to add a `url` column storing a link to the original experiment, and to add one or more columns for subsetting the dataset, such as a cell type column or a library type column. Please, nullify the rownames of the annotation table before saving the object:
+- `newDataset$annotation`, a data.frame (with string as character, not factor) of one line per experiment in the dataset. The number of lines of the annotation table must be equal to the number of columns of the dataMatrix, and be in the same order. The annotation table MUST contain a `name` column containing UNIQUE character strings describing the experiment. It is strongly advised to add a `url` column storing a link to the original experiment, and to add one or more columns for subsetting the dataset, such as a cell type column or a library type column. Please, nullify the row names of the annotation table before saving the object:
 ```R
 row.names(newDataset$annotation) <- NULL
 ```
@@ -74,7 +74,7 @@ save(newDataset, file = "heatrnaseq/data/newDataset.RData")
 
 **2) Generating a newDataset_preload.RData**
 
-Depending on the number of experiments, those datasets can be quite heavy, so we will load only one at a time on the shiny server. However, each dataset needs to be preloaded. One can generate a `newDataset_preload.RData` by doing the following:
+Datasets can be quite heavy, so we will load only one at a time on the shiny server. However, each dataset needs to be preloaded. One can generate a `newDataset_preload.RData` by doing the following:
 ```R
 load("heatrnaseq/data/newDataset.RData")
 nullifyDataForFasterPreloading <- function(myList) {
@@ -116,7 +116,7 @@ We will now setup the subsetting widget for the new dataset. Subsetting is done 
                                     selected = NULL, multiple = TRUE)
                     ),
 ```
-Here we only add one subsetting field, but one can include as many as she/he wants. Look for `div(id = "widgetForBgeeHuman",` to see how to include multiple filtering fields.
+Here we have detailed how to add one subsetting field, but one can include as many as she/he wants. Look for `div(id = "widgetForBgeeHuman",` to see how to include multiple filtering fields.
 - In the [server.R](application/heatrnaseq/server.R), modify the second `observe({` function so that the filtering widget is displayed only when this dataset was selected:
 ```R
 observe({
@@ -193,7 +193,7 @@ After debugging for typos, missing commas, parenthesis and brackets, it should w
 **1) Formatting the dataset**
 
 One needs to create an R list object, hereafter named `newDataset`, which contains the following elements (the element name matters, not the order of them in the list):
-- `newDataset$dataMatrix`, a boolean matrix of one row per genomic regions (they should be no overlapping region, please merge the overlapping regions) and one column per sample. A cell with `TRUE` means that that experiment (column) had a peak overlapping with that region (row). I would strongly advise to remove regions with no peaks in the dataset `which(!any(newDataset$dataMatrix))`, to not name the rows and columns, and to replace all NAs by `FALSE`.
+- `newDataset$dataMatrix`, a boolean matrix of one row per genomic regions (there should be no overlapping region, please merge the overlapping regions) and one column per sample. A cell with `TRUE` means that that experiment (column) had a peak overlapping with that region (row). I would strongly advise to remove regions with no peaks in the dataset `which(!any(newDataset$dataMatrix))`, to not name the rows and columns, and to replace all NAs by `FALSE`.
 - `newDataset$regionMetaData`, a [GRanges](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html) object of as many ranges as there are rows in dataMatrix, containing the genomic coordinates of the dataMatrix, in the same order as in the dataMatrix. Use `chr1`, `chr2`, ..., `chrX`, as seqnames. One can build such an object from a bed table loaded as an R data.frame:
 ```R
 newDataset$regionMetaData <- with(bed_as_dataFrane, GRanges(chr, IRanges(start, end)))
@@ -213,7 +213,7 @@ save(newDataset, file = "heatchipseq/data/newDataset.RData")
 
 **2) Generating a newDataset_preload.RData**
 
-Depending on the number of experiments, those datasets can be quite heavy, so we will load only one at a time on the shiny server. However, each dataset needs to be preloaded. One can generate a `newDataset_preload.RData` by doing the following:
+Datasets can be quite heavy, so we will load only one at a time on the shiny server. However, each dataset needs to be preloaded. One can generate a `newDataset_preload.RData` by doing the following:
 ```R
 load("heatchipseq/data/newDataset.RData")
 nullifyDataForFasterPreloading <- function(myList) {
@@ -256,7 +256,7 @@ We will now setup the subsetting widget for the new dataset. Subsetting is done 
                                     selected = NULL, multiple = TRUE)
                     ),
 ```
-Here we only add two subsetting fields, but one can include as many as she/he wants. Look for `div(id = "widgetForCodexHuman",` to see more complex filtering fields.
+Here we demonstrate how to add two subsetting fields, but one can include as many as needed. Look for `div(id = "widgetForCodexHuman",` to see more complex filtering fields.
 - In the [server.R](application/heatchipseq/server.R), modify the second `observe({` function so that the filtering widget is displayed only when this dataset was selected:
 ```R
 observe({

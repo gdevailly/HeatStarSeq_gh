@@ -129,8 +129,7 @@ shinyServer(function(input, output, session) {
                 dataset <- getSelectedDataset()
                 validate(need(
                     input$selectedDataset %in% c("ENCODE TFBS ChIP-seq (human, hg19)", "CODEX ChIP-seq (human, hg19)"),
-                    "Something is wrong, sorry. :(
-                    \nThe example file is a human ChIP-seq experiment. You should choose a human dataset, I am sure it will work better."
+                    "The example file is a  human ChIP-seq experiment. Please choose a human dataset or unload the example."
                 ))
                 # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what it is uploading...
                 # Which encode region overlaps?
@@ -334,10 +333,10 @@ shinyServer(function(input, output, session) {
 
         myLabels <- dataset$annotation$name # annotation must have a name column, with _unique_ elements
         validate(
-            need(length(keep) >= 3, "Fewer than 3 experiments match your criteria. Please select more experiments.")
+            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please select more experiments.")
         )
         validate(
-            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select less experiments.")
+            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select fewer experiments.")
         )
         if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]

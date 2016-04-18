@@ -169,8 +169,7 @@ shinyServer(function(input, output, session) {
                 userExpressionFile[is.na(userExpressionFile)] <- 0
                 validate(need(
                     length(unique(userExpressionFile)) > 1,
-                    "Something is wrong, sorry. :(
-                    \nThe example file is a mouse RNA-seq experiment. You should choose a mouse dataset, I am sure it will work better."
+                    "The example file is a mouse RNA-seq experiment. Please choose a mouse dataset or unload the example."
                 ))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
@@ -205,10 +204,12 @@ shinyServer(function(input, output, session) {
                 userExpressionFile[is.na(userExpressionFile)] <- 0
                 validate(need(
                     length(unique(userExpressionFile)) > 1,
-                    "Something went wrong: all genes have the same expression value (probably 0). Cannot calculate correlations.
+                    "Something went wrong, sorry. :(
+                    \nUnable to compute correlations.
                     \nThis is likely because:
                     \n-the wrong dataset is selected (ie you may have uploaded a mouse expression file, but the selected dataset is for human).
-                    \n-the file formatting is not recognized. It should be a two columns, tab delimited text file. First columns should contain the ensembl gene name id (ie ENSG00000000003) or Flybase id (FBgn0000003). Second column should contains expression values."
+                    \n-the file formatting is not recognized. It should be a two columns, tab delimited text file. First columns should contain the ensembl gene name id (ie ENSG00000000003) or Flybase id (FBgn0000003). Second column should contains expression values.
+                    \nPlease contact us if you think you have found a bug."
                 ))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
@@ -430,10 +431,10 @@ shinyServer(function(input, output, session) {
 
         myLabels <- dataset$annotation$name
         validate(
-            need(length(keep) >= 3, "Fewer than 3 experiments match your criteria. Please select more experiments.")
+            need(length(keep) >= 3, "Less than 3 experiments match your criteria. Please select more experiments.")
         )
         validate(
-            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select less experiments.")
+            need(length(keep) <= 1100, "More than 1100 experiments match your criteria. Please select fewer experiments.")
         )
         if(length(keep) >= 3) {
             workingMatrix <- workingMatrix[keep, keep]

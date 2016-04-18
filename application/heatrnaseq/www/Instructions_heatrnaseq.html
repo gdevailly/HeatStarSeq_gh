@@ -93,7 +93,7 @@
     modify the label of your experiment.
 </p>
 <p class="text-muted">
-    HeatRNAseq computes Pearson correlation coefficient between experiments, so the unit of gene expression measure has little effect
+    HeatRNAseq computes Pearson's correlation coefficient between experiments, so the unit of gene expression measure has little effect
 	(any linear transformation of gene expression values will return the same correlation coefficient) as far as it takes into account the impact of gene-length.
 </p>
 <p class="text-muted">
@@ -204,7 +204,7 @@
 		The <strong>Advanced clustering options</strong> button will reveal the <strong>Distance calculation</strong> and <strong>Clustering method</strong> options.
 		The selected values are passed to the R <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/dist.html">dist()</a>
 		and <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/hclust.html">hclust()</a> method parameter. A special case is the
-        <strong>1 - Pearson correlation coefficient</strong> distance method: instead of using the dist() function on correlation values, it uses 1 - correlations as a measure of
+        <strong>1 - Pearson's correlation coefficient</strong> distance method: instead of using the dist() function on correlation values, it uses 1 - correlations as a measure of
         distance between experiments (a correlation of 0.75 will give a distance of 0.25).
     </li>
     <li>
@@ -378,9 +378,9 @@
 	(replace at with @). A well curated dataset can be implemented / updated within a working day.
 </p>
 <p class="text-muted">
-    <strong>GTEx (summary)</strong> was built taking median gene expression values for all samples from the same tissue.
-	<strong>GTEx (all samples)</strong> contains too many samples to be displayed as a heatmap here, but subsets of experiments can be displayed.
-	You can still calculate the correlation of any expression file with the entire GTEx dataset in less than 5 minutes by selecting the <strong>Correlation table</strong> tab.
+    <strong>GTEx (summary)</strong> data contains median gene expression values for all samples from the same tissue.
+	<strong>GTEx (all samples)</strong> data contains over 8000 samples, too many samples to be displayed as a single heatmap, but subsets of experiments can be displayed.
+	One can still calculate the correlation of any expression file with the entire GTEx dataset in less than 5 minutes by selecting the <strong>Correlation table</strong> tab.
 </p>
 <div>
     <h1>
