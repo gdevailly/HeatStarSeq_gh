@@ -165,12 +165,12 @@ shinyServer(function(input, output, session) {
                 userExpressionFile_temp_v <- userExpressionFile_temp$exp_value
                 names(userExpressionFile_temp_v) <- userExpressionFile_temp$ensembl_id
                 dataset <- getSelectedDataset()
-                userExpressionFile <- userExpressionFile_temp_v[dataset$geneName]
-                userExpressionFile[is.na(userExpressionFile)] <- 0
                 validate(need(
-                    length(unique(userExpressionFile)) > 1,
+                    input$dataset %in% c("Bgee RNA-seq (mouse)", "ENCODE RNA-seq (mouse)"),
                     "The example file is a mouse RNA-seq experiment. Please choose a mouse dataset or unload the example."
                 ))
+                userExpressionFile <- userExpressionFile_temp_v[dataset$geneName]
+                userExpressionFile[is.na(userExpressionFile)] <- 0
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
                 userCorrelations <- cor(userExpressionFile, dataset$dataMatrix) %>% as.vector

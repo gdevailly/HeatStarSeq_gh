@@ -10,11 +10,10 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                     selectInput("selectedDataset", label = NULL, choices = c(
                         "FANTOM5 (human, hg19)",
                         "FANTOM5 (mouse, mm9)"
-                    )),
+                    ), selected = "FANTOM5 (mouse, mm9)"),
                     h3("2 - Load your data  (optional)"),
                     actionButton("fileFormatInstructions", label = "File formating instructions"),
                     div(id = "div_fileFormatInstructions",
-
                         p("Upload a 6 column bed file, with the score column scoring CAGE expression.
                           Maximum size: 10MB. Please, use the same reference genome version than the selected dataset."),
                         HTML("<p>
@@ -69,12 +68,17 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                              <td>-</td>
                              </tr>
                              </table>
-                             </p>")
+                             </p>"),
+                        p("You can download ",
+                          downloadLink("downloadExempleFile", label = " an example file"),
+                          ". It is a mouse CAGE experiment from the liver (mm9), without a header.")
                     ),
-                    radioButtons("fileToUse", label = NULL, choices = c("Upload your result file")),
-                    div(id = "div_fileupload", fileInput("cageFile", strong("Upload your bed file:"), accept = "text/tab-separated-values")),
-                    div(id = "div_exampleInUse", "Sorry, no example file yet. It will come soon."),
-                    checkboxInput("header", "My file contains a header.", TRUE),
+                    radioButtons("fileToUse", label = NULL, choices = c("Upload your result file", "Use the example file")),
+                    div(id = "div_fileupload",
+                        fileInput("cageFile", strong("Upload your bed file:"), accept = "text/tab-separated-values"),
+                        checkboxInput("header", "My file contains a header.", TRUE)
+                    ),
+                    div(id = "div_exampleInUse", "The example file is a mouse CAGE experiment from the liver. Please select only the mouse dataset."),
                     textInput("nameOfCageFile", "Name of your experiment", value="my CAGE experiment"),
                     h3("3 - Plot customization"),
                     checkboxInput("highlight", strong("Highlight my experiment in the heatmap"), TRUE),

@@ -94,6 +94,13 @@ shinyServer(function(input, output, session) {
             }
             setProgress(value = 1, detail = "done!")
         })
+        isolate(
+            if (input$fileToUse == "Use the example file") {
+                if (!input$selectedDataset %in% c("FANTOM5 (mouse, mm9)")) {
+                    updateRadioButtons(session = session, "fileToUse", label = NULL, choices = NULL, selected = "Upload your result file")
+                }
+            }
+        )
         return(dataset)
     })
 
@@ -101,17 +108,21 @@ shinyServer(function(input, output, session) {
 
         if (input$fileToUse == "Use the example file") {
             withProgress(value = 1, message = "Usercage file: ", detail = "reading file", {
-                userCageFile <- read_tsv("userCageFileName$datapath", col_names = input$header)[, 1:6]
+                userCageFile <- read_tsv("www/Expression.mm9.HCC.49096peaks_column1.bed", col_names = FALSE)[, 1:6]
                 setProgress(value = 1, detail = "intersecting CAGE regions")
                 colnames(userCageFile) <- c("chr", "start", "end", "name", "score", "strand")
                 userCageFileGR <- with(userCageFile, GRanges(chr, IRanges(start, end), strand = strand, score = score))
                 dataset <- getSelectedDataset()
+                validate(need(
+                    input$selectedDataset %in% c("FANTOM5 (mouse, mm9)"),
+                    "The example file is a mouse RNA-seq experiment. Please choose a mouse dataset or unload the example."
+                ))
                 # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what he/her is uploading...
                 # Which region overlaps?
                 # we ignore peaks presents only in user peak lists.
                 suppressWarnings(userOverlap <- findOverlaps(dataset$regionMetaData, userCageFileGR, select = "arbitrary"))
                 userCuratedValues <- numeric(nrow(dataset$dataMatrix))
-                userCuratedValues[!is.na(userOverlap)] <- userCageFile[userOverlap[!is.na(userOverlap)], "score"]
+                userCuratedValues[!is.na(userOverlap)] <- as.data.frame(userCageFile)[userOverlap[!is.na(userOverlap)], "score"]
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
                 userCorrelations <- cor(userCuratedValues,
@@ -142,7 +153,7 @@ shinyServer(function(input, output, session) {
                 # we ignore peaks presents only in user peak lists.
                 suppressWarnings(userOverlap <- findOverlaps(dataset$regionMetaData, userCageFileGR, select = "arbitrary"))
                 userCuratedValues <- numeric(nrow(dataset$dataMatrix))
-                userCuratedValues[!is.na(userOverlap)] <- userCageFile[userOverlap[!is.na(userOverlap)], "score"]
+                userCuratedValues[!is.na(userOverlap)] <- as.data.frame(userCageFile)[userOverlap[!is.na(userOverlap)], "score"]
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
                 userCorrelations <- cor(userCuratedValues,
@@ -493,10 +504,10 @@ shinyServer(function(input, output, session) {
                                                    },
                                                    contentType = "text/tsv")
 
-    # output$downloadExempleFile <- downloadHandler("chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed",
-    #                                               content = function(file) {
-    #                                                   file.copy("www/chipseq_human_hg19_GSM1890761_ERa_peaks_no_header.bed", file)
-    #                                               },
-    #                                               contentType = "text/tsv")
+    output$downloadExempleFile <- downloadHandler("Expression.mm9.HCC.49096peaks_column1.bed",
+                                                  content = function(file) {
+                                                      file.copy("www/Expression.mm9.HCC.49096peaks_column1.bed", file)
+                                                  },
+                                                  contentType = "text/tsv")
 
 })
