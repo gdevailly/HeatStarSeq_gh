@@ -361,7 +361,7 @@ shinyServer(function(input, output, session) {
             myData <- subsetMatrix()
             myMat <- myData$mat
             colnames(myMat) <- rownames(myMat) <- myData$myLabels
-            if (input$distOption == "1 - Pearson correlation coefficient") {
+            if (input$distOption == "1 - Pearson's correlation coefficient") {
                 d <- as.dist(1 - myMat)
             } else {
                 d <- dist(myMat, method = input$distOption)
