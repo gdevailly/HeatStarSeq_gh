@@ -3,7 +3,7 @@
 # files: 57epigenomes.RPKM.nc.gz  57epigenomes.RPKM.pc.gz  57epigenomes.RPKM.rb.gz  EG.name.txt  Ensembl_v65.Gencode_v10.ENSG.gene_info
 # downloaded from: http://egg2.wustl.edu/roadmap/data/byDataType/rna/expression/
 ###
-setwd("/mnt/ris-fas1a/linux_groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/data/roadmap")
+setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/data/roadmap")
 library(dplyr)
 library(readr)
 
@@ -18,7 +18,7 @@ lapply(roadmap, dim)
 lapply(roadmap, head)
 
 roadmap$all <- do.call(rbind, roadmap)
-roadmap$pc_nc <- rbind(roadmap$pc, roadmap$pcnc)
+roadmap$pc_nc <- rbind(roadmap$pc, roadmap$nc)
 
 roadmap$all_mat <- roadmap$all[, -1] %>% as.matrix
 roadmap$pc_nc_mat <-  roadmap$pc_nc[, -1] %>% as.matrix
