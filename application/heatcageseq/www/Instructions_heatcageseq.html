@@ -229,11 +229,15 @@
         <strong>1 - Pearson's correlation coefficient</strong> distance method: instead of using the dist() function on correlation values, it uses 1 - correlations as a measure of
         distance between experiments (a correlation of 0.75 will give a distance of 0.25).
     </li>
-    <li>
-        The <strong>Sample name size</strong> slider will modify label size.
+	<li>
+       Label and margin size can be decided manually: The <strong>Sample name size</strong> slider will modify label size.
+	   The <strong>Sample name margin</strong> will modify the size of the margin of the plot.
+	   Two scrolling menus will allow to show and hide row and/or column dendrograms and sample labels.
     </li>
     <li>
-        The <strong>Sample name margin</strong> will modify the size of the margin of the plot.
+		The <strong>Customise colour</strong> button will revealed items allowing to change the colour key used for the heatmap.
+		Four threshold values and associated colours can be specified (by default, -0.5 is blue, 0 is white, 0.5 is red, and 1 is black).
+		Values need to be strictly increasing. To apply changes, click the <strong>Apply colour changes</strong> button.
     </li>
 </ul>
 <p class="text-muted">
@@ -241,7 +245,8 @@
 </p>
 <p>
     Buttons <strong>Save as png</strong>, <strong>Save as pdf</strong> and <strong>Save as svg</strong> can be found below the heatmap to export the
-    image in those formats. Button <strong>Export data as tab delimited .txt</strong> exports the heatmap data as a text file.
+    image in those formats. Button <strong>Export data as tab delimited .txt</strong> exports the heatmap data as a text file.  To download the colour key,
+	right click on it and select <strong>Save Image As...</strong>
 </p>
 <h3>
     <a name="_Responsive_heatmap"></a>2.5 Responsive heatmap

@@ -28,6 +28,11 @@ shinyServer(function(input, output, session) {
     })
 
     observe({
+        junkVar <- input$coloursOptions
+        shinyjs::toggle("div_colourOptions")
+    })
+
+    observe({
         if(input$correlationCorrection == "Linear scaling") {
             shinyjs::show("div_maxCorrelation")
         } else {
@@ -76,6 +81,14 @@ shinyServer(function(input, output, session) {
         } else {
             shinyjs::show("widgetForLabelsManual")
         }
+    })
+
+    observe({
+        # range of colour slider should be precisely defined to keep ordering:
+        updateSliderInput(session, "col_val1", max = min(max(input$col_val2 - 0.05, -0.95), 0.7))
+        updateSliderInput(session, "col_val2", min = max(input$col_val1 + 0.05, -0.9), max = min(input$col_val3 - 0.05, 0.8))
+        updateSliderInput(session, "col_val3", min = max(input$col_val2 + 0.05, -0.8), max = min(input$col_val4 - 0.05, 0.9))
+        updateSliderInput(session, "col_val4", min = max(input$col_val3 + 0.05, -0.7))
     })
 
     # output computations
@@ -309,6 +322,15 @@ shinyServer(function(input, output, session) {
         return(matAA)
     })
 
+    getColourPalette <- reactive({
+        junkVar <- input$applyColoursOptions
+        isolate({
+            myCols <- c(input$col_col1, input$col_col2, input$col_col3, input$col_col4)
+            myBreaks <- c(input$col_val1, input$col_val2, input$col_val3, input$col_val4)
+        })
+        return(list("myCols" = myCols, "myBreaks" = myBreaks))
+    })
+
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -351,6 +373,8 @@ shinyServer(function(input, output, session) {
             labCol <-  if (input$showLabels %in% c("both", "column")) matData$myLabels[clusterDat$order] else NA
         }
 
+        myPalette <- getColourPalette()
+
         heatmap(matData$mat,
                 Rowv = clusterDat$dend,
                 Colv = "Rowv",
@@ -360,8 +384,13 @@ shinyServer(function(input, output, session) {
                 margins = if(input$labelOption == "Automatic") rep(newMargin, 2) else  rep(input$margin, 2),
                 cexRow = if(input$labelOption == "Automatic") newLabSize else input$labCex,
                 cexCol = if(input$labelOption == "Automatic") newLabSize else input$labCex,
-                breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
-                col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255),
+                breaks = unique(c(
+                    seq(myPalette$myBreaks[1], myPalette$myBreaks[2], length.out = 40),
+                    seq(myPalette$myBreaks[2], myPalette$myBreaks[3], length.out = 41),
+                    seq(myPalette$myBreaks[3], myPalette$myBreaks[4], length.out = 41),
+                    seq(myPalette$myBreaks[4], 3, length.out = 161)
+                )),
+                col = colorRampPalette(c(myPalette$myCols, "blue", "yellow", "green", "black"))(279),
                 useRaster = TRUE
         )
     }
@@ -402,27 +431,53 @@ shinyServer(function(input, output, session) {
 
     output$myHeatmap <- renderPlot(myRenderPlot())
 
+    renderColourKey <- function() {
+        myPalette <- getColourPalette()
+        breaks <- unique(c(
+            seq(myPalette$myBreaks[1], myPalette$myBreaks[2], length.out = 40),
+            seq(myPalette$myBreaks[2], myPalette$myBreaks[3], length.out = 41),
+            seq(myPalette$myBreaks[3], myPalette$myBreaks[4], length.out = 41)
+        ))
+        col <- colorRampPalette(myPalette$myCols)(119)
+        oldPar <- list(mar = par()$mar, cex = par()$cex, mgp = par()$mgp)
+        par(mar = c(1.5, 0.8, 1.5, 0.8), cex = 1.4, mgp = c(3, 0.4, 0))
+        image(matrix(breaks), col = col, axes = FALSE)
+        axis(1, at = c(0, 1/3, 2/3, 1), labels = myPalette$myBreaks)
+        title(main = "Correlation coefficient", line = 0.2)
+        box()
+        par(oldPar)
+    }
+
+    output$colourKey1 <- renderPlot(renderColourKey())
+
     output$myPlotlyHeatmap <- renderPlotly({
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
+        myPalette <- getColourPalette()
+        breaksForPlotly <- (c(myPalette$myBreaks, 1.5, 2, 2.5, 3) - myPalette$myBreaks[1])/(3 - myPalette$myBreaks[1])
+        colsForPlotly <- paste0(
+            "rgb(", col2rgb(myPalette$myCols)[1,], ",",
+            col2rgb(myPalette$myCols)[2,], ",",
+            col2rgb(myPalette$myCols)[3,], ")"
+        )
         p <- plot_ly(z = matData$mat[rev(clusterDat$order), clusterDat$order],
                      x = matData$myLabels[clusterDat$order],
                      y = matData$myLabels[rev(clusterDat$order)],
                      colorscale = list(
-                                       c(0.0, "rgb(0,0,255)"),
-                                       c(0.1428571, "rgb(255,255,255)"),
-                                       c(0.2857143, "rgb(255,0,0)"),
-                                       c(0.4285714, "rgb(0,0,0)"),
-                                       c(0.5714286, "rgb(0,0,255)"),
-                                       c(0.7142857, "rgb(255,255,0)"),
-                                       c(0.8571429, "rgb(0,255,0)"),
-                                       c(1, "rgb(0,0,0)")
-                                       ),
-                     zmin = -0.5,
+                         c(breaksForPlotly[1], colsForPlotly[1]),
+                         c(breaksForPlotly[2], colsForPlotly[2]),
+                         c(breaksForPlotly[3], colsForPlotly[3]),
+                         c(breaksForPlotly[4], colsForPlotly[4]),
+                         c(breaksForPlotly[5], "rgb(0,0,255)"),
+                         c(breaksForPlotly[6], "rgb(255,255,0)"),
+                         c(breaksForPlotly[7], "rgb(0,255,0)"),
+                         c(breaksForPlotly[8], "rgb(0,0,0)")
+                     ),
+                     zmin = myPalette$myBreaks[1],
                      zmax = 3, # color trick for the highlight
                      type = "heatmap",
                      showscale = FALSE
-                     )
+        )
         # style
         layout(p,
                title = "Pairwise correlations",
@@ -460,6 +515,8 @@ shinyServer(function(input, output, session) {
         )
         par(oldPar)
     }
+
+    output$colourKey2 <- renderPlot(renderColourKey())
 
     output$downloadTreePng <- downloadHandler("dendrogram.png",
                                               content = function(file) {
