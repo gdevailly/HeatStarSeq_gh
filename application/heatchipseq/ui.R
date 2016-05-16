@@ -153,7 +153,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                     selected = "both", multiple = FALSE)
                     ),
 
-                    actionButton("coloursOptions", label = "Customise colours:"),
+                    actionButton("coloursOptions", label = "Customise colours"),
                     div(id = "div_colourOptions",
                         colourInput("col_col1", label = "Colour 1:", value = "blue"),
                         sliderInput("col_val1", label = "Value 1:", value = -0.5, min = -1, max = 1, step = 0.05),
