@@ -466,8 +466,8 @@ shinyServer(function(input, output, session) {
                     seq(myPalette$myBreaks[2], myPalette$myBreaks[3], length.out = 41),
                     seq(myPalette$myBreaks[3], myPalette$myBreaks[4], length.out = 41),
                     seq(myPalette$myBreaks[4], 3, length.out = 161)
-                )), # color trick for the highlight
-                col = colorRampPalette(c(myPalette$myCols,"blue", "yellow", "green", "black"))(279),
+                )),
+                col = colorRampPalette(c(myPalette$myCols, "blue", "yellow", "green", "black"))(279),
                 useRaster = TRUE
         )
     }

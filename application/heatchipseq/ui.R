@@ -165,6 +165,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         sliderInput("col_val4", label = "Value 1:", value = 1, min = -1, max = 1, step = 0.05),
                         actionButton("applyColoursOptions", label = "Apply colour changes")
                     )
+
                 ),
 
                 mainPanel(
@@ -172,11 +173,11 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         tabPanel("My peaks",
                                  dataTableOutput("tabUserPeaks"),
                                  downloadButton("downloadUserPeaks", label = "Save as tab delimited .txt")
-                                 ),
+                        ),
                         tabPanel("Correlation table",
                                  dataTableOutput("tabUserCorrelationTable"),
                                  downloadButton("downloadUserCorrelationTable", label = "Save as tab delimited .txt")
-                                 ),
+                        ),
                         tabPanel("Static heatmap",
                                  plotOutput("myHeatmap", width = "950px", height = "950px"),
                                  plotOutput("colourKey1", width = "250px", height = "100px"),
@@ -184,7 +185,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                  downloadButton("downloadHMpdf", label = "Save as pdf"),
                                  downloadButton("downloadHMsvg", label = "Save as svg"),
                                  downloadButton("downloadHMdata", label = "Export data as tab delimited .txt")
-                                 ),
+                        ),
                         tabPanel("Responsive heatmap",
                                  plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
                                  plotOutput("colourKey2", width = "250px", height = "100px")
@@ -198,8 +199,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         tabPanel("Samples metadata",
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
-                        )
-                        , id = "myPanels", selected = "Static heatmap"
+                        ), id = "myPanels", selected = "Static heatmap"
                     )
                 )
 

@@ -169,7 +169,21 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         selectInput("showLabels", "Show labels?",
                                     choices = c("both", "row", "column", "none"),
                                     selected = "both", multiple = FALSE)
+                    ),
+
+                    actionButton("coloursOptions", label = "Customise colours"),
+                    div(id = "div_colourOptions",
+                        colourInput("col_col1", label = "Colour 1:", value = "blue"),
+                        sliderInput("col_val1", label = "Value 1:", value = -0.5, min = -1, max = 1, step = 0.05),
+                        colourInput("col_col2", label = "Colour 2:", value = "white"),
+                        sliderInput("col_val2", label = "Value 2:", value = 0, min = -1, max = 1, step = 0.05),
+                        colourInput("col_col3", label = "Colour 1:", value = "red"),
+                        sliderInput("col_val3", label = "Value 1:", value = 0.5, min = -1, max = 1, step = 0.05),
+                        colourInput("col_col4", label = "Colour 1:", value = "black"),
+                        sliderInput("col_val4", label = "Value 1:", value = 1, min = -1, max = 1, step = 0.05),
+                        actionButton("applyColoursOptions", label = "Apply colour changes")
                     )
+
                 ),
 
                 mainPanel(
@@ -177,34 +191,33 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         tabPanel("My expression file",
                                  dataTableOutput("tabUserExpressionFile"),
                                  downloadButton("downloadUserExpressionFile", label = "Save as tab delimited .txt")
-                                 ),
+                        ),
                         tabPanel("Correlation table",
                                  dataTableOutput("tabUserCorrelationTable"),
                                  downloadButton("downloadUserCorrelationTable", label = "Save as tab delimited .txt")
-                                 ),
+                        ),
                         tabPanel("Static heatmap",
                                  plotOutput("myHeatmap", width = "950px", height = "950px"),
-                                 img(src = "legend_small.png"),
+                                 plotOutput("colourKey1", width = "250px", height = "100px"),
                                  downloadButton("downloadHMpng", label = "Save as png"),
                                  downloadButton("downloadHMpdf", label = "Save as pdf"),
                                  downloadButton("downloadHMsvg", label = "Save as svg"),
                                  downloadButton("downloadHMdata", label = "Export data as tab delimited .txt")
-                                 ),
+                        ),
                         tabPanel("Responsive heatmap",
                                  plotlyOutput("myPlotlyHeatmap", width = "1000px", height = "1000px"),
-                                 img(src = "legend_small.png")
-                                 ),
+                                 plotOutput("colourKey2", width = "250px", height = "100px")
+                        ),
                         tabPanel("Tree",
                                  plotOutput("myTree", width = "500px", height = "950px"),
                                  downloadButton("downloadTreePng", label = "Save as png"),
                                  downloadButton("downloadTreePdf", label = "Save as pdf"),
                                  downloadButton("downloadTreeSvg", label = "Save as svg")
-                                 ),
+                        ),
                         tabPanel("Samples metadata",
                                  dataTableOutput("tabSampleList"),
                                  downloadButton("downloadDatasetTable", label = "Save as tab delimited .txt")
-                                 )
-                        , id = "myPanels", selected = "Static heatmap"
+                        ), id = "myPanels", selected = "Static heatmap"
                     )
                 )
 
