@@ -388,9 +388,10 @@ shinyServer(function(input, output, session) {
                     seq(myPalette$myBreaks[1], myPalette$myBreaks[2], length.out = 40),
                     seq(myPalette$myBreaks[2], myPalette$myBreaks[3], length.out = 41),
                     seq(myPalette$myBreaks[3], myPalette$myBreaks[4], length.out = 41),
-                    seq(myPalette$myBreaks[4], 3, length.out = 161)
+                    seq(myPalette$myBreaks[4], 1.01, length.out = 2),
+                    seq(1.01, 3, length.out = 121)
                 )),
-                col = colorRampPalette(c(myPalette$myCols, "blue", "yellow", "green", "black"))(279),
+                col = c(colorRampPalette(myPalette$myCols)(119), myPalette$myCols[4], colorRampPalette(c("blue", "yellow", "green", "black"))(120)),
                 useRaster = TRUE
         )
     }
@@ -454,7 +455,7 @@ shinyServer(function(input, output, session) {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
         myPalette <- getColourPalette()
-        breaksForPlotly <- (c(myPalette$myBreaks, 1.5, 2, 2.5, 3) - myPalette$myBreaks[1])/(3 - myPalette$myBreaks[1])
+        breaksForPlotly <- (c(myPalette$myBreaks, 1.01, 1.5, 2, 2.5, 3) - myPalette$myBreaks[1])/(3 - myPalette$myBreaks[1])
         colsForPlotly <- paste0(
             "rgb(", col2rgb(myPalette$myCols)[1,], ",",
             col2rgb(myPalette$myCols)[2,], ",",
@@ -468,10 +469,11 @@ shinyServer(function(input, output, session) {
                          c(breaksForPlotly[2], colsForPlotly[2]),
                          c(breaksForPlotly[3], colsForPlotly[3]),
                          c(breaksForPlotly[4], colsForPlotly[4]),
-                         c(breaksForPlotly[5], "rgb(0,0,255)"),
-                         c(breaksForPlotly[6], "rgb(255,255,0)"),
-                         c(breaksForPlotly[7], "rgb(0,255,0)"),
-                         c(breaksForPlotly[8], "rgb(0,0,0)")
+                         c(breaksForPlotly[5], colsForPlotly[4]),
+                         c(breaksForPlotly[6], "rgb(0,0,255)"),
+                         c(breaksForPlotly[7], "rgb(255,255,0)"),
+                         c(breaksForPlotly[8], "rgb(0,255,0)"),
+                         c(breaksForPlotly[9], "rgb(0,0,0)")
                      ),
                      zmin = myPalette$myBreaks[1],
                      zmax = 3, # color trick for the highlight
