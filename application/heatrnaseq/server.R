@@ -138,10 +138,10 @@ shinyServer(function(input, output, session) {
             } else if (input$dataset == "Roadmap Epigenomics RNA-seq (human)") {
                 load("data/roadmap_rnaseq.RData")
                 dataset <- roadmap_rnaseq
-            } else if (input$dataset == "GETx summary (human)") {
+            } else if (input$dataset == "GTEx summary (human)") {
                 load("data/gtex_small.RData")
                 dataset <- gtex_small
-            } else if (input$dataset == "GETx - all samples (human)") {
+            } else if (input$dataset == "GTEx - all samples (human)") {
                 load("data/gtex_large.RData")
                 dataset <- gtex_large
             } else if (input$dataset == "ENCODE RNA-seq (mouse)") {
