@@ -77,7 +77,7 @@ If you whish to create a mirror of Heat\*Seq, please feel free to [contact me](m
 **1) Formatting the dataset**
 
 One needs to create an R list object, hereafter named `newDataset`, which contains the following elements (the element name matters, not the order of them in the list):
-- `newDataset$dataMatrix`, a numeric matrix of one row per [GENCODE gene](http://www.gencodegenes.org/) and one column per sample. Each value should be a measure of gene expression (usually FPKM or TPM) for that gene in that sample. I would strongly advise to remove genes with no expression in the dataset `which(rowSums(newDataset$dataMatrix) != 0)` and to replace all NAs by 0s. Please do not name the rows and columns,
+- `newDataset$dataMatrix`, a numeric matrix of one row per [GENCODE gene](http://www.gencodegenes.org/) and one column per sample. Each value should be a measure of gene expression (log10(FPKM+1) or log10(TPM+1), FPKM: Fragment Per Kilobase per Million, TPM: Transcript Per Million) for that gene in that sample. I would strongly advise to remove genes with no expression in the dataset `which(rowSums(newDataset$dataMatrix) != 0)` and to replace all NAs by 0s. Please do not name the rows and columns,
 - `newDataset$geneName`, a character vector of as many elements as there are in the rows of dataMatrix, containing the [GENCODE gene](http://www.gencodegenes.org/) name of each gene, in the same order as in the dataMatrix. Use GENCODE name without the number of transcripts (ENSG00000134046 and not ENSG00000134046.5).
 - `newDataset$correlationMatrix`, the output of `cor(newDataset$dataMatrix)`:
 ```R
