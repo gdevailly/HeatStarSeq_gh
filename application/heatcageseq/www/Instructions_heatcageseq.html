@@ -91,8 +91,8 @@
     modify the label of your experiment.
 </p>
 <p class="text-muted">
-    HeatCAGEseq computes Pearson's correlation coefficient between experiment score column, so the unit of expression measure has little effect
-	(any linear transformation of expression values will return the same correlation coefficient).
+    HeatRNAseq computes Pearson's correlation coefficient between experiments, after scaling them using log10(expression value + 1). Don't upload log-scaled values
+	as the application will do it itself.
 </p>
 <p class="text-muted">
     The maximum size you can upload is 10 Mb. If your bed file is larger than that, try keeping only the first six columns of it to reduce file size. If
