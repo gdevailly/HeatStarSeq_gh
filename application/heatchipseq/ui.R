@@ -159,10 +159,10 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         sliderInput("col_val1", label = "Value 1:", value = -0.5, min = -1, max = 1, step = 0.05),
                         colourInput("col_col2", label = "Colour 2:", value = "white"),
                         sliderInput("col_val2", label = "Value 2:", value = 0, min = -1, max = 1, step = 0.05),
-                        colourInput("col_col3", label = "Colour 1:", value = "red"),
-                        sliderInput("col_val3", label = "Value 1:", value = 0.5, min = -1, max = 1, step = 0.05),
-                        colourInput("col_col4", label = "Colour 1:", value = "black"),
-                        sliderInput("col_val4", label = "Value 1:", value = 1, min = -1, max = 1, step = 0.05),
+                        colourInput("col_col3", label = "Colour 3:", value = "red"),
+                        sliderInput("col_val3", label = "Value 3:", value = 0.5, min = -1, max = 1, step = 0.05),
+                        colourInput("col_col4", label = "Colour 4:", value = "black"),
+                        sliderInput("col_val4", label = "Value 4:", value = 1, min = -1, max = 1, step = 0.05),
                         actionButton("applyColoursOptions", label = "Apply colour changes")
                     )
 
