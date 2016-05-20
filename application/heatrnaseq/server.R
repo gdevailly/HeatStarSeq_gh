@@ -186,7 +186,7 @@ shinyServer(function(input, output, session) {
                 userExpressionFile[is.na(userExpressionFile)] <- 0
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
-                userCorrelations <- cor(userExpressionFile, dataset$dataMatrix) %>% as.vector
+                userCorrelations <- cor(log10(userExpressionFile + 1), dataset$dataMatrix) %>% as.vector
                 userExpressionFile <- data.frame(
                     geneName = dataset$geneName,
                     value = userExpressionFile,
@@ -226,7 +226,7 @@ shinyServer(function(input, output, session) {
                 ))
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
-                userCorrelations <- cor(userExpressionFile, dataset$dataMatrix) %>% as.vector
+                userCorrelations <- cor(log10(userExpressionFile + 1), dataset$dataMatrix) %>% as.vector
                 userExpressionFile <- data.frame(
                     geneName = dataset$geneName,
                     value = userExpressionFile,
