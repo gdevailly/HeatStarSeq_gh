@@ -66,4 +66,8 @@ flybase_rnaseq <- list(
     annotation = metadata
 )
 
+# log transform
+flybase_rnaseq$dataMatrix <- log10(flybase_rnaseq$dataMatrix + 1)
+flybase_rnaseq$correlationMatrix <- cor(flybase_rnaseq$dataMatrix)
+
 save(flybase_rnaseq, file = "../../heatrnaseq/data/flybase_rnaseq.RData")

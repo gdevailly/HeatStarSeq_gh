@@ -162,4 +162,8 @@ rownames(fantom5_mouse_cage$dataMatrix) <- NULL
 rownames(fantom5_mouse_cage$correlationMatrix) <- NULL
 rownames(fantom5_mouse_cage$annotation) <- NULL
 
+# log transfrom
+fantom5_mouse_cage$dataMatrix <- log10(fantom5_mouse_cage$dataMatrix + 1)
+fantom5_mouse_cage$correlationMatrix <- cor(fantom5_mouse_cage$dataMatrix)
+
 save(fantom5_mouse_cage, file = "../../heatcageseq/data/fantom5_mouse_cage.RData")

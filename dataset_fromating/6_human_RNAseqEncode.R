@@ -131,7 +131,6 @@ metadata <- data.frame(
     stringsAsFactors = FALSE
 )
 
-
 encode_rnaseq <- list(
     "dataMatrix" = fpkmMatrix,
     "geneName" = geneName,
@@ -142,5 +141,69 @@ encode_rnaseq <- list(
 lapply(encode_rnaseq, dim)
 length(geneName)
 
+# log scale
+encode_rnaseq$dataMatrix <- log10(encode_rnaseq$dataMatrix + 1)
+encode_rnaseq$correlationMatrix <- cor(encode_rnaseq$dataMatrix)
+
 setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap")
 save(encode_rnaseq, file = "heatrnaseq/data/encode_rnaseq.RData")
+
+# spearman of FPKM
+encode_rnaseq_spearman <- encode_rnaseq
+t0 <- Sys.time()
+encode_rnaseq_spearman$correlationMatrix <- cor(encode_rnaseq_spearman$dataMatrix, method = "spearman")
+Sys.time() - t0 # 7 sec
+save(encode_rnaseq_spearman, file = "application3/data/encode_rnaseq_spearman.RData")
+
+# log10(FPKM) + 1
+encode_rnaseq_log10 <- encode_rnaseq
+t0 <- Sys.time()
+encode_rnaseq_log10$dataMatrix <- log10(encode_rnaseq$dataMatrix + 1)
+encode_rnaseq_log10$correlationMatrix <- cor(encode_rnaseq_log10$dataMatrix)
+Sys.time() - t0 #
+save(encode_rnaseq_log10, file = "application3/data/encode_rnaseq_log10.RData")
+
+# asinh
+encode_rnaseq_asinh <- encode_rnaseq
+t0 <- Sys.time()
+encode_rnaseq_asinh$dataMatrix <- asinh(encode_rnaseq$dataMatrix)
+encode_rnaseq_asinh$correlationMatrix <- cor(encode_rnaseq_asinh$dataMatrix)
+Sys.time() - t0 #
+save(encode_rnaseq_asinh, file = "application3/data/encode_rnaseq_asinh.RData")
+
+# invnorm
+encode_rnaseq_invnorm <- encode_rnaseq
+t0 <- Sys.time()
+encode_rnaseq_invnorm$dataMatrix <- 1/(encode_rnaseq$dataMatrix + 1)
+encode_rnaseq_invnorm$correlationMatrix <- cor(encode_rnaseq_invnorm$dataMatrix)
+Sys.time() - t0 #
+save(encode_rnaseq_invnorm, file = "application3/data/encode_rnaseq_invnorm.RData")
+
+# bimodal:
+encode_rnaseq_bimodal <- encode_rnaseq
+library(mixtools)
+
+testDat <- encode_rnaseq$dataMatrix[, 1][which(encode_rnaseq$dataMatrix[, 1]!=0)]
+
+testDat <- encode_rnaseq$dataMatrix[, 1]
+plot(density(testDat))
+mixmdl <- normalmixEM(testDat, k=2)
+plot(mixmdl,which=2)
+lines(density(testDat), lty=2, lwd=2)
+
+
+
+t0 <- Sys.time()
+encode_rnaseq_bimodal$dataMatrix <- apply(encode_rnaseq$dataMatrix, 2, function(x) {
+    v0 <- x
+    v1 <- v0[which(v1 == 0)] <- NA
+    mxmdl <- normalmixEM(v1, k = 2)
+
+})
+encode_rnaseq_bimodal$correlationMatrix <- cor(encode_rnaseq_bimodal$dataMatrix)
+Sys.time() - t0 #
+save(encode_rnaseq_bimodal, file = "application3/data/encode_rnaseq_bimodal.RData")
+
+
+
+

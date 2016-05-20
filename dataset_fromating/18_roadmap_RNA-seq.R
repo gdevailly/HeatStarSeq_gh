@@ -28,19 +28,19 @@ roadmap$cor_all <- cor(roadmap$all_mat)
 roadmap$cor_pc_nc <- cor(roadmap$pc_nc_mat)
 Sys.time() - t0 # 0.5 sec
 
-pdf(file = "heatmaps_roadmap.pdf")
-heatmap(roadmap$cor_all,
-        scale = "none",
-        breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
-        col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255)
-)
-heatmap(roadmap$cor_pc_nc,
-        scale = "none",
-        breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
-        col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255)
-)
-dev.off()
-system("firefox heatmaps_roadmap.pdf &")
+# pdf(file = "heatmaps_roadmap.pdf")
+# heatmap(roadmap$cor_all,
+#         scale = "none",
+#         breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
+#         col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255)
+# )
+# heatmap(roadmap$cor_pc_nc,
+#         scale = "none",
+#         breaks = seq(-0.5, 3, length.out = 256), # color trick for the highlight
+#         col = colorRampPalette(c("blue", "white", "red", "black", "blue", "yellow", "green", "black"))(255)
+# )
+# dev.off()
+# system("firefox heatmaps_roadmap.pdf &")
 
 geneName <- c(roadmap$pc$gene_id, roadmap$nc$gene_id, roadmap$rb$gene_id)
 metadata <- read_tsv("EG.name.txt", col_names = FALSE)
@@ -63,6 +63,10 @@ colnames(roadmap_rna$correlationMatrix) <- NULL
 rownames(roadmap_rna$annotation) <- NULL
 roadmap_rnaseq <- roadmap_rna
 roadmap_rnaseq$annotation <- roadmap_rnaseq$annotation[-nrow(roadmap_rnaseq$annotation),]
+
+# log transformed
+roadmap_rnaseq$dataMatrix <- log10(roadmap_rnaseq$dataMatrix + 1)
+roadmap_rnaseq$correlationMatrix <- cor(roadmap_rnaseq$dataMatrix)
 
 save(roadmap_rnaseq, file ="../../heatrnaseq/data/roadmap_rnaseq.RData")
 

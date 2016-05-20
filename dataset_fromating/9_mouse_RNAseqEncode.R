@@ -150,6 +150,10 @@ colnames(encode_mouse_rnaseq$annotation) <- c("encodeAccession", "tissue", "name
 
 object.size(encode_mouse_rnaseq) # 58 Mo
 
+# log transform
+encode_mouse_rnaseq$dataMatrix <- log10(encode_mouse_rnaseq$dataMatrix + 1)
+encode_mouse_rnaseq$correlationMatrix <- cor(encode_mouse_rnaseq$dataMatrix)
+
 setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap")
 save(encode_mouse_rnaseq, file = "heatrnaseq/data/encode_mouse_rnaseq.RData")
 

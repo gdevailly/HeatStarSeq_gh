@@ -64,5 +64,9 @@ gtex_small <- list(
 
 gtex_small$annotation$name <- as.character(gtex_small$annotation$name)
 
+# log transform
+gtex_small$dataMatrix <- log10(gtex_small$dataMatrix + 1)
+gtex_small$correlationMatrix <- cor(gtex_small$dataMatrix)
+
 save(gtex_small, file = "../../heatrnaseq/data/gtex_small.RData")
 

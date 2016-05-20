@@ -116,6 +116,10 @@ blueprint_rnaseq <- list(
 
 blueprint_rnaseq$annotation$name <- paste(blueprint_rnaseq$annotation$name, blueprint_rnaseq$annotation$level3)
 colnames(blueprint_rnaseq$annotation) <- c("name", "sampleSource", "cellType", "url")
+# log transform
+blueprint_rnaseq$dataMatrix <- log10(blueprint_rnaseq$dataMatrix + 1)
+blueprint_rnaseq$correlationMatrix <- cor(blueprint_rnaseq$dataMatrix)
+
 save(blueprint_rnaseq, file = "../../heatrnaseq/data/blueprint_rnaseq.RData")
 
 

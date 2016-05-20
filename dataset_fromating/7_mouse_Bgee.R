@@ -70,5 +70,55 @@ colnames(bgee_mouse$annotation) <-  c("geoAccession", "tissue", "name", "stage",
 
 object.size(bgee_mouse) # 36Mo
 
+# log transform
+# log10(FPKM) + 1
+t0 <- Sys.time()
+bgee_mouse$dataMatrix <- log10(bgee_mouse$dataMatrix + 1)
+bgee_mouse$correlationMatrix <- cor(bgee_mouse$dataMatrix)
+Sys.time() - t0 #
+
 save(bgee_mouse, file = "/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/heatrnaseq/data/bgee_mouse.RData")
+
+# various old tests
+save(bgee_mouse, file = "/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/application4/data/bgee_mouse.RData")
+setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/")
+
+# spearman of FPKM
+bgee_mouse_spearman <- bgee_mouse
+t0 <- Sys.time()
+bgee_mouse_spearman$correlationMatrix <- cor(bgee_mouse_spearman$dataMatrix, method = "spearman")
+Sys.time() - t0 # 1 sec
+save(bgee_mouse_spearman, file = "application4/data/bgee_mouse_spearman.RData")
+
+# log10(FPKM) + 1
+bgee_mouse_log10 <- bgee_mouse
+t0 <- Sys.time()
+bgee_mouse_log10$dataMatrix <- log10(bgee_mouse$dataMatrix + 1)
+bgee_mouse_log10$correlationMatrix <- cor(bgee_mouse_log10$dataMatrix)
+Sys.time() - t0 #
+save(bgee_mouse_log10, file = "application4/data/bgee_mouse_log10.RData")
+
+# asinh
+bgee_mouse_asinh <- bgee_mouse
+t0 <- Sys.time()
+bgee_mouse_asinh$dataMatrix <- asinh(bgee_mouse$dataMatrix)
+bgee_mouse_asinh$correlationMatrix <- cor(bgee_mouse_asinh$dataMatrix)
+Sys.time() - t0 #
+save(bgee_mouse_asinh, file = "application4/data/bgee_mouse_asinh.RData")
+
+# invnorm
+bgee_mouse_invnorm <- bgee_mouse
+t0 <- Sys.time()
+bgee_mouse_invnorm$dataMatrix <- 1/(bgee_mouse$dataMatrix + 1)
+bgee_mouse_invnorm$correlationMatrix <- cor(bgee_mouse_invnorm$dataMatrix)
+Sys.time() - t0 #
+save(bgee_mouse_invnorm, file = "application4/data/bgee_mouse_invnorm.RData")
+
+# log2(FPKM + 1)
+bgee_mouse_log2 <- bgee_mouse
+t0 <- Sys.time()
+bgee_mouse_log2$dataMatrix <- log2(bgee_mouse$dataMatrix + 1)
+bgee_mouse_log2$correlationMatrix <- cor(bgee_mouse_log2$dataMatrix)
+Sys.time() - t0 #
+save(bgee_mouse_log2, file = "application4/data/bgee_mouse_log2.RData")
 

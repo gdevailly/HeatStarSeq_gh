@@ -138,7 +138,7 @@ shinyServer(function(input, output, session) {
                 userCuratedValues[!is.na(userOverlap)] <- as.data.frame(userCageFile)[userOverlap[!is.na(userOverlap)], "score"]
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
-                userCorrelations <- cor(userCuratedValues,
+                userCorrelations <- cor(log10(userCuratedValues + 1),
                                         dataset$dataMatrix
                 ) %>% as.vector
                 setProgress(value = 1, detail = "done!")
@@ -169,8 +169,8 @@ shinyServer(function(input, output, session) {
                 userCuratedValues[!is.na(userOverlap)] <- as.data.frame(userCageFile)[userOverlap[!is.na(userOverlap)], "score"]
                 # correlation calculation
                 setProgress(value = 1, detail = "correlations calculation")
-                userCorrelations <- cor(userCuratedValues,
-                                         dataset$dataMatrix
+                userCorrelations <- cor(log10(userCuratedValues + 1),
+                                        dataset$dataMatrix
                                         ) %>% as.vector
                 setProgress(value = 1, detail = "done!")
             })

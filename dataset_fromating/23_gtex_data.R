@@ -41,6 +41,8 @@ dim(gtexNumData)
 gtexNumData <- gtexNumData[, metadata$SAMPID]
 dim(gtexNumData)
 
+# log scale
+gtexNumData <- log10(gtexNumData + 1)
 t0 <- Sys.time()
 corMatrix <- cor(gtexNumData)
 Sys.time() - t0 # 2h

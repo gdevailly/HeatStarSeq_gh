@@ -63,6 +63,10 @@ colnames(bgee_human$annotation) <- c("geoAccession", "tissue", "name", "stage", 
 
 object.size(bgee_human) # 37Mo
 
+# log scale
+bgee_human$dataMatrix <- log10(bgee_human$dataMatrix + 1)
+bgee_human$correlationMatrix <- cor(bgee_human$dataMatrix)
+
 save(bgee_human, file = "/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/heatrnaseq/data/bgee_human.RData")
 
 

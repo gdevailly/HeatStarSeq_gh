@@ -207,6 +207,10 @@ rownames(fantom5_human_cage$dataMatrix) <- NULL
 rownames(fantom5_human_cage$correlationMatrix) <- NULL
 rownames(fantom5_human_cage$annotation) <- NULL
 
+# log transform
+fantom5_human_cage$dataMatrix <- log10(fantom5_human_cage$dataMatrix  + 1)
+fantom5_human_cage$correlationMatrix <- cor(fantom5_human_cage$dataMatrix)
+
 save(fantom5_human_cage, file = "../../heatcageseq/data/fantom5_human_cage.RData")
 
 
