@@ -560,13 +560,14 @@ shinyServer(function(input, output, session) {
                 cexRow = if(input$labelOption == "Automatic") newLabSize else input$labCex,
                 cexCol = if(input$labelOption == "Automatic") newLabSize else input$labCex,
                 breaks = unique(c(
+                    -1,
                     seq(myPalette$myBreaks[1], myPalette$myBreaks[2], length.out = 40),
                     seq(myPalette$myBreaks[2], myPalette$myBreaks[3], length.out = 41),
                     seq(myPalette$myBreaks[3], myPalette$myBreaks[4], length.out = 41),
                     seq(myPalette$myBreaks[4], 1.01, length.out = 2),
                     seq(1.01, 3, length.out = 121)
                 )),
-                col = c(colorRampPalette(myPalette$myCols)(119), myPalette$myCols[4], colorRampPalette(c("blue", "yellow", "green", "black"))(120)),
+                col = c(myPalette$myCols[1], colorRampPalette(myPalette$myCols)(119), myPalette$myCols[4], colorRampPalette(c("blue", "yellow", "green", "black"))(120)),
                 useRaster = TRUE
         )
     }
