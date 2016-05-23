@@ -6,7 +6,7 @@ options(shiny.maxRequestSize = 10*1024^2) # max file size, 10Mb
 
 shinyServer(function(input, output, session) {
 
-    # UI elements activations
+    # UI elements activations -------------------
     observe({
         junkVar <- input$fileFormatInstructions
         shinyjs::toggle("div_fileFormatInstructions")
@@ -113,7 +113,17 @@ shinyServer(function(input, output, session) {
         updateSliderInput(session, "col_val4", min = max(input$col_val3 + 0.05, -0.7))
     })
 
-    # output computations
+    observe({
+        if(input$myPanels == "Pairwise plot") {
+            shinyjs::show("widgetForPairwisePlots")
+            shinyjs::hide("widgetsForHeatmap")
+        } else {
+            shinyjs::hide("widgetForPairwisePlots")
+            shinyjs::show("widgetsForHeatmap")
+        }
+    })
+
+    # output computations ----------------
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
             load("data/encode_rnaseq_preload.RData")
@@ -253,6 +263,21 @@ shinyServer(function(input, output, session) {
         return(userExpressionFileData)
     })
 
+    getExperimentList <- reactive({
+        datasetSampleNames <- getSelectedDataset()$annotation$name
+        if (!is.null(input$expressionFile) | input$fileToUse == "Use the example file") {
+            datasetSampleNames <- c(input$nameOfExpressionFile, datasetSampleNames)
+        }
+        return(datasetSampleNames)
+    })
+
+    output$scatterPlotSample1 <- renderUI({
+        selectInput("scatterPlotSample1Defined", "Experiment 1:", getExperimentList(), selected = getExperimentList()[1])
+    })
+
+    output$scatterPlotSample2 <- renderUI({
+        selectInput("scatterPlotSample2Defined", "Experiment 2:", getExperimentList(), selected = getExperimentList()[2])
+    })
 
     output$tabUserExpressionFile <- renderDataTable({
         validate(
@@ -297,7 +322,7 @@ shinyServer(function(input, output, session) {
                                                               write.table(getCorrelationTable(), file = file, row.names = FALSE, quote = FALSE, sep = "\t")
                                                            },
                                                            contentType = "text/tsv")
-
+    # functions and reactives ------------------
     subsetMatrix <- reactive({
         dataset <- getSelectedDataset()
         workingMatrix <- dataset$correlationMatrix
@@ -506,6 +531,7 @@ shinyServer(function(input, output, session) {
         return(list("myCols" = myCols, "myBreaks" = myBreaks))
     })
 
+    # static heatmap ------------------------
     myRenderPlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -627,6 +653,7 @@ shinyServer(function(input, output, session) {
 
     output$colourKey1 <- renderPlot(renderColourKey())
 
+    # responsive heatmap -----------------------
     output$myPlotlyHeatmap <- renderPlotly({
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -671,6 +698,7 @@ shinyServer(function(input, output, session) {
 
     output$colourKey2 <- renderPlot(renderColourKey())
 
+    # dendrogram plot --------------------
     myRenderTreePlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -696,6 +724,8 @@ shinyServer(function(input, output, session) {
         par(oldPar)
     }
 
+    output$myTree <- renderPlot(myRenderTreePlot())
+
     output$downloadTreePng <- downloadHandler("dendrogram.png",
                                             content = function(file) {
                                                 png(file, width = 500, height = 950)
@@ -720,8 +750,112 @@ shinyServer(function(input, output, session) {
                                               },
                                               contentType = "image/svg")
 
-    output$myTree <- renderPlot(myRenderTreePlot())
+    # scatter plot -----------------
+    getPairWiseData <- reactive({
+        dataset <- getSelectedDataset()
+        if (input$scatterPlotSample1Defined == input$nameOfExpressionFile) {
+            expression_file1 <- log10(userExpressionFileAnalysis()$expression$value + 1)
+        } else {
+            expression_file1 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample1Defined)]
+        }
+        if (input$scatterPlotSample2Defined == input$nameOfExpressionFile) {
+            expression_file2 <- log10(userExpressionFileAnalysis()$expression$value + 1)
+        } else {
+            expression_file2 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample2Defined)]
+        }
+        if (input$scatterPlotDataScaling == "none") {
+            expression_file1 <- 10^expression_file1 - 1
+            expression_file2 <- 10^expression_file2 - 1
+        } else if (input$scatterPlotDataScaling == "log(e + 1)") {
+            expression_file1 <- expression_file1 * log(10)
+            expression_file2 <- expression_file2 * log(10)
+        } else if (input$scatterPlotDataScaling == "log2(e + 1)") {
+            expression_file1 <- expression_file1 * log(10)/log(2)
+            expression_file2 <- expression_file2 * log(10)/log(2)
+        } else if (input$scatterPlotDataScaling == "asinh(e)") {
+            expression_file1 <- asinh(10^expression_file1 - 1)
+            expression_file2 <- asinh(10^expression_file2 - 1)
+        } else if (input$scatterPlotDataScaling == "1/(1 + e)") {
+            expression_file1 <- 1/(10^expression_file1)
+            expression_file2 <- 1/(10^expression_file2)
+        }
+        return(data.frame(
+            geneID = dataset$geneName,
+            exp1 = expression_file1,
+            exp2 = expression_file2,
+            stringsAsFactors = FALSE
+        ))
+    })
 
+    renderMyScatterPlot <- function() {
+        myDF <- getPairWiseData()
+        if (input$scatterPlotType == "XY") {
+            myScatterPlot <- ggplot(myDF, aes(x = exp1, y = exp2)) + geom_point()
+            if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_abline(intercept = 0, slope = 1, colour = "red")
+        } else if (input$scatterPlotType == "MA") {
+            myDF$mean <- rowMeans(myDF[, c("exp1", "exp2")])
+            myDF$delta <- myDF$exp1 - myDF$exp2
+            myScatterPlot <- ggplot(myDF, aes(x = mean, y = delta)) + geom_point()
+            if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_hline(yintercept = 0, colour = "red")
+        }
+        if (input$scatterPlotRegression) myScatterPlot <- myScatterPlot +  geom_smooth(method = "lm")
+        myScatterPlot <- myScatterPlot + theme_bw(base_size = 24)
+        print(myScatterPlot)
+    }
+
+    output$myScatterPlot <- renderPlot(renderMyScatterPlot())
+
+    output$scatterPlotMetricsPearson <- renderText({
+        myDF <- getPairWiseData()
+        pcc <- cor(myDF$exp1, myDF$exp2, method = "pearson")
+        paste0(
+            "Pearson correlation coefficient: ",
+            round(pcc, digits = 4)
+        )
+    })
+
+    output$scatterPlotMetricsSpearman <- renderText({
+        myDF <- getPairWiseData()
+        scc <- cor(myDF$exp1, myDF$exp2, method = "spearman")
+        paste0(
+            "Spearman correlation coefficient: ",
+            round(scc, digits = 4)
+        )
+    })
+
+    output$downloadScatterPlotPng <- downloadHandler("scatterplot.png",
+                                            content = function(file) {
+                                                png(file, width = 500, height = 500)
+                                                renderMyScatterPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/png")
+
+    output$downloadScatterPlotPdf <- downloadHandler("scatterplot.pdf",
+                                            content = function(file) {
+                                                pdf(file, width = 7.29, height = 7.29)
+                                                renderMyScatterPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/pdf")
+
+    output$downloadScatterPlotSvg <- downloadHandler("scatterplot.svg",
+                                            content = function(file) {
+                                                svglite(file, width = 7.29, height = 7.29)
+                                                renderMyScatterPlot()
+                                                dev.off()
+                                            },
+                                            contentType = "image/svg")
+
+    output$downloadScatterPlotData <- downloadHandler("clusteredMatrix.txt",
+                                             content = function(file) {
+                                                 myDF <- getPairWiseData()
+                                                 colnames(myDF) <- c("geneID", input$scatterPlotSample1Defined, input$scatterPlotSample2Defined)
+                                                 write.table(myDF, file = file, quote = FALSE, sep = "\t")
+                                             },
+                                             contentType = "text/tsv")
+
+    # Metadata table -----------------
     output$tabSampleList <- renderDataTable({
         myTable <- getSelectedDataset()$annotation
         if(!is.null(myTable$url)) {
@@ -745,4 +879,5 @@ shinyServer(function(input, output, session) {
                                                    },
                                                    contentType = "text/tsv")
 
+    # end of server -------------
 })
