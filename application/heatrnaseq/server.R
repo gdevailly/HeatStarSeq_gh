@@ -779,6 +779,7 @@ shinyServer(function(input, output, session) {
             expression_file1 <- 1/(10^expression_file1)
             expression_file2 <- 1/(10^expression_file2)
         }
+        validate(need(length(expression_file1) == length(expression_file2), "Loading..."))
         return(data.frame(
             geneID = dataset$geneName,
             exp1 = expression_file1,
@@ -787,26 +788,32 @@ shinyServer(function(input, output, session) {
         ))
     })
 
-    renderMyScatterPlot <- function() {
+    renderMyScatterPlot <- reactive({
         myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 3, "Loading..."))
         if (input$scatterPlotType == "XY") {
-            myScatterPlot <- ggplot(myDF, aes(x = exp1, y = exp2)) + geom_point()
+            myScatterPlot <- ggplot(myDF, aes(x = exp1, y = exp2)) + geom_point(size = 0.6) +
+                labs(x = input$scatterPlotSample1Defined, y = input$scatterPlotSample2Defined)
             if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_abline(intercept = 0, slope = 1, colour = "red")
         } else if (input$scatterPlotType == "MA") {
             myDF$mean <- rowMeans(myDF[, c("exp1", "exp2")])
             myDF$delta <- myDF$exp1 - myDF$exp2
-            myScatterPlot <- ggplot(myDF, aes(x = mean, y = delta)) + geom_point()
+            myScatterPlot <- ggplot(myDF, aes(x = mean, y = delta)) + geom_point(size = 0.6) +
+                labs(x = "mean", y = "difference", title = paste(input$scatterPlotSample1Defined, "\n-", input$scatterPlotSample2Defined))
             if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_hline(yintercept = 0, colour = "red")
         }
         if (input$scatterPlotRegression) myScatterPlot <- myScatterPlot +  geom_smooth(method = "lm")
-        myScatterPlot <- myScatterPlot + theme_bw(base_size = 24)
-        print(myScatterPlot)
-    }
+        myScatterPlot <- myScatterPlot + theme_bw(base_size = 20)
+        return(myScatterPlot)
+    })
 
-    output$myScatterPlot <- renderPlot(renderMyScatterPlot())
+    output$myScatterPlot <- renderPlot({
+        print(renderMyScatterPlot())
+    })
 
     output$scatterPlotMetricsPearson <- renderText({
         myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 3, ""))
         pcc <- cor(myDF$exp1, myDF$exp2, method = "pearson")
         paste0(
             "Pearson correlation coefficient: ",
@@ -816,6 +823,7 @@ shinyServer(function(input, output, session) {
 
     output$scatterPlotMetricsSpearman <- renderText({
         myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 3, ""))
         scc <- cor(myDF$exp1, myDF$exp2, method = "spearman")
         paste0(
             "Spearman correlation coefficient: ",
@@ -826,7 +834,7 @@ shinyServer(function(input, output, session) {
     output$downloadScatterPlotPng <- downloadHandler("scatterplot.png",
                                             content = function(file) {
                                                 png(file, width = 500, height = 500)
-                                                renderMyScatterPlot()
+                                                print(renderMyScatterPlot())
                                                 dev.off()
                                             },
                                             contentType = "image/png")
@@ -834,7 +842,7 @@ shinyServer(function(input, output, session) {
     output$downloadScatterPlotPdf <- downloadHandler("scatterplot.pdf",
                                             content = function(file) {
                                                 pdf(file, width = 7.29, height = 7.29)
-                                                renderMyScatterPlot()
+                                                print(renderMyScatterPlot())
                                                 dev.off()
                                             },
                                             contentType = "image/pdf")
@@ -842,7 +850,7 @@ shinyServer(function(input, output, session) {
     output$downloadScatterPlotSvg <- downloadHandler("scatterplot.svg",
                                             content = function(file) {
                                                 svglite(file, width = 7.29, height = 7.29)
-                                                renderMyScatterPlot()
+                                                print(renderMyScatterPlot())
                                                 dev.off()
                                             },
                                             contentType = "image/svg")

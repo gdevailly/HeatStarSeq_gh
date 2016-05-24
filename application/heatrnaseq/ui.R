@@ -232,7 +232,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                  downloadButton("downloadTreeSvg", label = "Save as svg")
                         ),
                         tabPanel("Pairwise plot",
-                                 plotOutput("myScatterPlot", width = "500px", height = "500px"),
+                                 id = "staticScatterPlot", plotOutput("myScatterPlot", width = "500px", height = "500px"),
                                  textOutput("scatterPlotMetricsPearson"),
                                  textOutput("scatterPlotMetricsSpearman"),
                                  downloadButton("downloadScatterPlotPng", label = "Save as png"),
