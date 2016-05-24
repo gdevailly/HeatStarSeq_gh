@@ -91,6 +91,16 @@ shinyServer(function(input, output, session) {
         updateSliderInput(session, "col_val4", min = max(input$col_val3 + 0.05, -0.7))
     })
 
+    observe({
+        if(input$myPanels == "Pairwise plot") {
+            shinyjs::show("widgetForPairwisePlots")
+            shinyjs::hide("widgetsForHeatmap")
+        } else {
+            shinyjs::hide("widgetForPairwisePlots")
+            shinyjs::show("widgetsForHeatmap")
+        }
+    })
+
     # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
@@ -119,13 +129,14 @@ shinyServer(function(input, output, session) {
 
     userCageFileAnalysis_1 <- reactive({
 
+        dataset <- getSelectedDataset()
+
         if (input$fileToUse == "Use the example file") {
             withProgress(value = 1, message = "Usercage file: ", detail = "reading file", {
                 userCageFile <- read_tsv("www/Expression.mm9.HCC.49096peaks_column1.bed", col_names = FALSE)[, 1:6]
                 setProgress(value = 1, detail = "intersecting CAGE regions")
                 colnames(userCageFile) <- c("chr", "start", "end", "name", "score", "strand")
                 userCageFileGR <- with(userCageFile, GRanges(chr, IRanges(start, end), strand = strand, score = score))
-                dataset <- getSelectedDataset()
                 validate(need(
                     input$selectedDataset %in% c("FANTOM5 (mouse, mm9)"),
                     "The example file is a mouse RNA-seq experiment. Please choose a mouse dataset or unload the example."
@@ -144,7 +155,7 @@ shinyServer(function(input, output, session) {
                 setProgress(value = 1, detail = "done!")
             })
             return(list(
-                "peaks" = userCageFile,
+                "peaks" =  data.frame(as.data.frame(dataset$regionMetaData)[1:3], score = userCuratedValues),
                 "correlations" = userCorrelations,
                 "linearNormCorrelations" = NULL # to be fill below
             ))
@@ -152,15 +163,17 @@ shinyServer(function(input, output, session) {
 
         userCageFileName <- input$cageFile
         if (is.null(userCageFileName)){
-            userCageFile <- NULL
-            userCorrelations <- NULL
+            return(list(
+                "peaks" = NULL,
+                "correlations" = NULL,
+                "linearNormCorrelations" = NULL # to be fill below
+            ))
         } else {
             withProgress(value = 1, message = "Usercage file: ", detail = "reading file", {
                 userCageFile <- read_tsv(userCageFileName$datapath, col_names = input$header)[, 1:6]
                 setProgress(value = 1, detail = "intersecting CAGE regions")
                 colnames(userCageFile) <- c("chr", "start", "end", "name", "score", "strand")
                 userCageFileGR <- with(userCageFile, GRanges(chr, IRanges(start, end), strand = strand, score = score))
-                dataset <- getSelectedDataset()
                 # warnings about missing chromosomes in one of the 2 sets. Let's assume user now what he/her is uploading...
                 # Which region overlaps?
                 # we ignore peaks presents only in user peak lists.
@@ -173,13 +186,13 @@ shinyServer(function(input, output, session) {
                                         dataset$dataMatrix
                                         ) %>% as.vector
                 setProgress(value = 1, detail = "done!")
+                return(list(
+                    "peaks" = data.frame(as.data.frame(dataset$regionMetaData)[1:3], score = userCuratedValues),
+                    "correlations" = userCorrelations,
+                    "linearNormCorrelations" = NULL # to be fill below
+                ))
             })
         }
-        return(list(
-            "peaks" = userCageFile,
-            "correlations" = userCorrelations,
-            "linearNormCorrelations" = NULL # to be fill below
-        ))
     })
 
     userCageFileAnalysis <- reactive({
@@ -191,6 +204,22 @@ shinyServer(function(input, output, session) {
             }
         }
         return(userCageFileData)
+    })
+
+    getExperimentList <- reactive({
+        datasetSampleNames <- getSelectedDataset()$annotation$name
+        if (!is.null(input$cageFile) | input$fileToUse == "Use the example file") {
+            datasetSampleNames <- c(input$nameOfCageFile, datasetSampleNames)
+        }
+        return(datasetSampleNames)
+    })
+
+    output$scatterPlotSample1 <- renderUI({
+        selectInput("scatterPlotSample1Defined", "Experiment 1:", getExperimentList(), selected = getExperimentList()[1])
+    })
+
+    output$scatterPlotSample2 <- renderUI({
+        selectInput("scatterPlotSample2Defined", "Experiment 2:", getExperimentList(), selected = getExperimentList()[2])
     })
 
     output$tabUserCageFile <- renderDataTable({
@@ -547,6 +576,122 @@ shinyServer(function(input, output, session) {
 
     output$myTree <- renderPlot(myRenderTreePlot())
 
+    # scatter plot -----------------
+    getPairWiseData <- reactive({
+        dataset <- getSelectedDataset()
+        if (input$scatterPlotSample1Defined == input$nameOfCageFile) {
+            expression_file1 <- log10(userCageFileAnalysis()$peaks$score + 1)
+        } else {
+            expression_file1 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample1Defined)]
+        }
+        if (input$scatterPlotSample2Defined == input$nameOfCageFile) {
+            expression_file2 <- log10(userCageFileAnalysis()$peaks$score + 1)
+        } else {
+            expression_file2 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample2Defined)]
+        }
+        if (input$scatterPlotDataScaling == "none") {
+            expression_file1 <- 10^expression_file1 - 1
+            expression_file2 <- 10^expression_file2 - 1
+        } else if (input$scatterPlotDataScaling == "log(e + 1)") {
+            expression_file1 <- expression_file1 * log(10)
+            expression_file2 <- expression_file2 * log(10)
+        } else if (input$scatterPlotDataScaling == "log2(e + 1)") {
+            expression_file1 <- expression_file1 * log(10)/log(2)
+            expression_file2 <- expression_file2 * log(10)/log(2)
+        } else if (input$scatterPlotDataScaling == "asinh(e)") {
+            expression_file1 <- asinh(10^expression_file1 - 1)
+            expression_file2 <- asinh(10^expression_file2 - 1)
+        } else if (input$scatterPlotDataScaling == "1/(1 + e)") {
+            expression_file1 <- 1/(10^expression_file1)
+            expression_file2 <- 1/(10^expression_file2)
+        }
+        # validate(need(length(expression_file1) == length(expression_file2), "Loading..."))
+        return(data.frame(
+            as.data.frame(dataset$regionMetaData)[,1:3],
+            exp1 = expression_file1,
+            exp2 = expression_file2,
+            stringsAsFactors = FALSE
+        ))
+    })
+
+    renderMyScatterPlot <- reactive({
+        myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, "Loading..."))
+        if (input$scatterPlotType == "XY") {
+            myScatterPlot <- ggplot(myDF, aes(x = exp1, y = exp2)) + geom_point(size = 0.6) +
+                labs(x = input$scatterPlotSample1Defined, y = input$scatterPlotSample2Defined)
+            if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_abline(intercept = 0, slope = 1, colour = "red")
+        } else if (input$scatterPlotType == "MA") {
+            myDF$mean <- rowMeans(myDF[, c("exp1", "exp2")])
+            myDF$delta <- myDF$exp1 - myDF$exp2
+            myScatterPlot <- ggplot(myDF, aes(x = mean, y = delta)) + geom_point(size = 0.6) +
+                labs(x = "mean", y = "difference", title = paste(input$scatterPlotSample1Defined, "\n-", input$scatterPlotSample2Defined))
+            if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_hline(yintercept = 0, colour = "red")
+        }
+        if (input$scatterPlotRegression) myScatterPlot <- myScatterPlot + geom_smooth(method = "lm")
+        myScatterPlot <- myScatterPlot + theme_bw(base_size = 20)
+        return(myScatterPlot)
+    })
+
+    output$myScatterPlot <- renderPlot({
+        withProgress(value = 1, message = "Making scatter plot...",
+            print(renderMyScatterPlot())
+        )
+    })
+
+    output$scatterPlotMetricsPearson <- renderText({
+        myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, ""))
+        pcc <- cor(myDF$exp1, myDF$exp2, method = "pearson")
+        paste0(
+            "Pearson correlation coefficient: ",
+            round(pcc, digits = 4)
+        )
+    })
+
+    output$scatterPlotMetricsSpearman <- renderText({
+        myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, ""))
+        scc <- cor(myDF$exp1, myDF$exp2, method = "spearman")
+        paste0(
+            "Spearman correlation coefficient: ",
+            round(scc, digits = 4)
+        )
+    })
+
+    output$downloadScatterPlotPng <- downloadHandler("scatterplot.png",
+                                                     content = function(file) {
+                                                         png(file, width = 500, height = 500)
+                                                         print(renderMyScatterPlot())
+                                                         dev.off()
+                                                     },
+                                                     contentType = "image/png")
+
+    output$downloadScatterPlotPdf <- downloadHandler("scatterplot.pdf",
+                                                     content = function(file) {
+                                                         pdf(file, width = 7.29, height = 7.29)
+                                                         print(renderMyScatterPlot())
+                                                         dev.off()
+                                                     },
+                                                     contentType = "image/pdf")
+
+    output$downloadScatterPlotSvg <- downloadHandler("scatterplot.svg",
+                                                     content = function(file) {
+                                                         svglite(file, width = 7.29, height = 7.29)
+                                                         print(renderMyScatterPlot())
+                                                         dev.off()
+                                                     },
+                                                     contentType = "image/svg")
+
+    output$downloadScatterPlotData <- downloadHandler("clusteredMatrix.txt",
+                                                      content = function(file) {
+                                                          myDF <- getPairWiseData()
+                                                          colnames(myDF) <- c("chr", "start", "end", input$scatterPlotSample1Defined, input$scatterPlotSample2Defined)
+                                                          write.table(myDF, file = file, quote = FALSE, sep = "\t")
+                                                      },
+                                                      contentType = "text/tsv")
+
+    # Metadata table -----------------
     output$tabSampleList <- renderDataTable({
         myTable <- getSelectedDataset()$annotation
         if(!is.null(myTable$url)) {
@@ -554,6 +699,7 @@ shinyServer(function(input, output, session) {
         }
         return(myTable)
     }, escape = FALSE)
+
 
     output$downloadDatasetTable <- downloadHandler("dataset_table.txt",
                                                    content = function(file) {

@@ -185,6 +185,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                             actionButton("applyColoursOptions", label = "Apply colour changes")
                         )
                     ),
+
                     div(id = "widgetForPairwisePlots",
                         uiOutput("scatterPlotSample1"),
                         uiOutput("scatterPlotSample2"),

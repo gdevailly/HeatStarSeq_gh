@@ -802,7 +802,7 @@ shinyServer(function(input, output, session) {
                 labs(x = "mean", y = "difference", title = paste(input$scatterPlotSample1Defined, "\n-", input$scatterPlotSample2Defined))
             if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_hline(yintercept = 0, colour = "red")
         }
-        if (input$scatterPlotRegression) myScatterPlot <- myScatterPlot +  geom_smooth(method = "lm")
+        if (input$scatterPlotRegression) myScatterPlot <- myScatterPlot + geom_smooth(method = "lm")
         myScatterPlot <- myScatterPlot + theme_bw(base_size = 20)
         return(myScatterPlot)
     })
