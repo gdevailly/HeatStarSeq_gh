@@ -808,7 +808,9 @@ shinyServer(function(input, output, session) {
     })
 
     output$myScatterPlot <- renderPlot({
-        print(renderMyScatterPlot())
+        withProgress(value = 1, message = "Making scatter plot...",
+                     print(renderMyScatterPlot())
+        )
     })
 
     output$scatterPlotMetricsPearson <- renderText({
@@ -817,7 +819,7 @@ shinyServer(function(input, output, session) {
         pcc <- cor(myDF$exp1, myDF$exp2, method = "pearson")
         paste0(
             "Pearson correlation coefficient: ",
-            round(pcc, digits = 4)
+            signif(pcc, digits = 4)
         )
     })
 
@@ -827,7 +829,7 @@ shinyServer(function(input, output, session) {
         scc <- cor(myDF$exp1, myDF$exp2, method = "spearman")
         paste0(
             "Spearman correlation coefficient: ",
-            round(scc, digits = 4)
+            signif(scc, digits = 4)
         )
     })
 
