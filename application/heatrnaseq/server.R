@@ -632,7 +632,12 @@ shinyServer(function(input, output, session) {
                                             },
                                             contentType = "text/tsv")
 
-    output$myHeatmap <- renderPlot(myRenderPlot())
+    output$myHeatmap <- renderPlot({
+        withProgress(value = 1, message = "Ploting...", {
+            myRenderPlot()
+            setProgress(value = 1, detail = "done!")
+        })
+    })
 
     renderColourKey <- function() {
         myPalette <- getColourPalette()
@@ -792,13 +797,13 @@ shinyServer(function(input, output, session) {
         myDF <- getPairWiseData()
         validate(need(ncol(myDF) == 3, "Loading..."))
         if (input$scatterPlotType == "XY") {
-            myScatterPlot <- ggplot(myDF, aes(x = exp1, y = exp2)) + geom_point(size = 0.6) +
+            myScatterPlot <- ggplot(myDF, aes(x = exp1, y = exp2)) + geom_point(size = 1) +
                 labs(x = input$scatterPlotSample1Defined, y = input$scatterPlotSample2Defined)
             if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_abline(intercept = 0, slope = 1, colour = "red")
         } else if (input$scatterPlotType == "MA") {
             myDF$mean <- rowMeans(myDF[, c("exp1", "exp2")])
             myDF$delta <- myDF$exp1 - myDF$exp2
-            myScatterPlot <- ggplot(myDF, aes(x = mean, y = delta)) + geom_point(size = 0.6) +
+            myScatterPlot <- ggplot(myDF, aes(x = mean, y = delta)) + geom_point(size = 1) +
                 labs(x = "mean", y = "difference", title = paste(input$scatterPlotSample1Defined, "\n-", input$scatterPlotSample2Defined))
             if (input$scatterPlotGuide) myScatterPlot <- myScatterPlot + geom_hline(yintercept = 0, colour = "red")
         }
@@ -861,7 +866,7 @@ shinyServer(function(input, output, session) {
                                              content = function(file) {
                                                  myDF <- getPairWiseData()
                                                  colnames(myDF) <- c("geneID", input$scatterPlotSample1Defined, input$scatterPlotSample2Defined)
-                                                 write.table(myDF, file = file, quote = FALSE, sep = "\t")
+                                                 write.table(myDF, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
                                              },
                                              contentType = "text/tsv")
 

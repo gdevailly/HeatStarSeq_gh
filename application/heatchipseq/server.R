@@ -538,7 +538,12 @@ shinyServer(function(input, output, session) {
                                              },
                                              contentType = "text/tsv")
 
-    output$myHeatmap <- renderPlot(myRenderPlot())
+    output$myHeatmap <- renderPlot(
+        withProgress(value = 1, message = "Ploting...", {
+            myRenderPlot()
+            setProgress(value = 1, detail = "done!")
+        })
+    )
 
     renderColourKey <- function() {
         myPalette <- getColourPalette()

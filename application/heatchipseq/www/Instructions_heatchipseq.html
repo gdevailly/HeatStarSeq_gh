@@ -26,13 +26,16 @@
     <a href="#_Tree">2.6 Tree</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Samples_metadata">2.7 Sample metadata</a>
+    <a href="#_Pairwise_plot">2.7 Pairwise plot</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Correlation_correction">2.8 Correlation correction</a>
+    <a href="#_Samples_metadata">2.8 Sample metadata</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_About_the_datasets">2.9 About the datasets</a>
+    <a href="#_Correlation_correction">2.9 Correlation correction</a>
+</p>
+<p style="padding-left: 3em;">
+    <a href="#_About_the_datasets">2.10 About the datasets</a>
 </p>
 <h4 style="padding-left: 1em;">
     <a href="#_FAQ">3 FAQ</a>
@@ -278,7 +281,21 @@
     If you see a red, unfriendly error message: <strong>Figure margins too large</strong>, try reducing the size of the margin as well as the name size.
 </p>
 <h3>
-    <a name="_Samples_metadata"></a>2.7 Sample metadata
+    <a name="_Pairwise_plot"></a>2.7 Pairwise plot
+</h3>
+<p>
+	The <strong>Pairwise plot</strong> tab will display barplot of two selected experiments representing the number of overlaping and non-overlaping peaks.
+	Under the <strong>Plot customisation</strong> section on the left of the page, you can:
+<ul>
+	<li> choose experiment 1 and experiment 2.</li>
+	<li> add or remove a guide line (balck) corresponding to the number of overlaping peaks.</li>
+</ul>
+	Below the scatterplot should be the correlation coefficient between the two experiments (on binary data), the Jaccard index, and a table conating peak numbers.
+	Further bellow are buttons to download the barplot as png, pdf or svg (recommended), as well as export a tabulated text file containing the data used for making
+	the scatterplot.
+</p>
+<h3>
+    <a name="_Samples_metadata"></a>2.8 Sample metadata
 </h3>
 <p>
 	The sample metadata tab will display metadata information (experience name, cell type, url of the original data, etc.) for the <strong>selected dataset</strong>.
@@ -290,7 +307,7 @@
     for that experiment.
 </p>
 <h3>
-    <a name="_Correlation_correction:"></a>2.8 Correlation correction
+    <a name="_Correlation_correction:"></a>2.9 Correlation correction
 </h3>
 <p>
     Sometimes, the maximum correlation of a user peak file with any experiment in the dataset can be quite low. In some cases, when the user is confident
@@ -306,7 +323,7 @@
 	will still be third with scaling).
 </p>
 <h3>
-	<a name="_About_the_datasets"></a>2.9 About the datasets
+	<a name="_About_the_datasets"></a>2.10 About the datasets
 </h3>
 <p><table style="width:100%">
  <tr>
