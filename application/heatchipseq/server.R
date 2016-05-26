@@ -97,6 +97,16 @@ shinyServer(function(input, output, session) {
         updateSliderInput(session, "col_val4", min = max(input$col_val3 + 0.05, -0.7))
     })
 
+    observe({
+        if(input$myPanels == "Pairwise plot") {
+            shinyjs::show("widgetForPairwisePlots")
+            shinyjs::hide("widgetsForHeatmap")
+        } else {
+            shinyjs::hide("widgetForPairwisePlots")
+            shinyjs::show("widgetsForHeatmap")
+        }
+    })
+
     # output computations
     getSelectedDataset <- reactive({
         withProgress(value = 1, message = "Loading dataset: ", detail = "removing old dataset", {
@@ -158,7 +168,8 @@ shinyServer(function(input, output, session) {
             return(list(
                 "peaks" = userPeakFile,
                 "correlations" = userCorrelations,
-                "linearNormCorrelations" = NULL # to be fill below
+                "linearNormCorrelations" = NULL, # to be fill below
+                "overlaps" = userOverlap
             ))
         }
 
@@ -166,6 +177,7 @@ shinyServer(function(input, output, session) {
         if (is.null(userPeakFileName)){
             userPeakFile <- NULL
             userCorrelations <- NULL
+            userOverlap <- NULL
         } else {
             withProgress(value = 1, message = "User peak file: ", detail = "reading file", {
                 userPeakFile <- read_tsv(userPeakFileName$datapath, col_names = input$header)[, 1:3]
@@ -188,7 +200,8 @@ shinyServer(function(input, output, session) {
         return(list(
             "peaks" = userPeakFile,
             "correlations" = userCorrelations,
-            "linearNormCorrelations" = NULL # to be fill below
+            "linearNormCorrelations" = NULL, # to be fill below
+            "overlaps" = userOverlap
         ))
     })
 
@@ -203,6 +216,22 @@ shinyServer(function(input, output, session) {
         return(userPeakFileData)
     })
 
+    getExperimentList <- reactive({
+        datasetSampleNames <- getSelectedDataset()$annotation$name
+        if (!is.null(input$peakFile) | input$fileToUse == "Use the example file") {
+            datasetSampleNames <- c(input$nameOfPeakFile, datasetSampleNames)
+        }
+        return(datasetSampleNames)
+    })
+
+    output$barPlotSample1 <- renderUI({
+        selectInput("barPlotSample1Defined", "Experiment 1:", getExperimentList(), selected = getExperimentList()[1])
+    })
+
+    output$barPlotSample2 <- renderUI({
+        selectInput("barPlotSample2Defined", "Experiment 2:", getExperimentList(), selected = getExperimentList()[2])
+
+    })
 
     output$tabUserPeaks <- renderDataTable({
         validate(
@@ -399,6 +428,7 @@ shinyServer(function(input, output, session) {
         return(matAA)
     })
 
+    # heatmap
     getColourPalette <- reactive({
         junkVar <- input$applyColoursOptions
         isolate({
@@ -529,6 +559,7 @@ shinyServer(function(input, output, session) {
 
     output$colourKey1 <- renderPlot(renderColourKey())
 
+    # plotly heatmap
     output$myPlotlyHeatmap <- renderPlotly({
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -573,6 +604,7 @@ shinyServer(function(input, output, session) {
 
     output$colourKey2 <- renderPlot(renderColourKey())
 
+    # dendrogram
     myRenderTreePlot <- function() {
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -624,6 +656,135 @@ shinyServer(function(input, output, session) {
 
     output$myTree <- renderPlot(myRenderTreePlot())
 
+    # pairwise barPlot
+    getPairWiseData <- reactive({
+        dataset <- getSelectedDataset()
+        if (input$barPlotSample1Defined == input$nameOfPeakFile) {
+            peaks1 <- userPeakFileAnalysis()$overlaps
+        } else {
+            peaks1 <- dataset$dataMatrix[, which(dataset$annotation$name == input$barPlotSample1Defined)]
+        }
+        if (input$barPlotSample2Defined == input$nameOfPeakFile) {
+            peaks2 <- userPeakFileAnalysis()$overlaps
+        } else {
+            peaks2 <- dataset$dataMatrix[, which(dataset$annotation$name == input$barPlotSample2Defined)]
+        }
+        validate(need(length(peaks1) == length(peaks2), "Loading..."))
+        return(data.frame(
+            as.data.frame(dataset$regionMetaData)[, 1:3],
+            peaks1 = peaks1,
+            peaks2 = peaks2,
+            stringsAsFactors = FALSE
+        ))
+    })
+
+    renderMyBarPlot <- reactive({
+        myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, "Loading..."))
+        name1 <- input$barPlotSample1Defined %>%
+            gsub("+", "\n", ., fixed = TRUE) %>%
+            gsub(" ", "\n", ., fixed = TRUE) %>%
+            gsub("[\n]+", "\n", ., fixed = FALSE)
+        name2 <- input$barPlotSample2Defined %>%
+            gsub("+", "\n", ., fixed = TRUE) %>%
+            gsub(" ", "\n", ., fixed = TRUE) %>%
+            gsub("[\n]+", "\n", ., fixed = FALSE)
+        dfForBarplot <- data.frame(
+            experiment = factor(
+                c(rep(name1, 2), rep(name2, 2)),
+                levels = c(name1, name2)
+            ),
+            status = rep(c("common", "unique"), 2),
+            nPeaks = c(
+                length(which(myDF$peaks1 &  myDF$peaks2)),
+                length(which(myDF$peaks1 & !myDF$peaks2)),
+                length(which(myDF$peaks2 &  myDF$peaks1)),
+                length(which(myDF$peaks2 & !myDF$peaks1))
+            ),
+            stringsAsFactors = FALSE
+        )
+        myBarPlot <- ggplot(dfForBarplot, aes(x = experiment, y = nPeaks, fill = status)) + geom_bar(stat = "identity") +
+            labs(y = "number of peaks")
+        if (input$barPlotGuide) myBarPlot <- myBarPlot + geom_hline(yintercept = dfForBarplot$nPeaks[1])
+        myBarPlot <- myBarPlot + theme_bw(base_size = 20) +
+            theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), legend.position = "top")
+        return(myBarPlot)
+    })
+
+    output$myBarPlot <- renderPlot({
+        withProgress(value = 1, message = "Making bar plot...",
+                     print(renderMyBarPlot())
+        )
+    })
+
+    dataForBarPlotTests <- reactive({
+        myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, "Loading..."))
+        myTable <- data.frame(
+            category = c(
+                "common peak",
+                paste(input$barPlotSample1Defined, "only"),
+                paste(input$barPlotSample2Defined, "only"),
+                "peak space"
+            ),
+            nPeaks = c(
+                length(which(myDF$peaks1 &  myDF$peaks2)),
+                length(which(myDF$peaks1 & !myDF$peaks2)),
+                length(which(myDF$peaks2 & !myDF$peaks1)),
+                nrow(myDF)
+            )
+        )
+        return(myTable)
+    })
+
+    output$tabBarPlot <- renderTable(dataForBarPlotTests(), include.rownames = FALSE)
+
+    output$barPlotCorrelation <- renderText({
+        myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, "Loading..."))
+        cc <- cor(myDF$peaks1, myDF$peaks2)
+        return(paste("Correlation coefficient:", round(cc, digits = 4)))
+    })
+
+    output$barPlotJaccard <- renderText({
+        myDF <- dataForBarPlotTests()
+        myJaccard <- myDF$nPeaks[1] / (myDF$nPeaks[1] + myDF$nPeaks[2] + myDF$nPeaks[3])
+        return(paste("Jaccard index:", round(myJaccard, digits = 4)))
+    })
+
+    output$downloadBarPlotPng <- downloadHandler("barplot.png",
+                                                     content = function(file) {
+                                                         png(file, width = 500, height = 500)
+                                                         print(renderMyBarPlot())
+                                                         dev.off()
+                                                     },
+                                                     contentType = "image/png")
+
+    output$downloadBarPlotPdf <- downloadHandler("barplot.pdf",
+                                                     content = function(file) {
+                                                         pdf(file, width = 7.29, height = 7.29)
+                                                         print(renderMyBarPlot())
+                                                         dev.off()
+                                                     },
+                                                     contentType = "image/pdf")
+
+    output$downloadBarPlotSvg <- downloadHandler("barplot.svg",
+                                                     content = function(file) {
+                                                         svglite(file, width = 7.29, height = 7.29)
+                                                         print(renderMyBarPlot())
+                                                         dev.off()
+                                                     },
+                                                     contentType = "image/svg")
+
+    output$downloadBarPlotData <- downloadHandler("barplot.txt",
+                                                      content = function(file) {
+                                                          myDF <- getPairWiseData()
+                                                          colnames(myDF) <- c("chr", "start", "end", input$barPlotSample1Defined, input$barPlotSample2Defined)
+                                                          write.table(myDF, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
+                                                      },
+                                                      contentType = "text/tsv")
+
+    # metadata table
     output$tabSampleList <- renderDataTable({
         myTable <- getSelectedDataset()$annotation
         if(!is.null(myTable$url)) {
