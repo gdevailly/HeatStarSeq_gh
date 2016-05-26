@@ -230,6 +230,7 @@ shinyServer(function(input, output, session) {
 
     output$barPlotSample2 <- renderUI({
         selectInput("barPlotSample2Defined", "Experiment 2:", getExperimentList(), selected = getExperimentList()[2])
+
     })
 
     output$tabUserPeaks <- renderDataTable({
@@ -427,6 +428,7 @@ shinyServer(function(input, output, session) {
         return(matAA)
     })
 
+    # heatmap
     getColourPalette <- reactive({
         junkVar <- input$applyColoursOptions
         isolate({
@@ -557,6 +559,7 @@ shinyServer(function(input, output, session) {
 
     output$colourKey1 <- renderPlot(renderColourKey())
 
+    # plotly heatmap
     output$myPlotlyHeatmap <- renderPlotly({
         matData <- matAfterHighlight()
         clusterDat <- doTheClustering()
@@ -678,8 +681,19 @@ shinyServer(function(input, output, session) {
     renderMyBarPlot <- reactive({
         myDF <- getPairWiseData()
         validate(need(ncol(myDF) == 5, "Loading..."))
+        name1 <- input$barPlotSample1Defined %>%
+            gsub("+", "\n", ., fixed = TRUE) %>%
+            gsub(" ", "\n", ., fixed = TRUE) %>%
+            gsub("[\n]+", "\n", ., fixed = FALSE)
+        name2 <- input$barPlotSample2Defined %>%
+            gsub("+", "\n", ., fixed = TRUE) %>%
+            gsub(" ", "\n", ., fixed = TRUE) %>%
+            gsub("[\n]+", "\n", ., fixed = FALSE)
         dfForBarplot <- data.frame(
-            experiment = c(rep(input$barPlotSample1Defined, 2), rep(input$barPlotSample2Defined, 2)),
+            experiment = factor(
+                c(rep(name1, 2), rep(name2, 2)),
+                levels = c(name1, name2)
+            ),
             status = rep(c("common", "unique"), 2),
             nPeaks = c(
                 length(which(myDF$peaks1 &  myDF$peaks2)),
@@ -693,7 +707,7 @@ shinyServer(function(input, output, session) {
             labs(y = "number of peaks")
         if (input$barPlotGuide) myBarPlot <- myBarPlot + geom_hline(yintercept = dfForBarplot$nPeaks[1])
         myBarPlot <- myBarPlot + theme_bw(base_size = 20) +
-            theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "left")
+            theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), legend.position = "top")
         return(myBarPlot)
     })
 
@@ -705,6 +719,7 @@ shinyServer(function(input, output, session) {
 
     dataForBarPlotTests <- reactive({
         myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, "Loading..."))
         myTable <- data.frame(
             category = c(
                 "common peak",
@@ -726,6 +741,7 @@ shinyServer(function(input, output, session) {
 
     output$barPlotCorrelation <- renderText({
         myDF <- getPairWiseData()
+        validate(need(ncol(myDF) == 5, "Loading..."))
         cc <- cor(myDF$peaks1, myDF$peaks2)
         return(paste("Correlation coefficient:", round(cc, digits = 4)))
     })

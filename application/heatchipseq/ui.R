@@ -205,7 +205,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                                  downloadButton("downloadTreeSvg", label = "Save as svg")
                         ),
                         tabPanel("Pairwise plot",
-                                 plotOutput("myBarPlot", width = "500px", height = "500px"),
+                                 plotOutput("myBarPlot", width = "400px", height = "600px"),
                                  textOutput("barPlotCorrelation"),
                                  textOutput("barPlotJaccard"),
                                  tableOutput("tabBarPlot"),
