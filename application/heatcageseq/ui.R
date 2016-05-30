@@ -86,7 +86,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         # we adapt filtering widgets to the various datasets
                         div(id = "widgetForFantom5Human",
                             selectInput("f5h_cells", "Cell type(s) (empty to select all):",
-                                        choices = unique(fantom5_human_cage$annotation$tissue)[order(unique(fantom5_human_cage$annotation$tissue))],
+                                        choices = sort(unique(fantom5_human_cage$annotation$tissue)),
                                         selected = NULL, multiple = TRUE),
                             selectInput("f5h_isCellLine", "Sample origin:",
                                         choices = c("all", "only cell line", "only non cell line"),
@@ -94,7 +94,7 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                         ),
                         div(id = "widgetForFantom5Mouse",
                             selectInput("f5m_cells", "Cell type(s) (empty to select all):",
-                                        choices = unique(fantom5_mouse_cage$annotation$tissue)[order(unique(fantom5_mouse_cage$annotation$tissue))],
+                                        choices = sort(unique(fantom5_mouse_cage$annotation$tissue)),
                                         selected = NULL, multiple = TRUE)
                         ),
                         selectInput("correlationCorrection",

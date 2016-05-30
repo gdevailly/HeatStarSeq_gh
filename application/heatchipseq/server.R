@@ -217,7 +217,7 @@ shinyServer(function(input, output, session) {
     })
 
     getExperimentList <- reactive({
-        datasetSampleNames <- getSelectedDataset()$annotation$name
+        datasetSampleNames <- sort(getSelectedDataset()$annotation$name)
         if (!is.null(input$peakFile) | input$fileToUse == "Use the example file") {
             datasetSampleNames <- c(input$nameOfPeakFile, datasetSampleNames)
         }

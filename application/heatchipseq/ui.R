@@ -84,12 +84,12 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                             radioButtons("filterCellsBy_ch", label = "Filter by", choices = list("Cell type", "Cell subtype")),
                             conditionalPanel(condition = "input.filterCellsBy_ch == 'Cell type'",
                                              selectInput("cell_types_ch", "Cell type(s) (empty to select all):",
-                                                         choices = unique(codex_human_chip$annotation$cellType)[order(unique(codex_human_chip$annotation$cellType))],
+                                                         choices = sort(unique(codex_human_chip$annotation$cellType)),
                                                          selected = NULL, multiple = TRUE)
                             ),
                             conditionalPanel(condition = "input.filterCellsBy_ch == 'Cell subtype'",
                                              selectInput("cell_subtypes_ch", "Cell subtypes(s) (empty to select all):",
-                                                         choices = unique(codex_human_chip$annotation$cellSubtype)[order(unique(codex_human_chip$annotation$cellSubtype))],
+                                                         choices = sort(unique(codex_human_chip$annotation$cellSubtype)),
                                                          selected = NULL, multiple = TRUE)
                             )
                         ),
@@ -100,24 +100,24 @@ shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")
                              radioButtons("filterCellsBy", label = "Filter by", choices = list("Cell type", "Cell subtype")),
                              conditionalPanel(condition = "input.filterCellsBy == 'Cell type'",
                                               selectInput("cell_types_m", "SCell type(s) (empty to select all):",
-                                                          choices = unique(codex$annotation$cellType)[order(unique(codex$annotation$cellType))],
+                                                          choices = sort(unique(codex$annotation$cellType)),
                                                           selected = NULL, multiple = TRUE)
                              ),
                              conditionalPanel(condition = "input.filterCellsBy == 'Cell subtype'",
                                               selectInput("cell_subtypes_m", "Cell subtypes(s) (empty to select all):",
-                                                          choices = unique(codex$annotation$cellSubtype)[order(unique(codex$annotation$cellSubtype))],
+                                                          choices = sort(unique(codex$annotation$cellSubtype)),
                                                           selected = NULL, multiple = TRUE)
                              )
                         ),
                         div(id = "widgetForModEncodeD",
                             selectInput("tf_med", "Antibody (empty to select all):",
-                                        choices = unique(modEncodeD_ChIPseq$annotation$antibody)[order(unique(modEncodeD_ChIPseq$annotation$antibody))],
+                                        choices = sort(unique(modEncodeD_ChIPseq$annotation$antibody)),
                                         selected = NULL, multiple = TRUE),
                             selectInput("stage_med", "Developmental stage (empty to select all):",
-                                        choices = unique(modEncodeD_ChIPseq$annotation$devStage)[order(unique(modEncodeD_ChIPseq$annotation$devStage))],
+                                        choices = sort(unique(modEncodeD_ChIPseq$annotation$devStage)),
                                         selected = NULL, multiple = TRUE),
                             selectInput("strain_med", "Strain (empty to select all):",
-                                        choices = unique(modEncodeD_ChIPseq$annotation$strain)[order(unique(modEncodeD_ChIPseq$annotation$strain))],
+                                        choices = sort(unique(modEncodeD_ChIPseq$annotation$strain)),
                                         selected = NULL, multiple = TRUE)
                         ),
                         selectInput("correlationCorrection",

@@ -264,7 +264,7 @@ shinyServer(function(input, output, session) {
     })
 
     getExperimentList <- reactive({
-        datasetSampleNames <- getSelectedDataset()$annotation$name
+        datasetSampleNames <- sort(getSelectedDataset()$annotation$name)
         if (!is.null(input$expressionFile) | input$fileToUse == "Use the example file") {
             datasetSampleNames <- c(input$nameOfExpressionFile, datasetSampleNames)
         }
@@ -272,11 +272,15 @@ shinyServer(function(input, output, session) {
     })
 
     output$scatterPlotSample1 <- renderUI({
-        selectInput("scatterPlotSample1Defined", "Experiment 1:", getExperimentList(), selected = getExperimentList()[1])
+        withProgress(value = 1, message = "Creating list of experiments 1/2", {
+            selectInput("scatterPlotSample1Defined", "Experiment 1:", getExperimentList(), selected = getExperimentList()[1])
+        })
     })
 
     output$scatterPlotSample2 <- renderUI({
-        selectInput("scatterPlotSample2Defined", "Experiment 2:", getExperimentList(), selected = getExperimentList()[2])
+        withProgress(value = 1, message = "Creating list of experiments 2/2", {
+            selectInput("scatterPlotSample2Defined", "Experiment 2:", getExperimentList(), selected = getExperimentList()[2])
+        })
     })
 
     output$tabUserExpressionFile <- renderDataTable({
@@ -757,34 +761,36 @@ shinyServer(function(input, output, session) {
 
     # scatter plot -----------------
     getPairWiseData <- reactive({
-        dataset <- getSelectedDataset()
-        if (input$scatterPlotSample1Defined == input$nameOfExpressionFile) {
-            expression_file1 <- log10(userExpressionFileAnalysis()$expression$value + 1)
-        } else {
-            expression_file1 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample1Defined)]
-        }
-        if (input$scatterPlotSample2Defined == input$nameOfExpressionFile) {
-            expression_file2 <- log10(userExpressionFileAnalysis()$expression$value + 1)
-        } else {
-            expression_file2 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample2Defined)]
-        }
-        if (input$scatterPlotDataScaling == "none") {
-            expression_file1 <- 10^expression_file1 - 1
-            expression_file2 <- 10^expression_file2 - 1
-        } else if (input$scatterPlotDataScaling == "log(e + 1)") {
-            expression_file1 <- expression_file1 * log(10)
-            expression_file2 <- expression_file2 * log(10)
-        } else if (input$scatterPlotDataScaling == "log2(e + 1)") {
-            expression_file1 <- expression_file1 * log(10)/log(2)
-            expression_file2 <- expression_file2 * log(10)/log(2)
-        } else if (input$scatterPlotDataScaling == "asinh(e)") {
-            expression_file1 <- asinh(10^expression_file1 - 1)
-            expression_file2 <- asinh(10^expression_file2 - 1)
-        } else if (input$scatterPlotDataScaling == "1/(1 + e)") {
-            expression_file1 <- 1/(10^expression_file1)
-            expression_file2 <- 1/(10^expression_file2)
-        }
-        validate(need(length(expression_file1) == length(expression_file2), "Loading..."))
+        withProgress(value = 1, message = "Extracting data", {
+            dataset <- getSelectedDataset()
+            if (input$scatterPlotSample1Defined == input$nameOfExpressionFile) {
+                expression_file1 <- log10(userExpressionFileAnalysis()$expression$value + 1)
+            } else {
+                expression_file1 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample1Defined)]
+            }
+            if (input$scatterPlotSample2Defined == input$nameOfExpressionFile) {
+                expression_file2 <- log10(userExpressionFileAnalysis()$expression$value + 1)
+            } else {
+                expression_file2 <- dataset$dataMatrix[, which(dataset$annotation$name == input$scatterPlotSample2Defined)]
+            }
+            if (input$scatterPlotDataScaling == "none") {
+                expression_file1 <- 10^expression_file1 - 1
+                expression_file2 <- 10^expression_file2 - 1
+            } else if (input$scatterPlotDataScaling == "log(e + 1)") {
+                expression_file1 <- expression_file1 * log(10)
+                expression_file2 <- expression_file2 * log(10)
+            } else if (input$scatterPlotDataScaling == "log2(e + 1)") {
+                expression_file1 <- expression_file1 * log(10)/log(2)
+                expression_file2 <- expression_file2 * log(10)/log(2)
+            } else if (input$scatterPlotDataScaling == "asinh(e)") {
+                expression_file1 <- asinh(10^expression_file1 - 1)
+                expression_file2 <- asinh(10^expression_file2 - 1)
+            } else if (input$scatterPlotDataScaling == "1/(1 + e)") {
+                expression_file1 <- 1/(10^expression_file1)
+                expression_file2 <- 1/(10^expression_file2)
+            }
+            validate(need(length(expression_file1) == length(expression_file2), "Loading..."))
+        })
         return(data.frame(
             geneID = dataset$geneName,
             exp1 = expression_file1,
