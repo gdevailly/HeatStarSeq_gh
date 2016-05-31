@@ -8,34 +8,37 @@
     <a href="#_Instructions">2 Instructions</a>
 </h4>
 <p style="padding-left: 3em;">
-    <a href="#_Selecting_a_dataset">2.1 Selecting a dataset</a>
+    <a href="#_Remarks_on_performance">2.1 Remarks on performance</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Loading_a_CAGE_result_bed_file">2.2 Loading a CAGE result bed file</a>
+    <a href="#_Selecting_a_dataset">2.2 Selecting a dataset</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Looking_at_the_Correlation_table">2.3 Looking at the Correlation table</a>
+    <a href="#_Loading_a_CAGE_result_bed_file">2.3 Loading a CAGE result bed file</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Static_heatmap">2.4 Static heatmap</a>
+    <a href="#_Looking_at_the_Correlation_table">2.4 Looking at the Correlation table</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Responsive_heatmap">2.5 Responsive heatmap</a>
+    <a href="#_Static_heatmap">2.5 Static heatmap</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Tree">2.6 Tree</a>
+    <a href="#_Responsive_heatmap">2.6 Responsive heatmap</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Pairwise_plot">2.7 Pairwise plot</a>
+    <a href="#_Tree">2.7 Tree</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Samples_metadata">2.8 Sample metadata</a>
+    <a href="#_Pairwise_plot">2.8 Pairwise plot</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_Correlation_correction">2.9 Correlation correction</a>
+    <a href="#_Samples_metadata">2.9 Sample metadata</a>
 </p>
 <p style="padding-left: 3em;">
-    <a href="#_About_the_datasets">2.10 About the datasets</a>
+    <a href="#_Correlation_correction">2.10 Correlation correction</a>
+</p>
+<p style="padding-left: 3em;">
+    <a href="#_About_the_datasets">2.11 About the datasets</a>
 </p>
 <h4 style="padding-left: 1em;">
     <a href="#_FAQ">3 FAQ</a>
@@ -72,18 +75,42 @@
 	The step-by-step instructions for using the application are below.
 </p>
 <h3>
-    <a name="_Selecting_a_dataset"></a>2.1 Selecting a dataset
+    <a name="_Remarks_on_performance"></a>2.1 Remarks on performance
+</h3>
+<p>
+	HeatCAGEseq runs some quite intensive task on both server and client sides. It thus needs a reasonably recent browser
+	on a reasonably fast computer, tablet of phone. Here are some general advices concerning performance:
+</p>
+<ul>
+    <li>
+		Most of the task are queued: changing parameters during a loading is not stopping current task
+		but will be executed only when all previous tasks are done. The direct consequence is that some buttons
+		might look non-responsive because the application is running a task in the background 
+		(as shown as a loading bar on top of the webpage). We advise <b>to wait until current tasks is fully executed before changing parameters</b>.
+	</li>
+	<li>
+	One particular intensive task is the <b>Interactive heatmap</b>, we recommend using the <b>static heatmap</b> first while
+	changing options and filters before switching to interactive heatmap.
+	</li>
+	<li>
+	If the application display a grey filter, it means the connection with the server was lost, sorry. :(
+	Nothing can be done but re-opening the application. Refreshing the page usually keeps options as they were,
+	while opening a new web page restart the application with default values.
+	</li>
+</ul>
+<h3>
+    <a name="_Selecting_a_dataset"></a>2.2 Selecting a dataset
 </h3>
 <p>
     The first step is to <strong>select a dataset</strong> to work with. At the moment, there are 2 datasets available: CAGE 
 	experiments from <a href="http://fantom.gsc.riken.jp/">FANTOM5</a> in human (hg19) and mouse (mm9).
 </p>
 <h3>
-    <a name="_Loading_a_CAGE_result_bed_file"></a>2.2 Loading a CAGE result bed file
+    <a name="_Loading_a_CAGE_result_bed_file"></a>2.3 Loading a CAGE result bed file
 </h3>
 <p>
 	You can now upload a CAGE result bed file. Note that this is not mandatory, and you can jump to section
-    <a href="#_Static_heatmap">2.4</a> if you simply want to browse the selected dataset. The application accepts a six column tab-delimited text file following a bed
+    <a href="#_Static_heatmap">2.5</a> if you simply want to browse the selected dataset. The application accepts a six column tab-delimited text file following a bed
     format, and requires at least 6 columns: first column should be chromosome name (chr1, chr2, chrX, etc.),
 	the second genomic region start coordinate, the third genomic region end coordinate,
 	the fourth region name (not used, but required), the fifth a score CAGE expression value, such as RPM values or tag count, and the sixth 
@@ -170,19 +197,19 @@
 	It corresponds to the WT1 sample from 
     <a href= "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60982")>GEO dataset GSE60982</a>
 	supporting <a href="http://genome.cshlp.org/content/early/2015/10/27/gr.191031.115?top=1">this study</a>.
-	It is quite easy to rebuild. Goe to the <a href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60982" >GEO page</a> and 
+	It is quite easy to rebuild. Goe to the <a href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60982">GEO page</a> and 
 	download the GSE60982_Expression.mm9.HCC.49096peaks.txt.gz file. 
 	Extract the archive, and replace the fifth column by values contained in the thirteenth column, then delete every column but the six first. 
 	The file is now ready to be upload to HeatCageSeq.
 </p>
 <h3>
-    <a name="_Looking_at_the_Correlation_table"></a>2.3 Looking at the Correlation table
+    <a name="_Looking_at_the_Correlation_table"></a>2.4 Looking at the Correlation table
 </h3>
 <p>
 	If you uploaded a bed file, the <strong>Correlation table</strong> tab should now display a 3 column table. The first column contains the name of
     <strong>experiments</strong> in the selected dataset, the second column contains the <strong>correlation</strong> coefficient between the uploaded
     coordinates and the corresponding experiment in the dataset. A third column contains <strong>scaled correlation</strong> values (discussed in
-    section <a href="#_Correlation_correction:">2.8</a>); this column is not visible by default. At the bottom of the page, you will find a <strong>Save as tab delimited .txt</strong> download
+    section <a href="#_Correlation_correction:">2.10</a>); this column is not visible by default. At the bottom of the page, you will find a <strong>Save as tab delimited .txt</strong> download
     button, allowing you to download a copy of the correlation table as a tab delimited text file. Those files can be read by many spreadsheet programs
     including Microsoft Excel.
 </p>
@@ -191,7 +218,7 @@
     for that experiment.
 </p>
 <h3>
-    <a name="_Static_heatmap"></a>2.4 Static heatmap
+    <a name="_Static_heatmap"></a>2.5 Static heatmap
 </h3>
 <p class="text-muted">
     The heatmap can take up to a minute to be displayed, and a bit longer if you are importing a new peak file or switching datasets.
@@ -223,7 +250,7 @@
 <ul>
     <li>
 		The function of the <strong>Uploaded experiment correlation correction</strong> field and the <strong>Maximum expected correlation value for linear scaling correction</strong> slider is detailed in section
-        <a href="#_Correlation_correction:">2.8</a>.
+        <a href="#_Correlation_correction:">2.10</a>.
     </li>
     <li>
 		The <strong>Advanced clustering options</strong> button will reveal the <strong>Distance calculation</strong> and <strong>Clustering method</strong> options.
@@ -252,13 +279,13 @@
 	right click on it and select <strong>Save Image As...</strong>
 </p>
 <h3>
-    <a name="_Responsive_heatmap"></a>2.5 Responsive heatmap
+    <a name="_Responsive_heatmap"></a>2.6 Responsive heatmap
 </h3>
 <p>
     The <strong>responsive heatmap </strong>tab displays an interactive plot provided through the <a href="https://plot.ly/">plot.ly</a> API. It can take
     about a minute to be displayed on powerful computer running recent version of Firefox, Chrome, Safari, Internet explorer or
     Edge. It represents the same version of the <strong>Static heatmap</strong> presented in the previous section, without the side
-    dendrograms (trees). Most of the options are the same as for <strong>Static heatmap</strong>, so please check section <a href="#_Static_heatmap">2.4</a>
+    dendrograms (trees). Most of the options are the same as for <strong>Static heatmap</strong>, so please check section <a href="#_Static_heatmap">2.5</a>
     for more information. Additional options are available on the responsive heatmap itself:
 </p>
 <ul>
@@ -290,18 +317,18 @@
     </li>
 </ul>
 <h3>
-    <a name="_Tree"></a>2.6 Tree
+    <a name="_Tree"></a>2.7 Tree
 </h3>
 <p>
     The <strong>Tree</strong> tab will display only the dendrogram (or Tree) from the experiment clustering. Options are mostly similar to the one for static
-    heatmap, please refer to section <a href="#_Static_heatmap">2.4</a>. The <strong>Highlight my experiment in the heatmap</strong>
+    heatmap, please refer to section <a href="#_Static_heatmap">2.5</a>. The <strong>Highlight my experiment in the heatmap</strong>
     option will not highlight your experiment in the dendrogram.
 </p>
 <p class="text-muted">
     If you see a red, unfriendly error message: <strong>Figure margins too large</strong>, try reducing the size of the margin as well as the size of the name size.
 </p>
 <h3>
-    <a name="_Pairwise_plot"></a>2.7 Pairwise plot
+    <a name="_Pairwise_plot"></a>2.8 Pairwise plot
 </h3>
 <p>
 	The <strong>Pairwise plot</strong> tab will display scatter plot of two selected experiments where each dot represents a CAGE peak.
@@ -326,7 +353,7 @@
 	the scatterplot.
 </p>
 <h3>
-    <a name="_Sample_metadata"></a>2.8 Sample metadata
+    <a name="_Sample_metadata"></a>2.9 Sample metadata
 </h3>
 <p>
 	The sample metadata tab will display metadata information (experience name, cell type, url of the original data, etc.) for the <strong>selected dataset</strong>.
@@ -338,7 +365,7 @@
     for that experiment.
 </p>
 <h3>
-    <a name="_Correlation_correction"></a>2.9 Correlation correction
+    <a name="_Correlation_correction"></a>2.10 Correlation correction
 </h3>
 <p>
     Sometimes, the maximum correlation of a user peak file with any experiment in the dataset can be quite low. In some cases, when the user is confident
@@ -354,7 +381,7 @@
 	will still be third with scaling).
 </p>
 <h3>
-    <a name="_About_the_datasets"></a>2.10 About the datasets
+    <a name="_About_the_datasets"></a>2.11 About the datasets
 </h3>
 <p>
 <table style="width:100%">
