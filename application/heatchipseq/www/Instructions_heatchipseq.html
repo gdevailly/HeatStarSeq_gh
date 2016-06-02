@@ -78,24 +78,24 @@
     <a name="_Remarks_on_performance"></a>2.1 Remarks on performance
 </h3>
 <p>
-	HeatRNAseq runs some quite intensive task on both server and client sides. It thus needs a reasonably recent browser
-	on a reasonably fast computer, tablet of phone. Here are some general advices concerning performance:
+	HeatRNAseq runs some quite intensive tasks on both server and client sides. It thus needs a reasonably recent browser
+	on a reasonably fast computer, tablet of phone. Here are some general suggestions concerning performance:
 </p>
 <ul>
     <li>
-		Most of the task are queued: changing parameters during a loading is not stopping current task
-		but will be executed only when all previous tasks are done. The direct consequence is that some buttons
+		Most of the tasks are queued: changing parameters during loading does not stop current tasks
+		but puts them on hold until all previous tasks are completed. The direct consequence is that some buttons
 		might look non-responsive because the application is running a task in the background 
-		(as shown as a loading bar on top of the webpage). We advise <b>to wait until current tasks is fully executed before changing parameters</b>.
+		(loading bar on top of the webpage). We suggest <b>to wait until current tasks are fully executed before changing parameters</b>.
 	</li>
 	<li>
-	One particular intensive task is the <b>Interactive heatmap</b>, we recommend using the <b>static heatmap</b> first while
-	changing options and filters before switching to interactive heatmap.
+		One particular intensive task is the <b>Interactive heatmap</b>, we recommend using the <b>static heatmap</b> first while
+		changing options and filters before switching to the interactive heatmap.
 	</li>
 	<li>
-	If the application display a grey filter, it means the connection with the server was lost, sorry. :(
-	Nothing can be done but re-opening the application. Refreshing the page usually keeps options as they were,
-	while opening a new web page restart the application with default values.
+		If the application shows a grey filter, it means the connection with the server was lost, sorry. :(
+		Nothing can be done but re-launching the application. Refreshing the page usually keeps options as they were,
+		while opening a new web page will start the application with default values.
 	</li>
 </ul>
 <h3>
@@ -311,26 +311,24 @@
     <a name="_Pairwise_plot"></a>2.8 Pairwise plot
 </h3>
 <p>
-	The <strong>Pairwise plot</strong> tab will display barplot of two selected experiments representing the number of overlaping and non-overlaping peaks.
+	The <strong>Pairwise plot</strong> tab will display a barplot of two selected experiments representing the number of overlaping and non-overlaping peaks.
 	Under the <strong>Plot customisation</strong> section on the left of the page, you can:
 <ul>
 	<li> choose experiment 1 and experiment 2.</li>
 	<li> add or remove a guide line (balck) corresponding to the number of overlaping peaks.</li>
 </ul>
 	Below the scatterplot should be the correlation coefficient between the two experiments (on binary data), the Jaccard index, and a table conating peak numbers.
-	Further bellow are buttons to download the barplot as png, pdf or svg (recommended), as well as export a tabulated text file containing the data used for making
-	the scatterplot.
+	Further bellow are buttons to download the barplot as png, pdf or svg (recommended), as well as to export a tabulated text file containing the data used.
 </p>
 <h3>
     <a name="_Samples_metadata"></a>2.9 Sample metadata
 </h3>
 <p>
-	The sample metadata tab will display metadata information (experience name, cell type, url of the original data, etc.) for the <strong>selected dataset</strong>.
-	The table is sortable and searchable, and can be downloaded as a tab-delimited txt file using the <strong>save</strong>
-    button below the table.
+	The sample metadata tab will display metadata information (experiment name, cell type, url of the original data, etc.) for the <strong>selected dataset</strong>.
+	The table is sortable and searchable, and can be downloaded as a tab-delimited txt file using the <strong>save</strong> button below the table.
 </p>
 <p>
-    You can copy an experiment name from the correlation table and paste it into the Search field of the Samples metadata tab to learn all the metadata we have
+    You can copy an experiment name from the correlation table and paste it into the Search field of the Samples metadata tab to show all the metadata we have
     for that experiment.
 </p>
 <h3>
@@ -340,13 +338,13 @@
     Sometimes, the maximum correlation of a user peak file with any experiment in the dataset can be quite low. In some cases, when the user is confident
     that the top hits are relevant, this may be evidence of strong "batch effect" that could reflect an artefact of library preparation method, peak calling or
 	ChIP efficiency. The low correlation values might bias the clustering due to <a href="https://en.wikipedia.org/wiki/Long_branch_attraction">Long Branch Attraction</a>.
-	We provide an option to correct for his bias using the <strong>Linear scaling</strong> method on the <strong>Uploaded experiment correlation correction</strong> option.
+	We provide an option to correct for this bias using the <strong>Linear scaling</strong> method on the <strong>Uploaded experiment correlation correction</strong> option.
 	The correlation values will be linearly	up-scaled so the maximum correlation value will now be equal to the value of the
-    <strong>Maximum expected correlation value for linear scaling correction </strong>slider (default 0.95). The resulting transformed correlation value can be
+    <strong>Maximum expected correlation value for linear scaling correction</strong> slider (default 0.95). The resulting transformed correlation value can be
     obtained from the <strong>scaledCorrelation</strong> column of the <strong>Correlation table</strong>.
 </p>
 <p class="text-muted">
-    The linear scaling of correlation value will not change the ordering of the values, only scales the value (i.e. the third most correlated experiment without scaling
+    The linear scaling of correlation value does not change the ordering of the values, it only scales the value (i.e. the third most correlated experiment without scaling
 	will still be third with scaling).
 </p>
 <h3>
