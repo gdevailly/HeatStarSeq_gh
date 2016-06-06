@@ -727,7 +727,7 @@ shinyServer(function(input, output, session) {
         validate(need(ncol(myDF) == 5, "Loading..."))
         myTable <- data.frame(
             category = c(
-                "common peak",
+                "common peaks",
                 paste(input$barPlotSample1Defined, "only"),
                 paste(input$barPlotSample2Defined, "only"),
                 "peak space"
