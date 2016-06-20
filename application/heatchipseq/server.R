@@ -747,8 +747,8 @@ shinyServer(function(input, output, session) {
     output$barPlotCorrelation <- renderText({
         myDF <- getPairWiseData()
         validate(need(ncol(myDF) == 5, "Loading..."))
-        cc <- cor(myDF$peaks1, myDF$peaks2)
-        return(paste("Correlation coefficient:", round(cc, digits = 4)))
+        cc <- cor.test(as.numeric(myDF$peaks1), as.numeric(myDF$peaks2))
+        return(paste("Correlation coefficient:", round(cc$estimate, digits = 4), "  p-value:", signif(cc$p.value, digits = 4)))
     })
 
     output$barPlotJaccard <- renderText({

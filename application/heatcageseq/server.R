@@ -647,20 +647,24 @@ shinyServer(function(input, output, session) {
     output$scatterPlotMetricsPearson <- renderText({
         myDF <- getPairWiseData()
         validate(need(ncol(myDF) == 5, ""))
-        pcc <- cor(myDF$exp1, myDF$exp2, method = "pearson")
+        pcc <- cor.test(myDF$exp1, myDF$exp2, method = "pearson")
         paste0(
             "Pearson correlation coefficient: ",
-            round(pcc, digits = 4)
+            signif(pcc$estimate, digits = 4),
+            " p-value:",
+            signif(pcc$p.value, digits = 4)
         )
     })
 
     output$scatterPlotMetricsSpearman <- renderText({
         myDF <- getPairWiseData()
         validate(need(ncol(myDF) == 5, ""))
-        scc <- cor(myDF$exp1, myDF$exp2, method = "spearman")
+        scc <- cor.test(myDF$exp1, myDF$exp2, method = "spearman")
         paste0(
             "Spearman correlation coefficient: ",
-            round(scc, digits = 4)
+            signif(scc$estimate, digits = 4),
+            " p-value:",
+            signif(scc$p.value, digits = 4)
         )
     })
 
