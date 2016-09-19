@@ -68,7 +68,7 @@ shinyUI(tagList(useShinyjs()), navbarPage(a(div(icon("home"), "Heat*seq"), href 
 ```
 Alternatively, you can monitor your server using [google analitycs](http://shiny.rstudio.com/articles/google-analytics.html), by adding the `google_analytics.js` file in each `www` folder.
 Several R packages are required, from CRAN (shiny, shinyjs, plotly, magrittr, readr, svglite, cba) and Bioconductor (GenomicRanges). Two datasets are to heavy to be included in GitHub. Please download [the FANTOM5 human CAGE dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTYXhwZnptQWlyeDA/view?usp=sharing) and the [GTEx full dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTaXZPUHdVSVJ0dXc/view?usp=sharing) and place the file into the `application/heatcageseq/data/` and `application/heatrnaseq/data/` folders respectively.
-If you whish to create a mirror of Heat\*Seq, please feel free to [contact me](mailto:guillaume.devailly%20at%20rolsin.ed.ac.uk") (replace at with @).
+If you whish to create a mirror of Heat\*Seq, please feel free to [contact me](mailto:guillaume.devailly%20at%20roslin.ed.ac.uk") (replace at with @).
 
 ## How to add new datasets
 
