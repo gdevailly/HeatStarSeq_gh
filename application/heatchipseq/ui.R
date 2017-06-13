@@ -17,6 +17,7 @@ shinyUI(tagList(
                         selectInput("selectedDataset", label = NULL, choices = c(
                             "ENCODE TFBS ChIP-seq (human, hg19)",
                             "CODEX ChIP-seq (human, hg19)",
+                            "ENCODE TFBS ChIP-seq (mouse, mm10)",
                             "CODEX ChIP-seq (mouse, mm10)",
                             "modEncode TF ChIP-seq (drosophila, r5)"
                         ), selected = "ENCODE TFBS ChIP-seq (human, hg19)"),
@@ -99,6 +100,14 @@ shinyUI(tagList(
                                                              choices = sort(unique(codex_human_chip$annotation$cellSubtype)),
                                                              selected = NULL, multiple = TRUE)
                                 )
+                            ),
+                            div(id = "widgetForEncodeMouse",
+                                selectInput("TF_m_enc", "Transcription factor(s) (empty to select all):",
+                                            choices = unique(encode_mouse$annotation$target)[order(unique(encode_mouse$annotation$target))],
+                                            selected = NULL, multiple = TRUE),
+                                selectInput("cells_m_enc", "Cell line(s) (empty to select all):",
+                                            choices = unique(encode_mouse$annotation$cell_type)[order(unique(encode_mouse$annotation$cell_type))],
+                                            selected = NULL, multiple = TRUE)
                             ),
                             div(id = "widgetForCodexMouse",
                                  selectInput("TF_m", "Transcription factor(s) (empty to select all):",
