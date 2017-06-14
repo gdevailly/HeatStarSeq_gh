@@ -19,6 +19,7 @@ Contact: [@G_Devailly](https://twitter.com/G_Devailly) / guillaume.devailly _at_
 
 - [Gene expression data](https://github.com/gdevailly/HeatStarSeq_gh#gene-expression-data)
 - [ChIP-seq data](https://github.com/gdevailly/HeatStarSeq_gh#chip-seq-data)
+- Cage data (undocumented yet) :-(
 
 ## About  this repository
 The `application` folder contains subfolders, each of which contains a [Shiny Application](http://shiny.rstudio.com/). The `dataset_formatting` folder contains R scripts documenting the process of pre-formatting datasets, and experimental work on the application.
@@ -29,7 +30,7 @@ The `application` folder contains subfolders, each of which contains a [Shiny Ap
 Heat\*Seq is available [at this address](http://www.heatstarseq.roslin.ed.ac.uk/).
 
 ### Running Heat\*Seq locally
-Download the Github folder (for example, from [here](https://github.com/gdevailly/HeatStarSeq_gh/archive/master.zip)). Extract the .zip archive. You will need R (version 3.2 or later), and need to install several R packages from CRAN (shiny, shinyjs, plotly, magrittr, readr, svglite, cba) and Bioconductor (GenomicRanges). Two datasets are to heavy to be included in GitHub. Please download [the FANTOM5 human CAGE dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTYXhwZnptQWlyeDA/view?usp=sharing) and the [GTEx full dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTaXZPUHdVSVJ0dXc/view?usp=sharing) and place the file into the `application/heatcageseq/data/` and `application/heatrnaseq/data/` folders respectively.
+Download the Github folder (for example, from [here](https://github.com/gdevailly/HeatStarSeq_gh/archive/master.zip)). Extract the .zip archive. You will need R (version 3.2 or later), and need to install several R packages from CRAN (shiny, shinyjs, plotly, magrittr, readr, svglite, cba) and Bioconductor (GenomicRanges). Two datasets are too heavy to be included in GitHub. Please download [the FANTOM5 human CAGE dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTYXhwZnptQWlyeDA/view?usp=sharing) and the [GTEx full dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTaXZPUHdVSVJ0dXc/view?usp=sharing) and place the file into the `application/heatcageseq/data/` and `application/heatrnaseq/data/` folders respectively.
 You may need to replace a line 2 of `application/heatrnaseq/ui.R`, `application/heatchipseq/ui.R` or `application/heatcageseq/ui.R`:
 ```R
 shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
@@ -52,9 +53,11 @@ You can install the [Open source edition of Shiny server](https://github.com/rst
 
 Heat\*Seq is composed of three independent Shiny Apps, [HeatStarSeq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatstarseq), [HeatRNAseq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatrnaseq) and [HeatChIPseq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatchipseq). You will need to edit the [server_adresses.R](https://github.com/gdevailly/HeatStarSeq_gh/blob/master/application/heatstarseq/data/server_adresses.R) script with the proper web url:
 ```R
-URL_HEATSTARSEQ <- "http://www.chipcompare.roslin.ed.ac.uk"
-URL_HEATRNASEQ <- "http://www.chipcompare.roslin.ed.ac.uk/heatrnaseq"
-URL_HEATCHIPSEQ <- "http://www.chipcompare.roslin.ed.ac.uk/heatchipseq"
+URL_HEATSTARSEQ <- "http://www.heatstarseq.roslin.ed.ac.uk"
+URL_HEATRNASEQ <- "http://www.heatstarseq.roslin.ed.ac.uk/heatrnaseq"
+URL_HEATCHIPSEQ <- "http://www.heatstarseq.roslin.ed.ac.uk/heatchipseq"
+URL_HEATCAGESEQ <- "http://www.heatstarseq.roslin.ed.ac.uk/heatcageseq"
+
 ```
 and copy it in the `data` folder of **each** application.
 You may need to replace a line 2 of `application/heatstarseq/ui.R`, `application/heatrnaseq/ui.R`, `application/heatchipseq/ui.R` and `application/heatcageseq/ui.R`:
