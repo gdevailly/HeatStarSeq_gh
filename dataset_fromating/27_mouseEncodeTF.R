@@ -14,6 +14,8 @@ setwd("/groups2/joshi_grp/guillaume/otherProject/ChIP_heatmap/data/mouseEncodeTF
 metadata <- read_tsv("metadata.tsv", progress = FALSE)
 glimpse(metadata)
 
+table(metadata[, "Output type"] %>% unlist)
+
 unique(metadata[, "File format"] %>% unlist) # ok
 unique(metadata[, "Output type"] %>% unlist) # not ok
 unique(metadata[, "Assay"] %>% unlist) # ok
@@ -48,12 +50,7 @@ smallMD <- metadata[, c(
 colnames(smallMD) <- gsub(" ", "_", colnames(smallMD))
 colnames(smallMD)[11] <- "Biological_replicate"
 table(smallMD$Assembly, smallMD$Output_type)
-smallMD <- filter(smallMD, Assembly == "mm10", Output_type == "peaks") %>%
-    mutate(nrep = map_int(
-        strsplit(.$Biological_replicate, split = ","),
-        length
-    )) %>%
-    filter(nrep == 1) %>%
+smallMD <- filter(smallMD, Assembly == "mm10", Output_type == "optimal idr thresholded peaks") %>%
     select(
         File_accession,
         Experiment_accession,
@@ -75,9 +72,12 @@ smallMD <- filter(smallMD, Assembly == "mm10", Output_type == "peaks") %>%
     )
 )
 
-nrow(smallMD) # 334
-length(unique(smallMD$name)) # 334 \o/
+nrow(smallMD) # 156
+length(unique(smallMD$name)) # 156 \o/
 smallMD$name[duplicated(smallMD$name)]
+
+
+myPeakTmp <- read_tsv("ENCFF128TGM.bed.gz", progress = FALSE, col_names = FALSE, col_types = "ciicicdddi")
 
 t0 <- Sys.time()
 myPeaks <- map_df(seq_len(nrow(smallMD)), function(i) {
@@ -86,7 +86,7 @@ myPeaks <- map_df(seq_len(nrow(smallMD)), function(i) {
             paste0(smallMD[i, ]$File_accession, ".bed.gz"),
             col_names = FALSE,
             progress = FALSE,
-            col_types = "ciicicdidi"
+            col_types = "ciicicdddi"
         ) %>%
             select(X1, X2, X3) %>%
             rename(chr = X1, start = X2, end = X3) %>%
@@ -95,8 +95,8 @@ myPeaks <- map_df(seq_len(nrow(smallMD)), function(i) {
 })
 Sys.time() - t0
 
-nrow(myPeaks) # 88250367
-length(unique(myPeaks$name)) # 334
+nrow(myPeaks) # 3800966
+length(unique(myPeaks$name)) # 156
 
 write.table(myPeaks, file = "mouse_encode_tf_all_peaks.bed", col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
 
@@ -114,25 +114,22 @@ myMergedPeaks <- read_tsv(
 )
 colnames(myMergedPeaks) <- c("chr", "start", "end", "experiments")
 
-# dataMatrix <- matrix(data = FALSE, nrow = nrow(myMergedPeaks), ncol = nrow(smallMD))
-# colnames(dataMatrix) <- smallMD$name
-#
-# t0 <- Sys.time()
-# for(i in seq_len(nrow(dataMatrix))) {
-#     dataMatrix[
-#         grepl(colnames(dataMatrix)[i], myMergedPeaks$experiments, fixed = TRUE),
-#         i
-#     ] <- TRUE
-#     message(i)
-# }
-# Sys.time() - t0 # slow, the other strategy was faster
+table(myMergedPeaks$chr)
+# removal on sexual chormosomes and unconventional ones
+myMergedPeaks <- dplyr::filter(
+    myMergedPeaks,
+    chr %in% paste0("chr", 1:19)
+)
+table(myMergedPeaks$chr)
+
+summary(myMergedPeaks$end - myMergedPeaks$start) # seems ok
 
 template <- matrix(FALSE, nrow = 1, ncol = nrow(smallMD), dimnames = list(NULL, smallMD$name)) %>%
     as_data_frame
 
-t0 <- Sys.time() # 37 minutes
+t0 <- Sys.time() # 8 minutes
 dataMatrix2 <- map_df(
-    seq_len(nrow(myMergedPeaks))[1:2000],
+    seq_len(nrow(myMergedPeaks)),
     function(i) {
         template[, strsplit(myMergedPeaks[i, ]$experiments, split = ",")[[1]]] <- TRUE
         return(template)
@@ -143,7 +140,7 @@ Sys.time() - t0
 colnames(dataMatrix2) <- NULL
 length(which(rowSums(dataMatrix2) == 0))
 
-t0 <- Sys.time() # 3 minutes
+t0 <- Sys.time() # 30 sec
 correlationMatrix <- cor(dataMatrix2)
 Sys.time() - t0
 
@@ -183,3 +180,5 @@ object.size(encode_mouse)
 encode_mouse <- nullifyDataForFasterPreloading(encode_mouse)
 object.size(encode_mouse)
 save(encode_mouse, file = "../../heatchipseq/data/encode_mouse_preload.RData")
+
+
