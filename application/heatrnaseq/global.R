@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+library(colourpicker)
 library(plotly)
 library(magrittr)
 
