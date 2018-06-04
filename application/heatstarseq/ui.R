@@ -36,6 +36,17 @@ shinyUI(tagList(tags$head(includeScript("www/google_analytics.js")),
                ),
                column(2)
             ),
+            fluidRow(
+                column(2),
+                column(2,
+                       h2("Gene lists", align = "center"),
+                       p(a(
+                           actionButton("geneButton", "HeatGeneList", class = "btn-danger", style = "font-size:150%"),
+                           href = URL_HEATGENELIST
+                       ), align = "center")
+                ),
+                column(8)
+            ),
             h1(img(src = "heatmap.svg", width = 700), align = "center")
 
 

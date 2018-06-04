@@ -51,27 +51,18 @@ Some datasets are heavy, so you may need more than 3 Gb of free memory.
 Heat\*Seq is a [Shiny application](http://shiny.rstudio.com/), so you will need a **Shiny server**.
 You can install the [Open source edition of Shiny server](https://github.com/rstudio/shiny-server) on any compatible web-server, or use [shinyapps.io](http://www.shinyapps.io/).
 
-Heat\*Seq is composed of three independent Shiny Apps, [HeatStarSeq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatstarseq), [HeatRNAseq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatrnaseq) and [HeatChIPseq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatchipseq). You will need to edit the [server_adresses.R](https://github.com/gdevailly/HeatStarSeq_gh/blob/master/application/heatstarseq/data/server_adresses.R) script with the proper web url:
+Heat\*Seq is composed of five independent Shiny Apps, [HeatStarSeq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatstarseq), [HeatRNAseq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatrnaseq), [HeatChIPseq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatchipseq) [HeatCageSeq](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatcageseq) and [HeatGeneList](https://github.com/gdevailly/HeatStarSeq_gh/tree/master/application/heatgenelist). You will need to edit the [server_adresses.R](https://github.com/gdevailly/HeatStarSeq_gh/blob/master/application/heatstarseq/data/server_adresses.R) script with the proper web url:
 ```R
 URL_HEATSTARSEQ <- "http://www.heatstarseq.roslin.ed.ac.uk"
 URL_HEATRNASEQ <- "http://www.heatstarseq.roslin.ed.ac.uk/heatrnaseq"
 URL_HEATCHIPSEQ <- "http://www.heatstarseq.roslin.ed.ac.uk/heatchipseq"
 URL_HEATCAGESEQ <- "http://www.heatstarseq.roslin.ed.ac.uk/heatcageseq"
-
+URL_HEATGENELIST <- "http://www.heatstarseq.roslin.ed.ac.uk/heatgenelist"
 ```
 and copy it in the `data` folder of **each** application.
-You may need to replace a line 2 of `application/heatstarseq/ui.R`, `application/heatrnaseq/ui.R`, `application/heatchipseq/ui.R` and `application/heatcageseq/ui.R`:
-```R
-shinyUI(tagList(useShinyjs(), tags$head(includeScript("www/google_analytics.js")), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
-```
-by:
-```R
-shinyUI(tagList(useShinyjs()), navbarPage(a(div(icon("home"), "Heat*seq"), href = URL_HEATSTARSEQ),
 
-```
-Alternatively, you can monitor your server using [google analitycs](http://shiny.rstudio.com/articles/google-analytics.html), by adding the `google_analytics.js` file in each `www` folder.
 Several R packages are required, from CRAN (shiny, shinyjs, plotly, magrittr, readr, svglite, cba) and Bioconductor (GenomicRanges). Two datasets are to heavy to be included in GitHub. Please download [the FANTOM5 human CAGE dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTYXhwZnptQWlyeDA/view?usp=sharing) and the [GTEx full dataset](https://drive.google.com/file/d/0B_p7ZTlH5xcTaXZPUHdVSVJ0dXc/view?usp=sharing) and place the file into the `application/heatcageseq/data/` and `application/heatrnaseq/data/` folders respectively.
-If you whish to create a mirror of Heat\*Seq, please feel free to [contact me](mailto:guillaume.devailly%20at%20roslin.ed.ac.uk") (replace at with @).
+If you whish to create a mirror of Heat\*Seq, please feel free to [open a GitHub issue](https://github.com/gdevailly/HeatStarSeq_gh/issues).
 
 ## How to add new datasets
 

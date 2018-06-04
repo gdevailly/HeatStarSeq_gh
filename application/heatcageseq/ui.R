@@ -2,7 +2,6 @@ source("data/server_adresses.R")
 shinyUI(tagList(
     useShinyjs(),
     tags$head(
-        includeScript("www/google_analytics.js"),
         includeScript("www/events.js")
     ),
     navbarPage(
