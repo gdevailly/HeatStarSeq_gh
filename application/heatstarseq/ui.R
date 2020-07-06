@@ -1,6 +1,6 @@
 library(shiny)
 source("data/server_adresses.R")
-shinyUI(tagList(tags$head(includeScript("www/google_analytics.js")),
+shinyUI(tagList(
     navbarPage(
         "",
         tabPanel(
